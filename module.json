@@ -1,0 +1,40 @@
+{
+  "id": "phil-pf2e-weredragon",
+  "title": "Homebrew: Weredragon (Werecreature Archetype)",
+  "description": "A drop-in replacement for the Werecreature Dedication feat (Howl of the Wild) with a homebrew 'Weredragon' type added directly to its type picker, alongside Werebat, Werebear, Wereboar, etc.",
+  "version": "2.1.0",
+  "compatibility": {
+    "minimum": "12",
+    "verified": "14.366"
+  },
+  "packs": [
+    {
+      "label": "Homebrew: Werecreature Dedication (+Weredragon)",
+      "name": "weredragon-feats",
+      "path": "packs/feats",
+      "type": "Item",
+      "system": "pf2e",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    }
+  ],
+  "relationships": {
+    "systems": [
+      {
+        "id": "pf2e",
+        "type": "system",
+        "compatibility": {
+          "minimum": "6.0.0",
+          "verified": "8.4.1"
+        }
+      }
+    ]
+  },
+  "authors": [
+    {
+      "name": "Phil"
+    }
+  ]
+}
