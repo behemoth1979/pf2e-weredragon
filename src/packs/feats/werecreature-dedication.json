@@ -698,6 +698,22 @@
           "agile",
           "unarmed"
         ]
+      },
+      {
+        "key": "TokenImage",
+        "predicate": [
+          "werecreature:weredragon",
+          "change-shape:hybrid"
+        ],
+        "value": "modules/phil-pf2e-weredragon/assets/tokens/weredragon-hybrid.webp"
+      },
+      {
+        "key": "TokenImage",
+        "predicate": [
+          "werecreature:weredragon",
+          "change-shape:animal"
+        ],
+        "value": "modules/phil-pf2e-weredragon/assets/tokens/weredragon-animal.webp"
       }
     ],
     "traits": {
