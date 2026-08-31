@@ -1,0 +1,48 @@
+{
+  "_id": "BrW3aponKaiju001",
+  "img": "systems/pf2e/icons/actions/TwoActions.webp",
+  "name": "Breath Weapon",
+  "system": {
+    "actionType": {
+      "value": "action"
+    },
+    "actions": {
+      "value": 2
+    },
+    "category": "offensive",
+    "description": {
+      "value": "<p><em>Homebrew: automated the same way the official Dragon Breath (Dragon Form) action is — clickable area-template and damage-roll links in the text below. As with Dragon Breath, the Reflex save against your spell DC isn't automated and is resolved manually.</em></p><p>Each creature in a @Template[type:cone|distance:60] takes @Damage[15d6[untyped]|options:area-damage] damage, with a basic save against your spell DC. Once activated, it can't be used again for [[/r 1d4 #Recharge Breath Weapon]]{1d4 rounds}.</p>"
+    },
+    "frequency": null,
+    "publication": {
+      "license": "ORC",
+      "remaster": true,
+      "title": "Homebrew"
+    },
+    "rules": [],
+    "traits": {
+      "value": [
+        "evocation",
+        "primal"
+      ]
+    }
+  },
+  "type": "action",
+  "_key": "!items!BrW3aponKaiju001",
+  "sort": 300000,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "coreVersion": "14.366",
+    "systemId": "pf2e",
+    "systemVersion": "8.4.1",
+    "createdTime": 1735689600000,
+    "modifiedTime": 1735689600000,
+    "lastModifiedBy": "phildedication00"
+  },
+  "effects": []
+}

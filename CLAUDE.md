@@ -145,6 +145,47 @@ requiring this save has the poison trait" — confirmed against a real
 official rule element using the same pattern, Iron Lung's
 `AdjustDegreeOfSuccess` on `saving-throw`).
 
+## Fourth/fifth homebrew items: Monstrosity Form (Kaiju) + Breath Weapon
+
+`src/packs/feats/spell-effect-monstrosity-form-kaiju.json` — a patched
+copy of the real `Spell Effect: Monstrosity Form (Kaiju)` (the battle
+form granted by the feat Heart of the Kaiju / the Monstrosity Form
+spell). The vanilla item is a single `BattleForm` rule element with no
+`GrantItem` and no automation for its Breath Weapon at all — the real
+official item only *describes* Breath Weapon in prose, it doesn't
+implement it. This patch adds:
+
+- `overrides.speeds.fly: 180` — added directly into the existing
+  `BattleForm` rule element's speed overrides (not a separate
+  `BaseSpeed` RE — `BattleForm` owns/controls all speeds while active,
+  so edit its data in place rather than layering another RE on top).
+- A `GrantItem` RE granting `src/packs/feats/breath-weapon-kaiju.json`
+  ("Breath Weapon") by in-module compendium UUID
+  (`Compendium.phil-pf2e-weredragon.weredragon-feats.Item.Breath
+  Weapon`) — granted/revoked automatically with this effect's
+  lifetime, same as any other RE-granted child item.
+- A `TokenImage` RE pointing at `assets/tokens/kaiju-form.webp`.
+
+`breath-weapon-kaiju.json` — the granted action itself. Deliberately
+copies the **exact automation pattern of the real, official Dragon
+Breath (Dragon Form) action** (`packs/pf2e/actions/spells/
+dragon-breath-dragon-form.json` upstream): `system.rules: []`, no
+`area`/`save` fields — all the interactivity comes from Foundry text
+enrichers embedded directly in `system.description.value`:
+`@Template[type:cone|distance:60]` (clickable cone-placement button),
+`@Damage[15d6[untyped]|options:area-damage]` (clickable damage-roll
+button), and `[[/r 1d4 #Recharge Breath Weapon]]` (clickable recharge
+roll). Like the real Dragon Breath action, the Reflex-vs-spell-DC save
+is **not** automated (no `@Check[...]` link) — that's not an
+oversight, it's the same limitation the official action has, kept
+for consistency rather than guessed at.
+
+As with the other homebrew items, actually getting this on the
+character means dragging this patched spell effect onto the sheet in
+place of the vanilla one (or in place of casting the real spell) —
+there's no attempt here to intercept the actual Monstrosity Form spell
+casting flow itself.
+
 ## Pending / in-progress work
 
 - **Token image swap on form change**: adding `TokenImage` rule

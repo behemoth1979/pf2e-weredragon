@@ -11,7 +11,7 @@
   },
   "packs": [
     {
-      "label": "Homebrew: Weredragon, Battle Form Handwraps & Black Dragon Hide",
+      "label": "Homebrew: Weredragon & Custom Items",
       "name": "weredragon-feats",
       "path": "packs/feats",
       "type": "Item",
