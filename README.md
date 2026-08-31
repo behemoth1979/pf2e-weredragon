@@ -59,6 +59,12 @@ active battle form's fixed attack/damage, instead of being discarded
 the way battle forms normally discard your gear. Striking-rune extra
 dice are deliberately left out of that carry-over.
 
+It also includes **Black Dragon Hide Armor** — a custom Hide Armor
+built from Dragonhide (standard-grade), etched with +3 potency, major
+resilient, Greater Fortification, Greater Dread, and Major Moonweave,
+plus a house rule granting a flat +1 bonus to AC and to saving throws
+against poison.
+
 ## Editing the design
 
 Source lives at:

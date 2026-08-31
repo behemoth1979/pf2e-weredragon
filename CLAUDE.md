@@ -112,6 +112,39 @@ update `system.runes` (potency/striking/property) *and* the matching
 aren't derived from each other, both are hardcoded to match the
 character's actual gear at time of writing.
 
+## Third homebrew item: Black Dragon Hide Armor
+
+`src/packs/feats/black-dragon-hide-armor.json` — a third item in the
+same `weredragon-feats` pack, a custom suit of armor for this
+character, built from a real Hide Armor base item (`baseItem:
+"hide-armor"`, ORC/remaster).
+
+Etched with +3 potency, major resilient, and three property runes
+(Greater Fortification, Greater Dread, Major Moonweave), crafted from
+Dragonhide (standard-grade) precious material (`material: {"type":
+"dragonhide", "grade": "standard"}`). All of that is standard PF2E
+automation the system already understands from `system.runes` and
+`system.material` — no custom rule elements needed for any of it.
+
+Note armor runes use a different shape than weapon runes: `property`
+is a plain string array (not the `{"0": ..., "1": ...}` object
+weapons use), and the fundamental rune field is `resilient` (not
+`striking`).
+
+The only actual homebrew automation is two `FlatModifier` rule
+elements for a flat house-rule bonus (this suit's black dragon hide
+grants +1 to AC and +1 to saves against poison): both use `type:
+"untyped"` deliberately, not `"item"` — an "item" bonus would be the
+same type as the armor's own potency-derived AC bonus and its
+resilient-derived save bonus, so per PF2E's same-type-doesn't-stack
+rule it would just get silently eclipsed by the larger existing item
+bonus and have no effect. `"untyped"` always stacks regardless of
+what else applies. The poison-save modifier is scoped with predicate
+`"item:trait:poison"` (the standard predicate for "the effect
+requiring this save has the poison trait" — confirmed against a real
+official rule element using the same pattern, Iron Lung's
+`AdjustDegreeOfSuccess` on `saving-throw`).
+
 ## Pending / in-progress work
 
 - **Token image swap on form change**: adding `TokenImage` rule

@@ -1,0 +1,96 @@
+{
+  "_id": "Bd9kH1d3ArmR7XpL",
+  "img": "icons/equipment/chest/vest-leather-tattered-white.webp",
+  "name": "Black Dragon Hide Armor",
+  "system": {
+    "acBonus": 3,
+    "baseItem": "hide-armor",
+    "bulk": {
+      "value": 3
+    },
+    "category": "medium",
+    "checkPenalty": -2,
+    "containerId": null,
+    "description": {
+      "value": "<p><em>Homebrew: hide armor crafted from black dragon hide (Dragonhide, standard-grade), etched with +3 potency, major resilient, greater fortification, greater dread, and major moonweave, plus a house rule: the armor grants a flat +1 bonus to AC and to saving throws against poison, reflecting the acid-resistant, poison-inured nature of black dragon hide.</em></p><hr /><p>A mix of furs, sturdy hide, and sometimes molded boiled leather, this armor provides protection due to its layers of leather, though its bulkiness slows the wearer down and decreases mobility. This suit is crafted from the hide of a black dragon (Dragonhide, standard-grade), giving it particular resilience and a dark, scaled appearance.</p>\n<hr /><p><strong>Runes</strong></p>\n<ul>\n<li><strong>Potency (+3):</strong> +3 item bonus to AC.</li>\n<li><strong>Resilient (Major):</strong> +3 item bonus to saving throws.</li>\n<li><strong>Fortification (Greater):</strong> each time you're critically hit, attempt a DC 14 flat check; on a success, it becomes a normal hit instead. Increases the armor's Bulk by 1 and the Strength required to reduce its penalties by 1 (both already reflected above).</li>\n<li><strong>Dread (Greater):</strong> frightened enemies within 30 feet that can see you must succeed at a DC 38 Will save at the end of their turn or their Frightened value doesn't decrease that turn.</li>\n<li><strong>Moonweave (Major):</strong> whenever you're healed by a spell or magical effect, you recover an additional 10 HP, once per healing spell or effect.</li>\n</ul>\n<hr /><p><strong>House rule</strong> This suit's black dragon hide grants a +1 bonus to AC and to saving throws against poison.</p>"
+    },
+    "grade": null,
+    "group": "leather",
+    "hardness": 0,
+    "hp": {
+      "max": 0,
+      "value": 0
+    },
+    "level": {
+      "value": 20
+    },
+    "material": {
+      "grade": "standard",
+      "type": "dragonhide"
+    },
+    "price": {
+      "value": {
+        "gp": 130602
+      }
+    },
+    "publication": {
+      "license": "ORC",
+      "remaster": true,
+      "title": "Pathfinder Player Core"
+    },
+    "quantity": 1,
+    "rules": [
+      {
+        "key": "FlatModifier",
+        "label": "Black Dragon Hide (armor)",
+        "selector": "ac",
+        "type": "untyped",
+        "value": 1
+      },
+      {
+        "key": "FlatModifier",
+        "label": "Black Dragon Hide (vs. poison)",
+        "predicate": [
+          "item:trait:poison"
+        ],
+        "selector": "saving-throw",
+        "type": "untyped",
+        "value": 1
+      }
+    ],
+    "runes": {
+      "potency": 3,
+      "property": [
+        "fortification-greater",
+        "dread-greater",
+        "moonweave-major"
+      ],
+      "resilient": 3
+    },
+    "size": "med",
+    "speedPenalty": -5,
+    "strength": 3,
+    "traits": {
+      "rarity": "common",
+      "value": []
+    }
+  },
+  "type": "armor",
+  "_key": "!items!Bd9kH1d3ArmR7XpL",
+  "sort": 200000,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "coreVersion": "14.366",
+    "systemId": "pf2e",
+    "systemVersion": "8.4.1",
+    "createdTime": 1735689600000,
+    "modifiedTime": 1735689600000,
+    "lastModifiedBy": "phildedication00"
+  },
+  "effects": []
+}
