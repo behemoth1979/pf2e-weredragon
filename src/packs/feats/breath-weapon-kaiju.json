@@ -11,7 +11,7 @@
     },
     "category": "offensive",
     "description": {
-      "value": "<p><em>Homebrew: automated the same way the official Dragon Breath (Dragon Form) action is — clickable area-template and damage-roll links in the text below. As with Dragon Breath, the Reflex save against your spell DC isn't automated and is resolved manually.</em></p><p>Each creature in a @Template[type:cone|distance:60] takes @Damage[15d6[untyped]|options:area-damage] damage, with a basic save against your spell DC. Once activated, it can't be used again for [[/r 1d4 #Recharge Breath Weapon]]{1d4 rounds}.</p>"
+      "value": "<p><em>Homebrew: activating this triggers casting the automated Breath Weapon (Kaiju) spell — same \"Activate → Cast a Spell → Effect: you cast X\" pattern official items like soaring armor and snapleaf use for activities that cast a specific spell.</em></p><p><strong>Activate</strong> <span class=\"action-glyph\">2</span> (evocation, primal)</p><hr /><p><strong>Effect</strong> You cast @UUID[Compendium.phil-pf2e-weredragon.weredragon-feats.Item.Breath Weapon (Kaiju)].</p>"
     },
     "frequency": null,
     "publication": {

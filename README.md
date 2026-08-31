@@ -67,12 +67,12 @@ against poison.
 
 Finally, it includes a patched **Spell Effect: Monstrosity Form
 (Kaiju)** that automates the Breath Weapon ability the vanilla effect
-only describes in text: it grants a proper **Breath Weapon** action
-(60-foot cone, 15d6 damage, basic Reflex save vs. spell DC, 1d4-round
-recharge, using the same clickable template/damage-roll controls as
-the official Dragon Breath action), sets fly Speed to 180 feet, and
-swaps the token to `kaiju-form.webp`. Drag it onto the sheet in place
-of the vanilla spell effect while transformed.
+only describes in text: it grants a **Breath Weapon** action that
+activates a real **Breath Weapon (Kaiju)** spell (60-foot cone, 15d6
+damage, basic Reflex save that rolls against this character's actual
+spell DC, 1d4-round recharge), sets fly Speed to 180 feet, and swaps
+the token to `kaiju-form.webp`. Drag it onto the sheet in place of the
+vanilla spell effect while transformed.
 
 ## Editing the design
 

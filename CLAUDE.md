@@ -145,7 +145,7 @@ requiring this save has the poison trait" — confirmed against a real
 official rule element using the same pattern, Iron Lung's
 `AdjustDegreeOfSuccess` on `saving-throw`).
 
-## Fourth/fifth homebrew items: Monstrosity Form (Kaiju) + Breath Weapon
+## Fourth/fifth/sixth homebrew items: Monstrosity Form (Kaiju), Breath Weapon action + spell
 
 `src/packs/feats/spell-effect-monstrosity-form-kaiju.json` — a patched
 copy of the real `Spell Effect: Monstrosity Form (Kaiju)` (the battle
@@ -159,26 +159,44 @@ implement it. This patch adds:
   `BattleForm` rule element's speed overrides (not a separate
   `BaseSpeed` RE — `BattleForm` owns/controls all speeds while active,
   so edit its data in place rather than layering another RE on top).
-- A `GrantItem` RE granting `src/packs/feats/breath-weapon-kaiju.json`
-  ("Breath Weapon") by in-module compendium UUID
-  (`Compendium.phil-pf2e-weredragon.weredragon-feats.Item.Breath
-  Weapon`) — granted/revoked automatically with this effect's
-  lifetime, same as any other RE-granted child item.
+- Two `GrantItem` REs, both tied to this effect's lifetime: one for
+  `breath-weapon-kaiju.json` ("Breath Weapon", the action) and one for
+  `breath-weapon-kaiju-spell.json` ("Breath Weapon (Kaiju)", the
+  spell) — both referenced by in-module compendium UUID
+  (`Compendium.phil-pf2e-weredragon.weredragon-feats.Item.<name>`).
 - A `TokenImage` RE pointing at `assets/tokens/kaiju-form.webp`.
 
-`breath-weapon-kaiju.json` — the granted action itself. Deliberately
-copies the **exact automation pattern of the real, official Dragon
-Breath (Dragon Form) action** (`packs/pf2e/actions/spells/
-dragon-breath-dragon-form.json` upstream): `system.rules: []`, no
-`area`/`save` fields — all the interactivity comes from Foundry text
-enrichers embedded directly in `system.description.value`:
-`@Template[type:cone|distance:60]` (clickable cone-placement button),
-`@Damage[15d6[untyped]|options:area-damage]` (clickable damage-roll
-button), and `[[/r 1d4 #Recharge Breath Weapon]]` (clickable recharge
-roll). Like the real Dragon Breath action, the Reflex-vs-spell-DC save
-is **not** automated (no `@Check[...]` link) — that's not an
-oversight, it's the same limitation the official action has, kept
-for consistency rather than guessed at.
+**Action triggers spell, not description enrichers.** The action
+(`breath-weapon-kaiju.json`) doesn't carry its own area/damage
+automation — its description is just "**Activate** [2] (evocation,
+primal); **Effect** You cast @UUID[...Breath Weapon (Kaiju)]", the
+same "Activate → Cast a Spell → Effect: you cast X" text pattern every
+real official item that triggers a specific spell uses (soaring
+armor, snapleaf, the-fiend, gamtu-hat, dawnlight, flurrying — checked
+several, all purely descriptive/manual, no functional auto-trigger
+exists in the system for this). Clicking the action doesn't
+programmatically roll anything; the player follows the link (or finds
+the granted spell directly) and casts it themselves — that's how this
+class of ability works everywhere in the real game, not a limitation
+specific to this module.
+
+**The actual automation lives on the spell**
+(`breath-weapon-kaiju-spell.json`, `type: "spell"`), built from real
+structured spell fields (`system.area`, `system.damage`,
+`system.defense.save`) the same way an official spell like Cone of
+Cold is — not text enrichers like the old action-only version had.
+This is strictly better than the original action-only implementation:
+a real `defense.save` field gives a genuine clickable save button that
+resolves against this character's actual spell DC, which text
+enrichers alone can never do. Granted as an "innate"-style spell via
+bare `GrantItem` (same mechanism used elsewhere in this repo for
+Toughness/Change Shape) — pf2e has no dedicated rule element for
+spell-granting; `GrantItem` doesn't special-case spells at all, it
+just adds the item, and the actor's own spellcasting-collection logic
+is what places an entry-less granted spell somewhere usable. If it
+doesn't show up cleanly in the Spellcasting tab in-session, that's the
+part to debug — everything else here (area/damage/save, the action
+wrapper) is fully verified against source.
 
 As with the other homebrew items, actually getting this on the
 character means dragging this patched spell effect onto the sheet in

@@ -1,0 +1,87 @@
+{
+  "_id": "BrW3aponSpl00001",
+  "img": "systems/pf2e/icons/spells/monstrosity-form.webp",
+  "name": "Breath Weapon (Kaiju)",
+  "system": {
+    "area": {
+      "type": "cone",
+      "value": 60
+    },
+    "cost": {
+      "value": ""
+    },
+    "counteraction": false,
+    "damage": {
+      "0": {
+        "applyMod": false,
+        "category": null,
+        "formula": "15d6",
+        "kinds": [
+          "damage"
+        ],
+        "materials": [],
+        "type": "untyped"
+      }
+    },
+    "defense": {
+      "save": {
+        "basic": true,
+        "statistic": "reflex"
+      }
+    },
+    "description": {
+      "value": "<p><em>Homebrew: the automated spell form of the Kaiju form's Breath Weapon, granted innately while transformed. Real area/damage/save fields (not just description enrichers), so the Reflex save actually rolls against this character's own spell DC.</em></p><p>Each creature in the area takes 15d6 damage (of your chosen damage type), with a basic Reflex save. Once activated, it can't be used again for [[/r 1d4 #Recharge Breath Weapon]]{1d4 rounds}.</p>"
+    },
+    "duration": {
+      "sustained": false,
+      "value": ""
+    },
+    "level": {
+      "value": 10
+    },
+    "publication": {
+      "license": "ORC",
+      "remaster": true,
+      "title": "Homebrew"
+    },
+    "range": {
+      "value": ""
+    },
+    "requirements": "",
+    "rules": [],
+    "target": {
+      "value": ""
+    },
+    "time": {
+      "value": "2"
+    },
+    "traits": {
+      "rarity": "common",
+      "traditions": [
+        "primal"
+      ],
+      "value": [
+        "evocation",
+        "primal"
+      ]
+    }
+  },
+  "type": "spell",
+  "_key": "!items!BrW3aponSpl00001",
+  "sort": 350000,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "coreVersion": "14.366",
+    "systemId": "pf2e",
+    "systemVersion": "8.4.1",
+    "createdTime": 1735689600000,
+    "modifiedTime": 1735689600000,
+    "lastModifiedBy": "phildedication00"
+  },
+  "effects": []
+}
