@@ -49,6 +49,15 @@ The feat's own `change-shape` toggle also explicitly includes a
 dropdown works the same as the vanilla feat's does, without depending
 on a separately granted item to merge that option in.
 
+The same compendium also includes **Handwraps of Mighty Blows +3
+(Battle Form House Rule)** — a patched copy of Handwraps of Mighty
+Blows for a character who also uses Wild Shape/Untamed Form. Drop it
+onto that character's sheet in place of their normal Handwraps, and
+its runes' bonuses (potency, major striking, Brilliant (Greater),
+Holy, Shock (Greater)) will keep applying on top of any active battle
+form's fixed attack/damage, instead of being discarded the way battle
+forms normally discard your gear.
+
 ## Editing the design
 
 Source lives at:

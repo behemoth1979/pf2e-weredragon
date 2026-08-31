@@ -67,6 +67,45 @@ for any new Weredragon-only mechanic:
   shared item merging it in. Don't remove this without understanding
   why it was added (see git history / README).
 
+## Second homebrew item: Handwraps of Mighty Blows (battle form house rule)
+
+`src/packs/feats/handwraps-of-mighty-blows-battle-form.json` — a second
+item in the same `weredragon-feats` pack, unrelated to Werecreature but
+belonging to the same player character (a Druid who also uses Wild
+Shape/Untamed Form). It's a patched copy of the real Handwraps of
+Mighty Blows, pre-etched with this character's actual runes (+3
+potency, major striking, Brilliant (Greater), Holy, Shock (Greater)).
+
+**The problem it solves:** real "battle forms" (Wild Shape's Wolf/
+Dinosaur/Dragon Form/etc.) use the `BattleForm` rule element, which
+overrides attack modifier and damage with the form's own fixed
+per-level bracket values and actively strips out most other damage
+modifiers (`BattleFormRuleElement#applyDamageExclusion`). This is a
+different code path from Werecreature's `Strike` rule element (which
+Weredragon uses, and which *does* automatically inherit handwraps
+runes via the actor's `unarmedRunes` merge — no patch needed there).
+
+**How the fix works:** `applyDamageExclusion` explicitly skips
+excluding any modifier whose own `predicate` array already contains
+`"battle-form"` (the roll option `BattleFormRuleElement` sets while
+any battle form is active) — this is the actual bypass mechanism,
+confirmed from the pf2e system source, not a documented feature.
+There's no equivalent exclusion for attack-roll modifiers, so a
+same-predicate `FlatModifier` just stacks normally. So the item's
+rules are: one `FlatModifier` (attack, `type: "item"`) and several
+`DamageDice` entries (striking dice + each property rune's bonus
+damage), each predicated on `["battle-form", "item:category:unarmed"]`
+(plus `target:trait:fiend`/`undead`/`unholy` where the rune's bonus is
+conditional). A `Note` RE reminds about rider effects that aren't
+automatable this way (Brilliant's crit blind save, Shock's crit arc,
+Holy's reaction heal, resistance-ignoring).
+
+**Keeping it in sync:** if this character's handwraps' runes change,
+update `system.runes` (potency/striking/property) *and* the matching
+`FlatModifier`/`DamageDice` values in `system.rules` together — they
+aren't derived from each other, both are hardcoded to match the
+character's actual gear at time of writing.
+
 ## Pending / in-progress work
 
 - **Token image swap on form change**: adding `TokenImage` rule
