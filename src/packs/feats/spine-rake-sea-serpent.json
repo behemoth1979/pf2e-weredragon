@@ -1,0 +1,47 @@
+{
+  "_id": "SpnRakeAct0001XY",
+  "img": "systems/pf2e/icons/actions/TwoActions.webp",
+  "name": "Spine Rake",
+  "system": {
+    "actionType": {
+      "value": "action"
+    },
+    "actions": {
+      "value": 2
+    },
+    "category": "offensive",
+    "description": {
+      "value": "<p><em>Homebrew: activating this triggers casting the automated Spine Rake (Sea Serpent) spell — same \"Activate → Cast a Spell → Effect: you cast X\" pattern used for this character's other homebrew battle-form abilities.</em></p><p><strong>Activate</strong> <span class=\"action-glyph\">2</span> (move)</p><hr /><p><strong>Effect</strong> You extend your spines and Swim or Stride; you cast @UUID[Compendium.phil-pf2e-weredragon.weredragon-feats.Item.Spine Rake (Sea Serpent)] to resolve the damage and save against each creature you're adjacent to during that movement.</p>"
+    },
+    "frequency": null,
+    "publication": {
+      "license": "ORC",
+      "remaster": true,
+      "title": "Homebrew"
+    },
+    "rules": [],
+    "traits": {
+      "value": [
+        "move"
+      ]
+    }
+  },
+  "type": "action",
+  "_key": "!items!SpnRakeAct0001XY",
+  "sort": 425000,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "coreVersion": "14.366",
+    "systemId": "pf2e",
+    "systemVersion": "8.4.1",
+    "createdTime": 1735689600000,
+    "modifiedTime": 1735689600000,
+    "lastModifiedBy": "phildedication00"
+  },
+  "effects": []
+}

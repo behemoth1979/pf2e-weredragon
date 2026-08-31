@@ -1,0 +1,83 @@
+{
+  "_id": "SpnRakeSpl0001XY",
+  "img": "systems/pf2e/icons/spells/monstrosity-form.webp",
+  "name": "Spine Rake (Sea Serpent)",
+  "system": {
+    "cost": {
+      "value": ""
+    },
+    "counteraction": false,
+    "damage": {
+      "0": {
+        "applyMod": false,
+        "category": null,
+        "formula": "4d8+10",
+        "kinds": [
+          "damage"
+        ],
+        "materials": [],
+        "type": "slashing"
+      }
+    },
+    "defense": {
+      "save": {
+        "basic": true,
+        "statistic": "reflex"
+      }
+    },
+    "description": {
+      "value": "<p><em>Homebrew: the automated spell form of Sea Serpent form's Spine Rake, granted innately while transformed. Real damage/save fields give a genuine save button resolving against this character's spell DC. The movement part of the ability (Swim or Stride, hitting every creature you're adjacent to along the way) isn't something the spell schema can represent geometrically and is resolved manually, same as the official item leaves it.</em></p><p>You extend your spines and Swim or Stride. Each creature you're adjacent to at any point during your movement takes 4d8+10 slashing damage, with a basic Reflex save.</p>"
+    },
+    "duration": {
+      "sustained": false,
+      "value": ""
+    },
+    "level": {
+      "value": 8
+    },
+    "publication": {
+      "license": "ORC",
+      "remaster": true,
+      "title": "Homebrew"
+    },
+    "range": {
+      "value": ""
+    },
+    "requirements": "",
+    "rules": [],
+    "target": {
+      "value": ""
+    },
+    "time": {
+      "value": "2"
+    },
+    "traits": {
+      "rarity": "common",
+      "traditions": [
+        "primal"
+      ],
+      "value": [
+        "primal",
+        "move"
+      ]
+    }
+  },
+  "type": "spell",
+  "_key": "!items!SpnRakeSpl0001XY",
+  "sort": 450000,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "coreVersion": "14.366",
+    "systemId": "pf2e",
+    "systemVersion": "8.4.1",
+    "createdTime": 1735689600000,
+    "modifiedTime": 1735689600000,
+    "lastModifiedBy": "phildedication00"
+  },
+  "effects": []
+}

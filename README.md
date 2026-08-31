@@ -74,6 +74,14 @@ spell DC, 1d4-round recharge), sets fly Speed to 180 feet, and swaps
 the token to `kaiju-form.webp`. Drag it onto the sheet in place of the
 vanilla spell effect while transformed.
 
+The module also patches the shared **Spell Effect: Monstrosity Form**
+item covering the other three battle forms (Cave Worm, Phoenix, Sea
+Serpent), adding a token swap for each (`cave-worm-form.webp`,
+`phoenix-form.webp`, `sea-serpent-form.webp`) and, for Sea Serpent, a
+**Spine Rake** action that activates a real **Spine Rake (Sea
+Serpent)** spell (4d8+10 slashing, basic Reflex save vs. this
+character's spell DC).
+
 ## Editing the design
 
 Source lives at:

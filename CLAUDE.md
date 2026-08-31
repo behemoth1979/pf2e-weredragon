@@ -204,6 +204,49 @@ place of the vanilla one (or in place of casting the real spell) —
 there's no attempt here to intercept the actual Monstrosity Form spell
 casting flow itself.
 
+## Seventh+ homebrew items: Monstrosity Form (Cave Worm/Phoenix/Sea Serpent) + Spine Rake
+
+Unlike Kaiju, the other three Monstrosity Form options (Cave Worm,
+Phoenix, Sea Serpent) are **one shared vanilla item** upstream —
+`Spell Effect: Monstrosity Form` (no per-form suffix) — with a single
+`ChoiceSet` (`rollOption: "monstrosity-form"`) and three separately
+predicated `BattleForm` REs (`monstrosity-form:cave-worm` /
+`:phoenix` / `:sea-serpent`), not three separate files. So this module
+patches that one shared item (`spell-effect-monstrosity-form.json`,
+note: no `-kaiju` suffix) rather than creating three parallel files —
+matches upstream's own structure instead of fighting it. Added: three
+`TokenImage` REs, each predicated on its own `monstrosity-form:<slug>`
+option, pointing at `cave-worm-form.webp` / `phoenix-form.webp` /
+`sea-serpent-form.webp`.
+
+Phoenix's own special ability (Shroud of Flame) was already fully
+automated in the vanilla item (`Aura` RE + toggleable `RollOption`) —
+nothing to add there. Cave Worm's Inexorable (auto-recovers from
+paralyzed/slowed/stunned each turn) is partially automated upstream
+(`immunities: [{"type": "immobilized"}]`) but the per-turn condition
+auto-removal isn't; left as-is, matching vanilla, since it wasn't part
+of this round's ask.
+
+Sea Serpent's **Spine Rake** was in the same under-automated state
+Kaiju's Breath Weapon was: described in prose only, no actual
+action/spell item. Given the same "action triggers spell" treatment:
+`spine-rake-sea-serpent.json` (action, "Activate → Cast a Spell"
+wrapper) and `spine-rake-sea-serpent-spell.json` (the real spell).
+One structural difference from Breath Weapon: Spine Rake's area is
+"every creature you're adjacent to during a Swim or Stride," which
+has no matching `system.area` geometry (only burst/cone/line/
+emanation exist) — so the spell omits `area` entirely (confirmed by
+checking a real non-area spell, Shocking Grasp, which omits the field
+rather than nulling it) and keeps `system.damage`/`system.defense.save`
+for a working save button, while the movement mechanic itself stays
+descriptive text, same as the vanilla item leaves it. Both new items
+are granted from the shared spell effect via `GrantItem` REs
+predicated on `monstrosity-form:sea-serpent` — this predicate-gated
+conditional-grant pattern is directly copied from the vanilla file's
+own existing `GrantItem` for Phoenix's "Blazing Conflagration" (only
+granted when `feat:phoenixs-flight` + `monstrosity-form:phoenix`), not
+guessed.
+
 ## Pending / in-progress work
 
 - **Token image swap on form change**: adding `TokenImage` rule
