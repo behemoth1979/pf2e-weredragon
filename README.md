@@ -53,10 +53,11 @@ The same compendium also includes **Handwraps of Mighty Blows +3
 (Battle Form House Rule)** — a patched copy of Handwraps of Mighty
 Blows for a character who also uses Wild Shape/Untamed Form. Drop it
 onto that character's sheet in place of their normal Handwraps, and
-its runes' bonuses (potency, major striking, Brilliant (Greater),
-Holy, Shock (Greater)) will keep applying on top of any active battle
-form's fixed attack/damage, instead of being discarded the way battle
-forms normally discard your gear.
+its potency (attack roll) and property rune bonus damage (Brilliant
+(Greater), Holy, Shock (Greater)) will keep applying on top of any
+active battle form's fixed attack/damage, instead of being discarded
+the way battle forms normally discard your gear. Striking-rune extra
+dice are deliberately left out of that carry-over.
 
 ## Editing the design
 

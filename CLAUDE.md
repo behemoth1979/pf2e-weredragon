@@ -93,12 +93,18 @@ confirmed from the pf2e system source, not a documented feature.
 There's no equivalent exclusion for attack-roll modifiers, so a
 same-predicate `FlatModifier` just stacks normally. So the item's
 rules are: one `FlatModifier` (attack, `type: "item"`) and several
-`DamageDice` entries (striking dice + each property rune's bonus
-damage), each predicated on `["battle-form", "item:category:unarmed"]`
-(plus `target:trait:fiend`/`undead`/`unholy` where the rune's bonus is
+`DamageDice` entries (each property rune's bonus damage), each
+predicated on `["battle-form", "item:category:unarmed"]` (plus
+`target:trait:fiend`/`undead`/`unholy` where the rune's bonus is
 conditional). A `Note` RE reminds about rider effects that aren't
 automatable this way (Brilliant's crit blind save, Shock's crit arc,
 Holy's reaction heal, resistance-ignoring).
+
+Deliberately **not** included: extra damage dice from the striking
+rune itself. The player found the +3 major-striking dice made battle
+form damage too swingy at this table, so only the attack-roll potency
+bonus and the property runes' bonus damage carry over — striking dice
+stay excluded like any other battle form.
 
 **Keeping it in sync:** if this character's handwraps' runes change,
 update `system.runes` (potency/striking/property) *and* the matching
