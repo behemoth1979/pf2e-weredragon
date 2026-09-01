@@ -90,6 +90,14 @@ dragon type with a token swap to `dragon-form.webp`, and Aerial Form
 `aerial-form.webp` that applies regardless of which of the four
 creatures you choose.
 
+Finally, **Spell Effect: Untamed Form** is patched to replace the
+vanilla dynamic form picker with a static list of exactly the 17
+forms above — pick one from the dropdown and it grants that
+token-swapped homebrew version directly, instead of needing to drag
+individual patched items onto the sheet one at a time. Pest Form,
+Insect Form, Elemental Form, and Plant Form aren't in this list (no
+custom art yet) — use the real Untamed Form for those.
+
 ## Editing the design
 
 Source lives at:

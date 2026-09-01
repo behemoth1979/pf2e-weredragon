@@ -296,6 +296,67 @@ guaranteed byte-exact rather than transcribed by hand. Same round-trip
 verification (compile → extract → diff) as every other item in this
 repo still applies before committing.
 
+## `system.slug` overrides — required on every renamed spell effect
+
+Every patched spell-effect item above appends `[Weredragon Homebrew]`
+to the vanilla name for clarity in the compendium browser. That
+rename is **not cosmetically free**: pf2e generates each effect's
+`self:effect:<slug>` roll option from `this.slug ?? sluggify(this.name)`,
+then strips a leading `spell-effect-`/`stance-`-style prefix
+(`abstract-effect/document.ts`, `prepareBaseData()`). Rename the item
+without an explicit `system.slug` override and the auto-slugified name
+now includes the `-weredragon-homebrew` tail, which survives the
+prefix-strip and produces the WRONG roll option — silently breaking
+any predicate elsewhere that checks `self:effect:<original-slug>`.
+This is real, not theoretical: Untamed Form's own Dragon Shape
+resistance gate checks `self:effect:dragon-form`, and Monstrosity
+Form's Phoenix choice-label gate checks `self:effect:untamed-form` —
+both cross-reference *other* patched items in this exact set.
+
+The fix: every renamed spell effect gets an explicit `"slug"` field
+in `system` set to the vanilla item's natural roll-option slug (what
+`self:effect:X` predicates elsewhere already expect) —
+`untamed-form`, `dragon-form`, `monstrosity-form`,
+`monstrosity-form-kaiju`, `aerial-form`, and `animal-form-<animal>`
+for each of the 13 animals. **When adding any new patched spell
+effect to this repo, set this field too** — don't rely on
+auto-slugification once the name carries the homebrew suffix.
+
+## Sixth-ish homebrew item: Untamed Form picker
+
+`src/packs/feats/spell-effect-untamed-form.json` — patched copy of
+`Spell Effect: Untamed Form` (the effect the Wild Shape order's
+Untamed Form focus spell grants). The vanilla item's `ChoiceSet` uses
+`"choices": "flags.system.wildShapeForms"` — a special string the
+pf2e codebase recognizes to dynamically compute the player's actual
+available-forms list from which druid feats they hold (Insect Shape,
+Soaring Shape, Plant Shape, etc.). That computation isn't something a
+module can safely extend or override, so this patch replaces it
+outright with a **static, hand-authored** `choices` array listing all
+17 forms this module has patched with token-swap art (13 Animal Form
+animals + Aerial Form + Dragon Form + Monstrosity Form + Monstrosity
+Form (Kaiju)), each `value` pointing at the corresponding
+in-module-compendium item by name UUID
+(`Compendium.phil-pf2e-weredragon.weredragon-feats.Item.<exact name,
+including the [Weredragon Homebrew] suffix>`). Selecting one grants
+that item via the same `GrantItem`
+`"{item|flags.system.rulesSelections.formEffect}"` dynamic-UUID
+pattern vanilla already uses — untouched from the original.
+
+Deliberately excludes Pest Form, Insect Form, Elemental Form, and
+Plant Form (not patched, no custom art) — confirmed with the user
+before building rather than assumed; if this character actually has
+feats unlocking those, use the real Untamed Form for them instead, or
+ask for them to be added here once art exists.
+
+Also deliberately **not feat-gated** per choice the way vanilla is
+(no `feat:soaring-shape`/`feat:dragon-shape`/etc. predicates on
+individual entries) — this is a personal tool for a specific character
+who has already demonstrated access to everything on the list; the
+risk of a wrong/guessed feat slug silently hiding an option the
+character does have outweighs the low cost of the list showing
+something they wouldn't otherwise pick.
+
 ## Pending / in-progress work
 
 - **Token image swap on form change**: adding `TokenImage` rule
