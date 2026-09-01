@@ -322,6 +322,40 @@ for each of the 13 animals. **When adding any new patched spell
 effect to this repo, set this field too** — don't rely on
 auto-slugification once the name carries the homebrew suffix.
 
+## `@UUID[...Item.<Name>]` content links need the real ID, not the name
+
+Every patched spell effect's description opens with `Granted by
+@UUID[Compendium.pf2e.spells-srd.Item.<Spell Name>]`, copied verbatim
+from the vanilla item (official pf2e content universally uses names
+here, not IDs — checked across dozens of files). That pattern works
+fine for a `GrantItem` rule element's `uuid` field (pf2e's own RE
+resolves by name reliably — confirmed working in this user's actual
+game for Toughness/Change Shape and others), but **not** for a
+`@UUID[...]` *content link* embedded in prose: Foundry's core text
+enricher needs the literal document ID there. With a name in that
+position it renders as "Granted by Unknown item" with a broken-link
+icon. Confirmed in-session: the user copied the real UUID for their
+installed Untamed Form spell and its ID (`8RWfKConLYFZpQ9X`) matched
+the current v14-dev source exactly — so pf2e item IDs are stable
+across versions and safe to fetch from upstream rather than asking
+the user to copy each one by hand.
+
+Fixed for all "Granted by" lines by swapping the name for the real ID
+and adding an explicit `{Label}` so the link still displays the
+readable name: `@UUID[Compendium.pf2e.spells-srd.Item.<id>]{<Spell
+Name>}`. IDs used: Untamed Form `8RWfKConLYFZpQ9X`, Animal Form
+`wp09USMB3GIW1qbp`, Dragon Form `5c692cCcTDXjSEzk`, Monstrosity Form
+`8AMvNVOUEtxBCDvJ`, Aerial Form `NzXpEzcZAjuDTZjK`. Kaiju's own
+"Granted by Heart of the Kaiju" line (a *feat*, `feats-srd` pack) was
+left untouched — not confirmed broken, and fixing it would need its
+own ID lookup.
+
+**When adding any new patched spell effect**: any `@UUID[...]`
+*content link* in its description (not RE `uuid` fields, those are
+fine by name) needs a real ID + explicit label, not just a copied name
+— check upstream for the ID rather than assuming a name-based link
+will render correctly.
+
 ## Sixth-ish homebrew item: Untamed Form picker
 
 `src/packs/feats/spell-effect-untamed-form.json` — patched copy of
