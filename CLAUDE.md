@@ -345,10 +345,9 @@ and adding an explicit `{Label}` so the link still displays the
 readable name: `@UUID[Compendium.pf2e.spells-srd.Item.<id>]{<Spell
 Name>}`. IDs used: Untamed Form `8RWfKConLYFZpQ9X`, Animal Form
 `wp09USMB3GIW1qbp`, Dragon Form `5c692cCcTDXjSEzk`, Monstrosity Form
-`8AMvNVOUEtxBCDvJ`, Aerial Form `NzXpEzcZAjuDTZjK`. Kaiju's own
-"Granted by Heart of the Kaiju" line (a *feat*, `feats-srd` pack) was
-left untouched — not confirmed broken, and fixing it would need its
-own ID lookup.
+`8AMvNVOUEtxBCDvJ`, Aerial Form `NzXpEzcZAjuDTZjK`, and (confirmed
+broken too, same fix applied) Heart of the Kaiju — a *feat*
+(`feats-srd` pack, not `spells-srd`) — `1ul2dasQBdlaMEC5`.
 
 **When adding any new patched spell effect**: any `@UUID[...]`
 *content link* in its description (not RE `uuid` fields, those are
