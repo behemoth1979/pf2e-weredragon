@@ -22,7 +22,7 @@ attacks/speeds automatically.
 
 | Type | Speed | Attack | Damage | Traits | Special |
 |---|---|---|---|---|---|
-| Weredragon | 25 ft, fly 10 ft | Jaws / Claw | 1d8 piercing / 1d6 slashing | — / Agile | Must begin and end each turn on a solid surface while flying, or fall (as Werebat) |
+| Weredragon | 25 ft, fly 10 ft | Antler / Claw / Jaws / Tail | 1d8 piercing / 1d8 slashing / 1d8 piercing / 1d8 bludgeoning | Shove / Agile / — / Reach 10 ft, Trip | Must begin and end each turn on a solid surface while flying, or fall (as Werebat) |
 
 ## Install
 
