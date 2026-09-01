@@ -390,6 +390,32 @@ risk of a wrong/guessed feat slug silently hiding an option the
 character does have outweighs the low cost of the list showing
 something they wouldn't otherwise pick.
 
+`src/packs/feats/untamed-form-spell.json` — patched copy of the real
+"Untamed Form" spell itself (`type: "spell"`, not `"effect"`), added
+after the user specifically asked for it separately from the spell
+effect above — a castable spell in the Spellcasting tab with real
+focus-point cost tracking, rather than only having the picker as a
+manually-dragged effect. Casting it doesn't auto-apply anything
+(matches vanilla — the real spell doesn't automate that either,
+`system.rules: []` both here and upstream); its description just
+links to `Spell Effect: Untamed Form (Weredragon Homebrew)` (this
+module's patched picker) instead of the vanilla one, same manual
+"drag/open the linked effect after casting" step as always.
+
+Fixed the same name-vs-ID content-link issue as everywhere else in
+this file for its three @UUID references (Pest Form
+`gfPjmG6Fe6D3MFjl`, Animal Form `wp09USMB3GIW1qbp`, and the link to
+our own patched effect item by its real in-module `_id`
+`UntamedFrmWeredr`, not by name).
+
+One gotcha specific to fetching a *spell* (as opposed to every other
+item type in this repo so far): the vanilla source carries a stray
+`"folder"` field referencing a folder ID internal to the pf2e system's
+own compendium structure — meaningless (and potentially confusing) in
+our own module's pack, so it gets stripped. None of this repo's other
+patched items had this field; check for it when patching any future
+spell specifically.
+
 ## Pending / in-progress work
 
 - **Token image swap on form change**: adding `TokenImage` rule

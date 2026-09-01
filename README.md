@@ -98,6 +98,10 @@ individual patched items onto the sheet one at a time. Pest Form,
 Insect Form, Elemental Form, and Plant Form aren't in this list (no
 custom art yet) — use the real Untamed Form for those.
 
+There's also a patched **Untamed Form** spell (a proper castable spell
+with focus-point cost, not just the effect) — its description links to
+the patched Spell Effect above instead of the vanilla one.
+
 ## Editing the design
 
 Source lives at:
