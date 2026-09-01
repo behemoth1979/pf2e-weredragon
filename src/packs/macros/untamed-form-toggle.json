@@ -1,0 +1,26 @@
+{
+  "_id": "UntamedFrmMacro1",
+  "author": null,
+  "command": "const actor = canvas.tokens.controlled[0]?.actor ?? game.user.character;\nif (!actor) {\n  ui.notifications.warn(\"Select a token or assign a character first.\");\n  return;\n}\n\nconst existing = actor.items.find((i) => i.type === \"effect\" && i.system.slug === \"untamed-form\");\nif (existing) {\n  await existing.delete();\n  ui.notifications.info(`${actor.name} reverts from Untamed Form.`);\n  return;\n}\n\nconst source = await fromUuid(\"Compendium.phil-pf2e-weredragon.weredragon-feats.Item.UntamedFrmWeredr\");\nif (!source) {\n  ui.notifications.error(\"Could not find the homebrew Untamed Form spell effect in the module compendium.\");\n  return;\n}\n\nawait actor.createEmbeddedDocuments(\"Item\", [source.toObject()]);\nui.notifications.info(`${actor.name} assumes Untamed Form — choose a shape from the prompt.`);\n",
+  "flags": {},
+  "folder": null,
+  "img": "icons/creatures/amphibians/treefrog-leaf-green.webp",
+  "name": "Untamed Form (Weredragon Homebrew)",
+  "ownership": {
+    "default": 0
+  },
+  "scope": "global",
+  "sort": 0,
+  "type": "script",
+  "_key": "!macros!UntamedFrmMacro1",
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "coreVersion": "14.366",
+    "systemId": "pf2e",
+    "systemVersion": "8.4.1",
+    "createdTime": 1735689600000,
+    "modifiedTime": 1735689600000,
+    "lastModifiedBy": "phildedication00"
+  }
+}

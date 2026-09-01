@@ -24,23 +24,27 @@ Owner/GM: Phil. Runs the game on Forge VTT.
 module.json              # Foundry module manifest — id, version, manifest/download URLs
 src/packs/feats/
   werecreature-dedication.json   # SOURCE OF TRUTH — edit this, never packs/
-packs/feats/              # COMPILED LevelDB — generated, never hand-edit
-build.mjs                 # compiles src/packs/ -> packs/ via @foundryvtt/foundryvtt-cli
+  (plus every other patched item — see sections below)
+src/packs/macros/
+  untamed-form-toggle.json       # SOURCE OF TRUTH for the hotbar macro — see below
+packs/feats/              # COMPILED LevelDB (Item pack) — generated, never hand-edit
+packs/macros/             # COMPILED LevelDB (Macro pack) — generated, never hand-edit
+build.mjs                 # compiles both src/packs/{feats,macros} -> packs/ via @foundryvtt/foundryvtt-cli
 rebuild-from-upstream.py  # regenerates src/ from a fresh pf2e system pull (see below)
 assets/tokens/            # token art for form changes (webp/png, square, e.g. 512x512+)
 README.md
 ```
 
-**Golden rule:** always edit `src/packs/feats/werecreature-dedication.json`,
-then run `node build.mjs` to regenerate `packs/feats/`. Never hand-edit
-anything under `packs/` — it's a compiled LevelDB and gets clobbered on
-every build.
+**Golden rule:** always edit the `src/packs/{feats,macros}/*.json` source
+files, then run `node build.mjs` to regenerate both `packs/feats/` and
+`packs/macros/`. Never hand-edit anything under `packs/` — it's compiled
+LevelDB and gets clobbered on every build.
 
 ## Build workflow
 
 ```bash
 npm install        # first time only
-node build.mjs      # compiles src/packs/ -> packs/ (LevelDB)
+node build.mjs      # compiles src/packs/{feats,macros} -> packs/{feats,macros} (LevelDB)
 ```
 
 Verify changes round-trip cleanly (compile → extract → diff) before
@@ -415,6 +419,34 @@ own compendium structure — meaningless (and potentially confusing) in
 our own module's pack, so it gets stripped. None of this repo's other
 patched items had this field; check for it when patching any future
 spell specifically.
+
+## Hotbar macro: one-click Untamed Form toggle
+
+The first non-JSON-content addition to this module: a **Macro**
+document (`type: "script"`), the user asked for a hotbar button
+instead of always having to drag the spell effect onto the sheet
+manually. Source at `src/packs/macros/untamed-form-toggle.json`,
+compiled into a *separate* pack (`packs/macros`, declared as
+`"type": "Macro"` in `module.json` — a compendium pack can only hold
+one document type, so this couldn't live in the existing `Item` pack
+alongside everything else). `build.mjs` now compiles both
+`src/packs/feats` and `src/packs/macros`.
+
+The macro's `command` (plain JS, runs client-side when clicked):
+resolves the acting character (selected token, falling back to
+`game.user.character`), checks `actor.items` for an existing item
+with `type === "effect"` and `system.slug === "untamed-form"` — reusing
+the explicit slug override already set on `spell-effect-untamed-form.json`
+(see the slug-drift section above) as a reliable identity check — and
+if found, deletes it (revert); otherwise fetches this module's patched
+"Spell Effect: Untamed Form (Weredragon Homebrew)" by its real
+in-pack UUID via `fromUuid()` and creates it on the actor via
+`createEmbeddedDocuments`, i.e. the exact same effect a manual drag
+would produce. No GM privileges needed — a player can create an item
+on an actor they own.
+
+To use: open the module's **Homebrew: Weredragon Macros** compendium,
+drag "Untamed Form (Weredragon Homebrew)" onto the hotbar.
 
 ## Pending / in-progress work
 

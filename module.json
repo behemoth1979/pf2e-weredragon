@@ -20,6 +20,17 @@
         "PLAYER": "OBSERVER",
         "ASSISTANT": "OWNER"
       }
+    },
+    {
+      "label": "Homebrew: Weredragon Macros",
+      "name": "weredragon-macros",
+      "path": "packs/macros",
+      "type": "Macro",
+      "system": "pf2e",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
     }
   ],
   "relationships": {

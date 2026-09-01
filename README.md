@@ -102,6 +102,15 @@ There's also a patched **Untamed Form** spell (a proper castable spell
 with focus-point cost, not just the effect) — its description links to
 the patched Spell Effect above instead of the vanilla one.
 
+## Hotbar macro
+
+The module includes a second compendium, **Homebrew: Weredragon
+Macros**, with a one-click "Untamed Form (Weredragon Homebrew)"
+macro — drag it onto your hotbar. Click once to transform (applies
+the patched Spell Effect: Untamed Form and prompts the form picker);
+click again to revert. No need to drag the effect onto the sheet by
+hand each time.
+
 ## Editing the design
 
 Source lives at:
