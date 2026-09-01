@@ -250,20 +250,20 @@ guessed.
 ## Animal Form and Dragon Form token swaps
 
 `src/packs/feats/spell-effect-animal-form-{ape,bear,bull,canine,cat,
-deer,frog,shark,snake}.json` — patched copies of the real per-animal
-Animal Form spell effects (each animal is its own upstream file, same
-as Kaiju, unlike Monstrosity Form's shared-item design). Each just
-adds one unconditional `TokenImage` RE (no predicate needed — the
-form's own presence on the actor is the condition) pointing at its
-matching asset. Only 9 of Animal Form's 13 options have art so far
-(no crab/crocodile/orca/seal token yet) — add the same pattern to
-those `spell-effect-animal-form-{crab,crocodile,orca,seal}.json` files
-once art exists for them, not before (don't add a `TokenImage` RE
-pointing at a file that doesn't exist in `assets/tokens/`).
+crab,crocodile,deer,frog,orca,seal,shark,snake}.json` — patched
+copies of the real per-animal Animal Form spell effects (each animal
+is its own upstream file, same as Kaiju, unlike Monstrosity Form's
+shared-item design). Each just adds one unconditional `TokenImage` RE
+(no predicate needed — the form's own presence on the actor is the
+condition) pointing at its matching asset. All 13 Animal Form options
+now have art and a patch — full coverage.
 
-Note: canine's asset is named `wolf-form.webp`, not `canine-form.webp`
-— check the actual filenames in `assets/tokens/` before assuming a
-name; don't infer it from the compendium's option label.
+Note: canine's asset was originally `wolf-form.webp` but was later
+renamed to `canine-form.webp` for consistency with the other
+filenames (which all match their compendium option name) — if a
+memory or old note says `wolf-form.webp`, it's stale; check the actual
+filenames in `assets/tokens/` rather than trusting a name from
+earlier in this file.
 
 `src/packs/feats/spell-effect-dragon-form.json` — Dragon Form is a
 single large shared item (40 dragon-type choices via one `ChoiceSet`,
