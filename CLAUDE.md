@@ -448,18 +448,36 @@ on an actor they own.
 To use: open the module's **Homebrew: Weredragon Macros** compendium,
 drag "Untamed Form (Weredragon Homebrew)" onto the hotbar.
 
-## Pending / in-progress work
+## Sound effect on Kaiju transform
 
-- **Token image swap on form change**: adding `TokenImage` rule
-  elements gated the same way as `BaseSpeed`/`Strike` above, pointing
-  at art in `assets/tokens/`. One RE per form (hybrid, animal). Art
-  files not yet finalized as of this writing — check `assets/tokens/`
-  for what's actually present before assuming names.
-- **Sound effect on transform**: discussed but NOT implemented. No
-  native pf2e rule element for this. Options if picked back up: Item
-  Macro module dependency, or a small script hooking
-  `preUpdateActor`/`updateActor` watching the change-shape roll option
-  flag, calling Foundry's `AudioHelper.play()`.
+Second piece of actual runtime JS (alongside the hotbar macro) — no
+rule element exists for "play a sound when this predicate becomes
+true," so this needed a real script. `scripts/kaiju-roar.js`, loaded
+via `module.json`'s `"scripts"` array, hooks `createItem` and checks
+for `item.type === "effect"` + `item.system.slug ===
+"monstrosity-form-kaiju"` (same slug-based identity pattern as the
+hotbar macro) — that slug is only ever created by getting the patched
+Kaiju spell effect onto an actor, however it got there (manual drag,
+the Untamed Form picker, a future macro), so this fires correctly
+regardless of path. Plays `assets/sounds/kaiju-roar.ogg` via
+`foundry.audio.AudioHelper.play(..., true)` — the `true` broadcasts to
+every connected client, not just the one who transformed, so the
+whole table hears it.
+
+**Important guard**: `createItem` fires on every client that receives
+the document sync, not just the one who created it — without checking
+`userId !== game.user.id` and returning early, every observing client
+would independently detect the same creation and each broadcast their
+own copy of the sound, causing overlapping/duplicate playback. Only
+the client that actually performed the creation should trigger the
+(already-broadcasting) play call.
+
+Scoped to Kaiju only, per what was actually asked — no sound wired up
+for any other form yet. If extended to other forms, reuse this same
+`createItem` + slug-check pattern rather than inventing a new
+mechanism, and remember each new form needs its own slug check (all
+the patched slugs are listed in the `system.slug` overrides section
+above).
 
 ## Keeping in sync with upstream pf2e system updates
 
@@ -487,7 +505,7 @@ which point at this repo's GitHub Releases (not raw branch files).
    resolves to `releases/latest`).
 3. Commit + push.
 4. Run `node build.mjs` if source changed, and re-zip the module
-   contents (module.json, packs/, src/, assets/, build.mjs,
+   contents (module.json, packs/, src/, assets/, scripts/, build.mjs,
    rebuild-from-upstream.py, README.md — NOT node_modules or .git).
 5. On github.com: repo → Releases → "Create a new release" → tag it
    `vX.Y.Z` matching `module.json` → attach both the zip and a

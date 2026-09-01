@@ -9,6 +9,9 @@
     "minimum": "12",
     "verified": "14.366"
   },
+  "scripts": [
+    "scripts/kaiju-roar.js"
+  ],
   "packs": [
     {
       "label": "Homebrew: Weredragon & Custom Items",

@@ -111,6 +111,12 @@ the patched Spell Effect: Untamed Form and prompts the form picker);
 click again to revert. No need to drag the effect onto the sheet by
 hand each time.
 
+## Sound effect
+
+Shifting into Kaiju form (however you get there — dragging the
+patched spell effect on, or picking it from the homebrew Untamed
+Form list) plays `kaiju-roar.ogg` for everyone at the table.
+
 ## Editing the design
 
 Source lives at:
