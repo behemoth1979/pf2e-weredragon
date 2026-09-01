@@ -353,11 +353,21 @@ Name>}`. IDs used: Untamed Form `8RWfKConLYFZpQ9X`, Animal Form
 broken too, same fix applied) Heart of the Kaiju — a *feat*
 (`feats-srd` pack, not `spells-srd`) — `1ul2dasQBdlaMEC5`.
 
+**Update, after the Untamed Form picker bug (see the `ChoiceSet`
+section below): "RE `uuid` fields are fine by name" is not a blanket
+rule — `GrantItem`'s `uuid` field genuinely does resolve by name, but
+`ChoiceSet`'s `choices[].value` (also nominally a `uuid` field) does
+NOT — it silently overwrites the label to `"???"` instead. Don't
+assume any given RE's UUID-ish field resolves by name just because
+`GrantItem`'s does; when in doubt, use the real `_id` — it always
+works, for every field, in every RE, with no downside.**
+
 **When adding any new patched spell effect**: any `@UUID[...]`
-*content link* in its description (not RE `uuid` fields, those are
-fine by name) needs a real ID + explicit label, not just a copied name
-— check upstream for the ID rather than assuming a name-based link
-will render correctly.
+*content link* in its description, and any `ChoiceSet` choice whose
+`value` is an item reference, needs a real ID (+ explicit `{label}`
+for content links specifically) — not just a copied name. Check
+upstream for the ID rather than assuming a name-based reference will
+resolve correctly anywhere outside `GrantItem`.
 
 ## Sixth-ish homebrew item: Untamed Form picker
 
@@ -373,12 +383,28 @@ outright with a **static, hand-authored** `choices` array listing all
 17 forms this module has patched with token-swap art (13 Animal Form
 animals + Aerial Form + Dragon Form + Monstrosity Form + Monstrosity
 Form (Kaiju)), each `value` pointing at the corresponding
-in-module-compendium item by name UUID
-(`Compendium.phil-pf2e-weredragon.weredragon-feats.Item.<exact name,
-including the [Weredragon Homebrew] suffix>`). Selecting one grants
-that item via the same `GrantItem`
+in-module-compendium item **by real `_id`**, not name
+(`Compendium.phil-pf2e-weredragon.weredragon-feats.Item.<_id>`).
+Selecting one grants that item via the same `GrantItem`
 `"{item|flags.system.rulesSelections.formEffect}"` dynamic-UUID
 pattern vanilla already uses — untouched from the original.
+
+**Every `value` in this choices array must be a real `_id`, never a
+name** — this bit twice already. First pass used name-based UUIDs
+(matching the style used everywhere else in this repo for `GrantItem`,
+which *does* resolve names fine), and every option in the in-game
+picker showed as literal "???". Root cause, confirmed by reading
+`ChoiceSetRuleElement`'s `inflateChoices()` directly
+(`src/module/rules/rule-element/choice-set/rule-element.ts`): for each
+choice it resolves `value` via `fromUuidSync`, and if the result isn't
+an `ItemPF2e` instance, it **unconditionally overwrites** whatever
+`label`/`img` was authored with `label = "???"` / `img =
+"broken.jpeg"` — this is a third, independent place (beyond `GrantItem`
+and `@UUID[...]` content links) where name-based UUIDs silently fail
+in this codebase. All vanilla `ChoiceSet` content confirms this the
+same way: every real choices array in the pf2e system uses either a
+localization key or (for item references) a real ID, never a bare
+item name.
 
 Deliberately excludes Pest Form, Insect Form, Elemental Form, and
 Plant Form (not patched, no custom art) — confirmed with the user

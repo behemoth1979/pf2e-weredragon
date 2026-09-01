@@ -27,71 +27,71 @@
         "choices": [
           {
             "label": "Ape",
-            "value": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.Spell Effect: Animal Form (Ape) [Weredragon Homebrew]"
+            "value": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.AnmFrmApe0000001"
           },
           {
             "label": "Bear",
-            "value": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.Spell Effect: Animal Form (Bear) [Weredragon Homebrew]"
+            "value": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.AnmFrmBer0000001"
           },
           {
             "label": "Bull",
-            "value": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.Spell Effect: Animal Form (Bull) [Weredragon Homebrew]"
+            "value": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.AnmFrmBul0000001"
           },
           {
             "label": "Canine",
-            "value": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.Spell Effect: Animal Form (Canine) [Weredragon Homebrew]"
+            "value": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.AnmFrmCan0000001"
           },
           {
             "label": "Cat",
-            "value": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.Spell Effect: Animal Form (Cat) [Weredragon Homebrew]"
+            "value": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.AnmFrmCat0000001"
           },
           {
             "label": "Crab",
-            "value": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.Spell Effect: Animal Form (Crab) [Weredragon Homebrew]"
+            "value": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.AnmFrmCrb0000001"
           },
           {
             "label": "Crocodile",
-            "value": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.Spell Effect: Animal Form (Crocodile) [Weredragon Homebrew]"
+            "value": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.AnmFrmCrc0000001"
           },
           {
             "label": "Deer",
-            "value": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.Spell Effect: Animal Form (Deer) [Weredragon Homebrew]"
+            "value": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.AnmFrmDer0000001"
           },
           {
             "label": "Frog",
-            "value": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.Spell Effect: Animal Form (Frog) [Weredragon Homebrew]"
+            "value": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.AnmFrmFrg0000001"
           },
           {
             "label": "Orca",
-            "value": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.Spell Effect: Animal Form (Orca) [Weredragon Homebrew]"
+            "value": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.AnmFrmOrc0000001"
           },
           {
             "label": "Seal",
-            "value": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.Spell Effect: Animal Form (Seal) [Weredragon Homebrew]"
+            "value": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.AnmFrmSel0000001"
           },
           {
             "label": "Shark",
-            "value": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.Spell Effect: Animal Form (Shark) [Weredragon Homebrew]"
+            "value": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.AnmFrmShk0000001"
           },
           {
             "label": "Snake",
-            "value": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.Spell Effect: Animal Form (Snake) [Weredragon Homebrew]"
+            "value": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.AnmFrmSnk0000001"
           },
           {
             "label": "Aerial Form (Bat/Bird/Wasp/Pterosaur)",
-            "value": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.Spell Effect: Aerial Form [Weredragon Homebrew]"
+            "value": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.AerialFrmWeredr1"
           },
           {
             "label": "Dragon Form",
-            "value": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.Spell Effect: Dragon Form [Weredragon Homebrew]"
+            "value": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.DrgnFrmWeredr001"
           },
           {
             "label": "Monstrosity Form (Cave Worm/Phoenix/Sea Serpent)",
-            "value": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.Spell Effect: Monstrosity Form [Weredragon Homebrew]"
+            "value": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.MonForm00Weredr1"
           },
           {
             "label": "Monstrosity Form (Kaiju)",
-            "value": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.Spell Effect: Monstrosity Form (Kaiju) [Weredragon Homebrew]"
+            "value": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.KaijuFrmEff001XQ"
           }
         ],
         "flag": "formEffect",
