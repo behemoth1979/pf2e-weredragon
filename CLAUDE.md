@@ -247,6 +247,46 @@ own existing `GrantItem` for Phoenix's "Blazing Conflagration" (only
 granted when `feat:phoenixs-flight` + `monstrosity-form:phoenix`), not
 guessed.
 
+## Animal Form and Dragon Form token swaps
+
+`src/packs/feats/spell-effect-animal-form-{ape,bear,bull,canine,cat,
+deer,frog,shark,snake}.json` — patched copies of the real per-animal
+Animal Form spell effects (each animal is its own upstream file, same
+as Kaiju, unlike Monstrosity Form's shared-item design). Each just
+adds one unconditional `TokenImage` RE (no predicate needed — the
+form's own presence on the actor is the condition) pointing at its
+matching asset. Only 9 of Animal Form's 13 options have art so far
+(no crab/crocodile/orca/seal token yet) — add the same pattern to
+those `spell-effect-animal-form-{crab,crocodile,orca,seal}.json` files
+once art exists for them, not before (don't add a `TokenImage` RE
+pointing at a file that doesn't exist in `assets/tokens/`).
+
+Note: canine's asset is named `wolf-form.webp`, not `canine-form.webp`
+— check the actual filenames in `assets/tokens/` before assuming a
+name; don't infer it from the compendium's option label.
+
+`src/packs/feats/spell-effect-dragon-form.json` — Dragon Form is a
+single large shared item (40 dragon-type choices via one `ChoiceSet`,
+confirmed directly against the downloaded upstream source, not a
+summary). Only one dragon type has art (`dragon-form.webp`, for
+Stormcrown), so this patch adds exactly one `TokenImage` RE, predicated
+on `["dragon-form:stormcrown"]` — verified against the file's own
+existing roll-option RE (`"dragon-form:{item|flags.system.
+rulesSelections.dragonForm.dragonType}"`) and several other REs in the
+same file already using the identical `dragon-form:<type>` predicate
+pattern for other dragon-specific overrides (burrow/climb/swim speed
+by type), so this isn't guessed syntax.
+
+**How these were built**: for files this large (Dragon Form is 768
+lines upstream), don't hand-type a reconstruction — `curl` the exact
+upstream JSON to a scratch file first, then edit it programmatically
+(a throwaway Node script) to inject the new RE(s) and rename/re-ID/add
+the wrapper fields (`_key`/`sort`/`ownership`/`flags`/`_stats`/
+`effects`), so the untouched bulk of the file is guaranteed byte-exact
+rather than transcribed by hand. Same round-trip verification
+(compile → extract → diff) as every other item in this repo still
+applies before committing.
+
 ## Pending / in-progress work
 
 - **Token image swap on form change**: adding `TokenImage` rule

@@ -82,6 +82,11 @@ Serpent), adding a token swap for each (`cave-worm-form.webp`,
 Serpent)** spell (4d8+10 slashing, basic Reflex save vs. this
 character's spell DC).
 
+It also patches nine of Animal Form's per-animal spell effects (Ape,
+Bear, Bull, Canine, Cat, Deer, Frog, Shark, Snake) with matching token
+swaps, and Dragon Form's Stormcrown dragon type with a token swap to
+`dragon-form.webp`.
+
 ## Editing the design
 
 Source lives at:
