@@ -1,0 +1,93 @@
+{
+  "_id": "WdrgnBreathSpl01",
+  "img": "systems/pf2e/icons/spells/chain-lightning.webp",
+  "name": "Weredragon Breath Weapon",
+  "system": {
+    "area": null,
+    "cost": {
+      "value": ""
+    },
+    "counteraction": false,
+    "damage": {
+      "0": {
+        "applyMod": false,
+        "category": null,
+        "formula": "8d12",
+        "kinds": [
+          "damage"
+        ],
+        "materials": [],
+        "type": "electricity"
+      }
+    },
+    "defense": {
+      "save": {
+        "basic": true,
+        "statistic": "reflex"
+      }
+    },
+    "description": {
+      "value": "<p><em>Homebrew: a straight duplicate of the real Chain Lightning spell, renamed for this character's Weredragon breath weapon — mechanics (damage, save, range, target, heightening) are unchanged from the original; the description text below still describes it as a lightning bolt rather than a breath cone, since only the name was asked to change. Ask if you'd like the flavor text reworked to match a breath weapon instead.</em></p><p>You discharge a powerful bolt of lightning at the target, dealing 8d12 electricity damage. The target must attempt a basic Reflex save. The electricity arcs to another creature within 30 feet of the first target, jumps to another creature within 30 feet of that target, and so on. You can end the chain at any point. You can't target the same creature more than once, and you must have line of effect to all targets. Roll the damage only once, and apply it to each target (halving or doubling as appropriate for its saving throw outcome). The chain ends if any one of the targets critically succeeds at its save.</p>\n<hr />\n<p><strong>Heightened (+1)</strong> The damage increases by 1d12.</p>"
+    },
+    "duration": {
+      "sustained": false,
+      "value": ""
+    },
+    "heightening": {
+      "damage": {
+        "0": "1d12"
+      },
+      "interval": 1,
+      "type": "interval"
+    },
+    "level": {
+      "value": 6
+    },
+    "publication": {
+      "license": "ORC",
+      "remaster": true,
+      "title": "Homebrew"
+    },
+    "range": {
+      "value": "500 feet"
+    },
+    "requirements": "",
+    "rules": [],
+    "target": {
+      "value": "1 creature, plus any number of additional creatures"
+    },
+    "time": {
+      "value": "2"
+    },
+    "traits": {
+      "rarity": "common",
+      "traditions": [
+        "arcane",
+        "primal"
+      ],
+      "value": [
+        "concentrate",
+        "electricity",
+        "manipulate"
+      ]
+    }
+  },
+  "type": "spell",
+  "_key": "!items!WdrgnBreathSpl01",
+  "sort": 775000,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "coreVersion": "14.366",
+    "systemId": "pf2e",
+    "systemVersion": "8.4.1",
+    "createdTime": 1735689600000,
+    "modifiedTime": 1735689600000,
+    "lastModifiedBy": "phildedication00"
+  },
+  "effects": []
+}

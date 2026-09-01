@@ -446,6 +446,18 @@ our own module's pack, so it gets stripped. None of this repo's other
 patched items had this field; check for it when patching any future
 spell specifically.
 
+## Weredragon Breath Weapon spell (Chain Lightning duplicate)
+
+`src/packs/feats/weredragon-breath-weapon-spell.json` — a straight
+duplicate of the real Chain Lightning spell (8d12 electricity, basic
+Reflex, chains to additional creatures within 30 ft, +1d12 per rank
+heightening), renamed only. No mechanical changes and, per what was
+actually asked ("duplicate ... call it X", not "reflavor"), the
+description text still describes a lightning bolt rather than a
+breath cone — flagged in the homebrew note in case that's wanted
+later, but not assumed. Standalone item, not wired into any other
+homebrew mechanism (no grants, no predicates referencing it).
+
 ## Hotbar macro: one-click Untamed Form toggle
 
 The first non-JSON-content addition to this module: a **Macro**

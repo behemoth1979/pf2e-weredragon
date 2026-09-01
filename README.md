@@ -102,6 +102,11 @@ There's also a patched **Untamed Form** spell (a proper castable spell
 with focus-point cost, not just the effect) — its description links to
 the patched Spell Effect above instead of the vanilla one.
 
+There's also a **Weredragon Breath Weapon** spell — a straight
+duplicate of Chain Lightning (8d12 electricity, basic Reflex,
+chains between nearby creatures), renamed for flavor only; the
+mechanics and description are otherwise unchanged from the original.
+
 ## Hotbar macro
 
 The module includes a second compendium, **Homebrew: Weredragon
