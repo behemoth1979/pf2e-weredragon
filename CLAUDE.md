@@ -448,15 +448,21 @@ spell specifically.
 
 ## Weredragon Breath Weapon spell (Chain Lightning duplicate)
 
-`src/packs/feats/weredragon-breath-weapon-spell.json` — a straight
+`src/packs/feats/weredragon-breath-weapon-spell.json` — a mechanical
 duplicate of the real Chain Lightning spell (8d12 electricity, basic
 Reflex, chains to additional creatures within 30 ft, +1d12 per rank
-heightening), renamed only. No mechanical changes and, per what was
-actually asked ("duplicate ... call it X", not "reflavor"), the
-description text still describes a lightning bolt rather than a
-breath cone — flagged in the homebrew note in case that's wanted
-later, but not assumed. Standalone item, not wired into any other
-homebrew mechanism (no grants, no predicates referencing it).
+heightening) — all numbers/fields unchanged from the original. First
+built with the name changed only, per the literal ask; a follow-up
+request reflavored the description prose to read as a draconic breath
+(exhale/arcs-of-breath language) while explicitly keeping the chain
+mechanic intact rather than rewriting it as a cone (the real mechanic
+is single-target-plus-arcing-chain, not an AoE burst — the flavor
+text was written to match that, not to imply a shape it doesn't have).
+Traits (including `manipulate`) were deliberately left untouched even
+though a "breath" conceptually shouldn't need somatic components —
+that would be a mechanical change, and only the text was asked to
+change; revisit only if asked. Standalone item, not wired into any
+other homebrew mechanism (no grants, no predicates referencing it).
 
 ## Hotbar macro: one-click Untamed Form toggle
 
