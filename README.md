@@ -84,8 +84,11 @@ character's spell DC).
 
 It also patches all 13 of Animal Form's per-animal spell effects (Ape,
 Bear, Bull, Canine, Cat, Crab, Crocodile, Deer, Frog, Orca, Seal,
-Shark, Snake) with matching token swaps, and Dragon Form's Stormcrown
-dragon type with a token swap to `dragon-form.webp`.
+Shark, Snake) with matching token swaps, Dragon Form's Stormcrown
+dragon type with a token swap to `dragon-form.webp`, and Aerial Form
+(Bat/Bird/Wasp/Pterosaur) with a single token swap to
+`aerial-form.webp` that applies regardless of which of the four
+creatures you choose.
 
 ## Editing the design
 

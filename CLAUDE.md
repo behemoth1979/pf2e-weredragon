@@ -247,7 +247,7 @@ own existing `GrantItem` for Phoenix's "Blazing Conflagration" (only
 granted when `feat:phoenixs-flight` + `monstrosity-form:phoenix`), not
 guessed.
 
-## Animal Form and Dragon Form token swaps
+## Animal Form, Dragon Form, and Aerial Form token swaps
 
 `src/packs/feats/spell-effect-animal-form-{ape,bear,bull,canine,cat,
 crab,crocodile,deer,frog,orca,seal,shark,snake}.json` — patched
@@ -277,15 +277,24 @@ same file already using the identical `dragon-form:<type>` predicate
 pattern for other dragon-specific overrides (burrow/climb/swim speed
 by type), so this isn't guessed syntax.
 
+`src/packs/feats/spell-effect-aerial-form.json` — also a single
+shared item (like Dragon Form/Monstrosity Form), with a `ChoiceSet`
+(`rollOption: "aerial-form"`) offering Bat/Bird/Wasp/Pterosaur, each
+gated by its own predicated `BattleForm`. Only one piece of art exists
+for this spell (`aerial-form.webp`, not one per creature), so unlike
+Dragon Form's single-predicated addition, this patch adds one
+**unconditional** `TokenImage` RE with no predicate — applies
+regardless of which of the four aerial creatures is chosen.
+
 **How these were built**: for files this large (Dragon Form is 768
-lines upstream), don't hand-type a reconstruction — `curl` the exact
-upstream JSON to a scratch file first, then edit it programmatically
-(a throwaway Node script) to inject the new RE(s) and rename/re-ID/add
-the wrapper fields (`_key`/`sort`/`ownership`/`flags`/`_stats`/
-`effects`), so the untouched bulk of the file is guaranteed byte-exact
-rather than transcribed by hand. Same round-trip verification
-(compile → extract → diff) as every other item in this repo still
-applies before committing.
+lines upstream, Aerial Form 637), don't hand-type a reconstruction —
+`curl` the exact upstream JSON to a scratch file first, then edit it
+programmatically (a throwaway Node script) to inject the new RE(s) and
+rename/re-ID/add the wrapper fields (`_key`/`sort`/`ownership`/
+`flags`/`_stats`/`effects`), so the untouched bulk of the file is
+guaranteed byte-exact rather than transcribed by hand. Same round-trip
+verification (compile → extract → diff) as every other item in this
+repo still applies before committing.
 
 ## Pending / in-progress work
 
