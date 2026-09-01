@@ -208,7 +208,7 @@
             "predicate": [
               "werecreature:weredragon"
             ],
-            "text": "Your hybrid and animal shapes are covered in small, hard scales, with vestigial wings that let you glide short distances. You gain a land Speed of 25 feet and a fly Speed of 10 feet, plus antler, claw, jaws, and tail (10-foot reach) unarmed attacks. As with a werebat, you must begin and end each of your turns on a solid surface while flying or you fall."
+            "text": "Your hybrid and animal shapes are covered in small, hard scales, with vestigial wings that let you glide short distances. You gain a land Speed of 30 feet and a fly Speed of 40 feet (50 feet in animal shape), plus antler, claw, jaws, and tail (10-foot reach) unarmed attacks. As with a werebat, you must begin and end each of your turns on a solid surface while flying or you fall."
           }
         ]
       },
@@ -628,21 +628,25 @@
           }
         ],
         "selector": "land",
-        "value": 25
+        "value": 30
       },
       {
         "key": "BaseSpeed",
         "predicate": [
           "werecreature:weredragon",
-          {
-            "or": [
-              "change-shape:hybrid",
-              "change-shape:animal"
-            ]
-          }
+          "change-shape:hybrid"
         ],
         "selector": "fly",
-        "value": 10
+        "value": 40
+      },
+      {
+        "key": "BaseSpeed",
+        "predicate": [
+          "werecreature:weredragon",
+          "change-shape:animal"
+        ],
+        "selector": "fly",
+        "value": 50
       },
       {
         "category": "unarmed",

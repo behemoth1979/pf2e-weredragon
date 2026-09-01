@@ -16,7 +16,7 @@ Owner/GM: Phil. Runs the game on Forge VTT.
 **Weredragon stat block:**
 | Type | Speed | Attack | Damage | Traits | Special |
 |---|---|---|---|---|---|
-| Weredragon | 25 ft, fly 10 ft | Antler / Claw / Jaws / Tail | 1d8 piercing / 1d8 slashing / 1d8 piercing / 1d8 bludgeoning | Shove / Agile / — / Reach 10 ft, Trip | Must begin and end each turn on solid ground while flying, or fall (same rule as Werebat) |
+| Weredragon | 30 ft, fly 40 ft (hybrid) / fly 50 ft (animal) | Antler / Claw / Jaws / Tail | 1d8 piercing / 1d8 slashing / 1d8 piercing / 1d8 bludgeoning | Shove / Agile / — / Reach 10 ft, Trip | Must begin and end each turn on solid ground while flying, or fall (same rule as Werebat) |
 
 ## Repo layout
 
