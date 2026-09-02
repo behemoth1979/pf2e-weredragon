@@ -116,6 +116,35 @@ update `system.runes` (potency/striking/property) *and* the matching
 aren't derived from each other, both are hardcoded to match the
 character's actual gear at time of writing.
 
+**Precious material extension (cold iron):** `system.material` is set
+to `{"type": "cold-iron", "grade": "high"}` (valid grade keys
+confirmed against `WEAPON_MATERIAL_VALUATION_DATA` in
+`src/module/item/physical/materials.ts` upstream: low/standard/high).
+Making battle-form unarmed strikes count as cold iron needed a
+different mechanism than the rune bonuses above — materials aren't a
+numeric modifier or extra damage dice, they're a structural property
+of the strike that pf2e's IWR (resistance/weakness) system reads
+directly, so `FlatModifier`/`DamageDice` don't apply here. Used the
+real official pattern instead: `AdjustStrike` with `property:
+"materials"`, `mode: "add"` — copied from how the actual Oread
+ancestry feat "Metal-veined Strikes" makes unarmed attacks count as a
+chosen material (`packs/pf2e/feats/ancestry/versatile-heritages/
+oread/metal-veined-strikes.json` upstream), not invented from
+scratch. `AdjustStrike` operates via `actor.synthetics
+.strikeAdjustments` — a generic list applied whenever *any* strike/
+weapon gets constructed, confirmed (by reading
+`adjust-strike.ts`) to run in `beforePrepareData()` on
+already-constructed weapon objects, entirely separate from
+`applyDamageExclusion`'s modifier-list filtering (which only touches
+`DamageDicePF2e`/`Modifier` instances). So unlike every other RE on
+this item, this one isn't "bypassing an exclusion" — material
+composition was never subject to that exclusion in the first place;
+the `["battle-form", "item:category:unarmed"]` predicate here exists
+purely to *scope* it to battle forms (so it doesn't also silently
+apply to the character's ordinary real-world unarmed strikes, which
+already get their material correctly from the equipped item through
+the normal, unrelated system path).
+
 ## Third homebrew item: Black Dragon Hide Armor
 
 `src/packs/feats/black-dragon-hide-armor.json` — a third item in the

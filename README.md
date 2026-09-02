@@ -57,7 +57,10 @@ its potency (attack roll) and property rune bonus damage (Brilliant
 (Greater), Holy, Shock (Greater)) will keep applying on top of any
 active battle form's fixed attack/damage, instead of being discarded
 the way battle forms normally discard your gear. Striking-rune extra
-dice are deliberately left out of that carry-over.
+dice are deliberately left out of that carry-over. They're made of
+high-grade cold iron, and that carries over into battle forms too —
+your unarmed attacks in any form count as cold iron for bypassing
+resistances/vulnerabilities keyed to that material.
 
 It also includes **Black Dragon Hide Armor** — a custom Hide Armor
 built from Dragonhide (standard-grade), etched with +3 potency, major
