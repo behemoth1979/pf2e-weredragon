@@ -37,6 +37,31 @@
  * top-level declaration inside a function eliminates this whole class
  * of cross-module collision regardless of what identifiers any other
  * module happens to use.
+ *
+ * Bug found in play: the DamageAlteration was overriding EVERY damage
+ * partial on the strike, not just the base weapon die -- property rune
+ * bonus dice from Gauntlets of the Obsidian Terror (Greater Brilliant/
+ * Holy/Greater Shock) were getting their damage type silently
+ * overridden too. Root cause, confirmed by reading
+ * `extractDamageAlterations(source, domains, targetSlug)` directly in
+ * the compiled system source: `.filter((e) => [targetSlug, null]
+ * .includes(e.slug))` -- this function is called once with `targetSlug
+ * = "base"` for the base weapon damage die, and once per *other*
+ * DamageDice entry with `targetSlug = <that dice's own slug>`
+ * (`DamageDicePF2e#slug`, auto-derived from its `label` if not set
+ * explicitly). A DamageAlteration rule element's own `slug` field
+ * (separate from its `predicate`) has to equal that target to be
+ * attempted at all -- and critically, `null` always passes the check
+ * regardless of target, since `[targetSlug, null].includes(null)` is
+ * always true. This rule element never set an explicit `slug`, so it
+ * defaulted to `null` and matched every partial unconditionally,
+ * regardless of what its own `predicate` said. Fixed by adding
+ * `"slug": "base"` -- this restricts it to matching only when
+ * `targetSlug === "base"` (the actual base-damage extraction call),
+ * so it no longer competes for the rune bonus dice's own extraction
+ * pass at all. This generalizes correctly to any future property-rune
+ * dice too, not just the specific ones on this character's gear today
+ * -- it isn't a hardcoded exclusion list of known rune slugs.
  */
 
 (() => {
@@ -153,6 +178,7 @@ async function promptBizarreTransformation(actor) {
             predicate: [`item:slug:${result.strike}`],
             property: "damage-type",
             selectors: ["strike-damage"],
+            slug: "base",
             value: result.damageType,
           },
           {

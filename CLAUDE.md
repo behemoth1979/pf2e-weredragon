@@ -802,6 +802,33 @@ effect" step was refactored to call this same new function rather than
 duplicating the lookup, so there's exactly one place that knows how to
 find and remove the effect.
 
+**Damage-type-override scope bug found in play: it was overriding
+every damage partial on the strike, not just the base weapon die.**
+Property rune bonus dice from Gauntlets of the Obsidian Terror (Greater
+Brilliant/Holy/Greater Shock) were getting their own damage types
+silently overridden to whatever Bizarre Transformation had chosen too,
+not just the base weapon damage as intended. Root cause, confirmed by
+reading `extractDamageAlterations(source, domains, targetSlug)`
+directly in the compiled system source
+(`.filter((e) => [targetSlug, null].includes(e.slug))`): this function
+runs once with `targetSlug = "base"` to gather alterations for the base
+weapon damage die, and once *per other* `DamageDicePF2e` entry with
+`targetSlug = <that dice's own slug>` (auto-derived from its `label` if
+no explicit `slug` is set). A `DamageAlteration` rule element's own
+`slug` field — separate from its `predicate` — has to equal whichever
+target slug is being gathered for it to even be *attempted*, with one
+exception: `null` always passes, regardless of target, since
+`[targetSlug, null].includes(null)` is always true. This rule element
+never set an explicit `slug`, so it defaulted to `null` and got
+attempted against *every* damage partial unconditionally — its
+`predicate` (`item:slug:<strike>`) only narrows which *strikes*
+qualify, it says nothing about which *damage partial on that strike*.
+Fixed with one field: `"slug": "base"` on the `DamageAlteration`,
+restricting it to the base-damage extraction pass only. This
+generalizes correctly to any future property rune dice added to this
+character's gear too — it isn't a hardcoded exclusion list of today's
+specific rune slugs, it works by construction.
+
 ## Healing Transformation: automated healing on casting Untamed Form
 
 `scripts/healing-transformation.js` + `src/packs/feats/healing-
