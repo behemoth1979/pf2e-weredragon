@@ -1,7 +1,7 @@
 {
   "_id": "Bd9kH1d3ArmR7XpL",
   "img": "icons/equipment/chest/vest-leather-tattered-white.webp",
-  "name": "Black Dragon Hide Armor",
+  "name": "Hide of the Obsidian Terror",
   "system": {
     "acBonus": 3,
     "baseItem": "hide-armor",
@@ -42,14 +42,14 @@
     "rules": [
       {
         "key": "FlatModifier",
-        "label": "Black Dragon Hide (armor)",
+        "label": "Hide of the Obsidian Terror (armor)",
         "selector": "ac",
         "type": "untyped",
         "value": 1
       },
       {
         "key": "FlatModifier",
-        "label": "Black Dragon Hide (vs. poison)",
+        "label": "Hide of the Obsidian Terror (vs. poison)",
         "predicate": [
           "item:trait:poison"
         ],

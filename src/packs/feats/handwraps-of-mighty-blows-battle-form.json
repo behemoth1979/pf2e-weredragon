@@ -1,7 +1,7 @@
 {
   "_id": "Hw9kBFrmR2LmXpQ7",
   "img": "icons/equipment/hand/gauntlet-simple-leather-brown-gold.webp",
-  "name": "Handwraps of Mighty Blows +3 (Battle Form House Rule)",
+  "name": "Gauntlets of the Obsidian Terror",
   "system": {
     "ammo": null,
     "baseItem": null,
@@ -57,7 +57,7 @@
     "rules": [
       {
         "key": "FlatModifier",
-        "label": "Handwraps of Mighty Blows (+3 potency)",
+        "label": "Gauntlets of the Obsidian Terror (+3 potency)",
         "predicate": [
           {
             "or": [
@@ -271,7 +271,7 @@
           "item:category:unarmed"
         ],
         "selector": "strike-damage",
-        "title": "Handwraps of Mighty Blows",
+        "title": "Gauntlets of the Obsidian Terror",
         "text": "Greater Brilliant: target must succeed at a Fortitude save (DC = your class DC) or be blinded for 1 round; this damage ignores fire/spirit/vitality resistance. Greater Shock: electricity arcs to up to 2 other creatures within 10 feet for the same damage, ignoring electricity resistance. Holy vs. unholy: once per day you may spend a reaction to heal HP equal to double the unholy creature's level."
       },
       {

@@ -49,9 +49,9 @@ The feat's own `change-shape` toggle also explicitly includes a
 dropdown works the same as the vanilla feat's does, without depending
 on a separately granted item to merge that option in.
 
-The same compendium also includes **Handwraps of Mighty Blows +3
-(Battle Form House Rule)** — a patched copy of Handwraps of Mighty
-Blows for a character who also uses Wild Shape/Untamed Form. Drop it
+The same compendium also includes **Gauntlets of the Obsidian
+Terror** — a patched copy of Handwraps of Mighty Blows for a character
+who also uses Wild Shape/Untamed Form. Drop it
 onto that character's sheet in place of their normal Handwraps, and
 its potency (attack roll) and property rune bonus damage (Brilliant
 (Greater), Holy, Shock (Greater)) will keep applying on top of any
@@ -62,7 +62,7 @@ high-grade cold iron, and that carries over into battle forms too —
 your unarmed attacks in any form count as cold iron for bypassing
 resistances/vulnerabilities keyed to that material.
 
-It also includes **Black Dragon Hide Armor** — a custom Hide Armor
+It also includes **Hide of the Obsidian Terror** — a custom Hide Armor
 built from Dragonhide (standard-grade), etched with +3 potency, major
 resilient, Greater Fortification, Greater Dread, and Major Moonweave,
 plus a house rule granting a flat +1 bonus to AC and to saving throws
@@ -158,8 +158,10 @@ The Healing Transformation feat's official content is a toggle plus a
 reminder note added to your next polymorph spell's description — it
 doesn't actually roll or apply any healing. This module automates it:
 turn on the Healing Transformation spellshape toggle, then cast
-Untamed Form (Weredragon Homebrew) — you automatically restore 1d6
-Hit Points per the rank it was cast at, no extra clicks needed.
+Untamed Form (Weredragon Homebrew) (from the sheet or the hotbar
+macro) — you automatically restore 1d6 Hit Points per the rank it was
+cast at, plus a flat +10 house-rule bonus ("Overflowing Life"), no
+extra clicks needed.
 
 ## Editing the design
 

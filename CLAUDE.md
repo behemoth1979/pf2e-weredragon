@@ -79,6 +79,10 @@ belonging to the same player character (a Druid who also uses Wild
 Shape/Untamed Form). It's a patched copy of the real Handwraps of
 Mighty Blows, pre-etched with this character's actual runes (+3
 potency, major striking, Brilliant (Greater), Holy, Shock (Greater)).
+**In-game display name is "Gauntlets of the Obsidian Terror"** (renamed
+on request) — this section keeps referring to it by its mechanical
+basis (Handwraps of Mighty Blows) since that's what's actually relevant
+to how it works, not what it's currently called.
 
 **The problem it solves:** real "battle forms" (Wild Shape's Wolf/
 Dinosaur/Dragon Form/etc.) use the `BattleForm` rule element, which
@@ -199,7 +203,9 @@ material through the ordinary system path). **Don't reuse
 `src/packs/feats/black-dragon-hide-armor.json` — a third item in the
 same `weredragon-feats` pack, a custom suit of armor for this
 character, built from a real Hide Armor base item (`baseItem:
-"hide-armor"`, ORC/remaster).
+"hide-armor"`, ORC/remaster). **In-game display name is "Hide of the
+Obsidian Terror"** (renamed on request) — this section (and the source
+filename) keep referring to it by its mechanical basis.
 
 Etched with +3 potency, major resilient, and three property runes
 (Greater Fortification, Greater Dread, Major Moonweave), crafted from
@@ -866,6 +872,29 @@ purely so the character has a proper, readable spell entry describing
 what this house rule does, matching how the rest of this module treats
 homebrew mechanics as real, inspectable items rather than invisible
 script-only magic.
+
+**Second trigger path, found in play (v2.15.1): the hotbar macro needed
+its own call, same as Bizarre Transformation before it.** Live testing
+confirmed casting Untamed Form from the sheet's Spellcasting tab
+already worked, but using the `untamed-form-toggle.json` hotbar macro
+did not -- that macro creates the "Spell Effect: Untamed Form" item
+directly via `createEmbeddedDocuments`, entirely bypassing
+`SpellPF2e#toMessage()`/spellcasting, so no chat message is ever
+created and the `createChatMessage` hook has nothing to see. This is
+the exact same "two different trigger paths" situation
+`bizarre-transformation.js` already solved for battle forms (via
+`createItem`) vs. Weredragon Hybrid/Animal (via a direct macro call) —
+fixed the same way here: `applyHealingTransformation(actor, rank)` was
+factored out of the hook handler and exposed on
+`game.modules.get("phil-pf2e-weredragon")` at `init`, and
+`untamed-form-toggle.json`'s command now calls it directly right after
+creating the effect (only on the "gain form" branch, not on revert).
+Rank is derived by looking up the actor's own embedded "Untamed Form
+(Weredragon Homebrew)" spell item and reading `.rank` from it — a
+reasonable source here specifically because that item is already
+confirmed present on this character (they've already cast it
+successfully from the sheet), falling back to `1` if it's ever absent
+on some other character using the macro without that spell added.
 
 ## Keeping in sync with upstream pf2e system updates
 
