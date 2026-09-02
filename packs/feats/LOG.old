@@ -1,5 +1,5 @@
-2026/09/02-11:08:07.278 11194 Delete type=3 #1
-2026/09/02-11:08:07.297 1221c Level-0 table #5: started
-2026/09/02-11:08:07.302 1221c Level-0 table #5: 66148 bytes OK
-2026/09/02-11:08:07.306 1221c Delete type=0 #3
-2026/09/02-11:08:07.307 1221c Manual compaction at level-0 from '!items!AerialFrmWeredr1' @ 72057594037927935 : 1 .. '!items!qqKcyHa9OH3HMt9a' @ 0 : 0; will stop at (end)
+2026/09/02-11:26:43.732 4d78 Delete type=3 #1
+2026/09/02-11:26:43.751 10f10 Level-0 table #5: started
+2026/09/02-11:26:43.756 10f10 Level-0 table #5: 66152 bytes OK
+2026/09/02-11:26:43.761 10f10 Delete type=0 #3
+2026/09/02-11:26:43.761 10f10 Manual compaction at level-0 from '!items!AerialFrmWeredr1' @ 72057594037927935 : 1 .. '!items!qqKcyHa9OH3HMt9a' @ 0 : 0; will stop at (end)

@@ -156,7 +156,6 @@
       },
       {
         "definition": [
-          "battle-form",
           "item:category:unarmed"
         ],
         "key": "AdjustStrike",

@@ -138,12 +138,26 @@ already-constructed weapon objects, entirely separate from
 `applyDamageExclusion`'s modifier-list filtering (which only touches
 `DamageDicePF2e`/`Modifier` instances). So unlike every other RE on
 this item, this one isn't "bypassing an exclusion" — material
-composition was never subject to that exclusion in the first place;
-the `["battle-form", "item:category:unarmed"]` predicate here exists
-purely to *scope* it to battle forms (so it doesn't also silently
-apply to the character's ordinary real-world unarmed strikes, which
-already get their material correctly from the equipped item through
-the normal, unrelated system path).
+composition was never subject to that exclusion in the first place.
+
+**Correction (found in play):** the `definition` field on
+`AdjustStrike` is **not** a general predicate like every other RE's
+`predicate` field — its own source (`adjust-strike.ts`) tests it via
+`definition.test(weapon.getRollOptions("item"))`, i.e. *only* the
+weapon's own item-scoped roll options (`item:category:unarmed`,
+`item:trait:X`, etc.), never the actor's general roll-option bag. So
+the originally-shipped `["battle-form", "item:category:unarmed"]`
+never matched anything — `"battle-form"` is an actor-level option and
+can never appear in a weapon's own `getRollOptions("item")` output,
+so the rule silently never fired, in or out of battle form. Fixed to
+`definition: ["item:category:unarmed"]` (no battle-form scoping — it
+isn't reachable at this field, so the RE now applies to *all* unarmed
+strikes, battle-form or not, which is harmless since real unarmed
+strikes should already be cold iron from the equipped item's own
+material through the ordinary system path). **Don't reuse
+`["battle-form", ...]` in a `definition` field on any future
+`AdjustStrike`** — that pattern only works on `predicate` fields
+(`FlatModifier`, `DamageDice`, etc.), not `definition`.
 
 ## Third homebrew item: Black Dragon Hide Armor
 
