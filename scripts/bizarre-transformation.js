@@ -67,6 +67,12 @@ const BATTLE_FORM_SLUGS = new Set([
   "animal-form-snake",
 ]);
 
+async function removeBizarreTransformation(actor) {
+  if (!actor) return;
+  const existing = actor.items.find((i) => i.getFlag(MODULE_ID, "bizarreTransformation"));
+  if (existing) await existing.delete();
+}
+
 async function promptBizarreTransformation(actor) {
   if (!actor) return;
 
@@ -126,8 +132,7 @@ async function promptBizarreTransformation(actor) {
   if (!result) return;
 
   // Only one Bizarre Transformation change should be active at a time.
-  const existing = actor.items.find((i) => i.getFlag(MODULE_ID, "bizarreTransformation"));
-  if (existing) await existing.delete();
+  await removeBizarreTransformation(actor);
 
   await actor.createEmbeddedDocuments("Item", [
     {
@@ -168,7 +173,10 @@ async function promptBizarreTransformation(actor) {
 
 Hooks.once("init", () => {
   const mod = game.modules.get(MODULE_ID);
-  if (mod) mod.promptBizarreTransformation = promptBizarreTransformation;
+  if (mod) {
+    mod.promptBizarreTransformation = promptBizarreTransformation;
+    mod.removeBizarreTransformation = removeBizarreTransformation;
+  }
 });
 
 Hooks.on("createItem", (item, _options, userId) => {
@@ -178,6 +186,21 @@ Hooks.on("createItem", (item, _options, userId) => {
   if (!BATTLE_FORM_SLUGS.has(item.system?.slug)) return;
 
   promptBizarreTransformation(item.parent);
+});
+
+// A tracked battle form's own effect being deleted means the actor just
+// reverted out of that form (dismissed, expired, or replaced by the
+// Untamed Form picker deleting the old effect before creating the new
+// one) -- clear any Bizarre Transformation riding on it rather than
+// leaving a stale damage-type override active on an attack that may not
+// even exist on whatever form (or no form) comes next.
+Hooks.on("deleteItem", (item, _options, userId) => {
+  if (userId !== game.user.id) return;
+  if (!(item.parent instanceof Actor)) return;
+  if (item.type !== "effect") return;
+  if (!BATTLE_FORM_SLUGS.has(item.system?.slug)) return;
+
+  removeBizarreTransformation(item.parent);
 });
 
 })();

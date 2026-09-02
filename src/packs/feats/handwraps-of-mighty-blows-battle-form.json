@@ -59,7 +59,22 @@
         "key": "FlatModifier",
         "label": "Handwraps of Mighty Blows (+3 potency)",
         "predicate": [
-          "battle-form",
+          {
+            "or": [
+              "battle-form",
+              {
+                "and": [
+                  "werecreature:weredragon",
+                  {
+                    "or": [
+                      "change-shape:hybrid",
+                      "change-shape:animal"
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
           "item:category:unarmed"
         ],
         "selector": "strike-attack-roll",
@@ -73,7 +88,22 @@
         "key": "DamageDice",
         "label": "Greater Brilliant",
         "predicate": [
-          "battle-form",
+          {
+            "or": [
+              "battle-form",
+              {
+                "and": [
+                  "werecreature:weredragon",
+                  {
+                    "or": [
+                      "change-shape:hybrid",
+                      "change-shape:animal"
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
           "item:category:unarmed"
         ],
         "selector": "strike-damage"
@@ -85,7 +115,22 @@
         "key": "DamageDice",
         "label": "Greater Brilliant (vs. fiends)",
         "predicate": [
-          "battle-form",
+          {
+            "or": [
+              "battle-form",
+              {
+                "and": [
+                  "werecreature:weredragon",
+                  {
+                    "or": [
+                      "change-shape:hybrid",
+                      "change-shape:animal"
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
           "item:category:unarmed",
           "target:trait:fiend"
         ],
@@ -98,7 +143,22 @@
         "key": "DamageDice",
         "label": "Greater Brilliant (vs. undead)",
         "predicate": [
-          "battle-form",
+          {
+            "or": [
+              "battle-form",
+              {
+                "and": [
+                  "werecreature:weredragon",
+                  {
+                    "or": [
+                      "change-shape:hybrid",
+                      "change-shape:animal"
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
           "item:category:unarmed",
           "target:trait:undead"
         ],
@@ -111,7 +171,22 @@
         "key": "DamageDice",
         "label": "Holy",
         "predicate": [
-          "battle-form",
+          {
+            "or": [
+              "battle-form",
+              {
+                "and": [
+                  "werecreature:weredragon",
+                  {
+                    "or": [
+                      "change-shape:hybrid",
+                      "change-shape:animal"
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
           "item:category:unarmed"
         ],
         "selector": "strike-damage"
@@ -123,7 +198,22 @@
         "key": "DamageDice",
         "label": "Holy (vs. unholy)",
         "predicate": [
-          "battle-form",
+          {
+            "or": [
+              "battle-form",
+              {
+                "and": [
+                  "werecreature:weredragon",
+                  {
+                    "or": [
+                      "change-shape:hybrid",
+                      "change-shape:animal"
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
           "item:category:unarmed",
           "target:trait:unholy"
         ],
@@ -136,7 +226,22 @@
         "key": "DamageDice",
         "label": "Greater Shock",
         "predicate": [
-          "battle-form",
+          {
+            "or": [
+              "battle-form",
+              {
+                "and": [
+                  "werecreature:weredragon",
+                  {
+                    "or": [
+                      "change-shape:hybrid",
+                      "change-shape:animal"
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
           "item:category:unarmed"
         ],
         "selector": "strike-damage"
@@ -147,7 +252,22 @@
           "criticalSuccess"
         ],
         "predicate": [
-          "battle-form",
+          {
+            "or": [
+              "battle-form",
+              {
+                "and": [
+                  "werecreature:weredragon",
+                  {
+                    "or": [
+                      "change-shape:hybrid",
+                      "change-shape:animal"
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
           "item:category:unarmed"
         ],
         "selector": "strike-damage",

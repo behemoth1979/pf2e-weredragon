@@ -86,8 +86,43 @@ overrides attack modifier and damage with the form's own fixed
 per-level bracket values and actively strips out most other damage
 modifiers (`BattleFormRuleElement#applyDamageExclusion`). This is a
 different code path from Werecreature's `Strike` rule element (which
-Weredragon uses, and which *does* automatically inherit handwraps
-runes via the actor's `unarmedRunes` merge — no patch needed there).
+Weredragon uses).
+
+**Correction (found in play): the "no patch needed for Weredragon"
+claim below was wrong for property rune damage.** This section
+originally claimed Weredragon's `Strike` RE "automatically inherits
+handwraps runes via the actor's `unarmedRunes` merge — no patch needed
+there," and on that assumption every rule element on this item
+(`FlatModifier`, all six `DamageDice`, the `Note`) was predicated
+`["battle-form", "item:category:unarmed"]` — gated behind the
+`battle-form` roll option `BattleFormRuleElement` sets, which
+Weredragon's `Strike` RE never sets at all (Weredragon doesn't go
+through `BattleFormRuleElement` in the first place). Live testing
+confirmed the split: the +3 potency attack bonus *does* come through
+correctly in Weredragon Hybrid/Animal form (the numeric `unarmedRunes`
+merge covers plain potency/striking numbers fine), but every property
+rune's bonus damage (Brilliant, Holy, Shock) showed up in the damage
+roll dialog as an available toggle and stayed permanently unchecked —
+`unarmedRunes` merges the actor's rune *numbers* onto a synthetic
+unarmed strike, it doesn't run the property runes' own rule-element
+generation the way an actual physical item with those runes attached
+would, so property rune effects specifically never applied for
+Weredragon at all, regardless of form.
+
+**Fix**: every affected predicate (`FlatModifier` and all six
+`DamageDice`/the `Note`) was extended from a bare `"battle-form"` to
+`{"or": ["battle-form", {"and": ["werecreature:weredragon", {"or":
+["change-shape:hybrid", "change-shape:animal"]}]}]}` — the same
+`werecreature:weredragon` + hybrid/animal predicate pattern already
+used throughout `werecreature-dedication.json` for every other
+Weredragon-specific rule element (see "How the patch works
+technically" above). This lets the bonuses apply in *either* a true
+`BattleForm`-driven form *or* Weredragon's own Hybrid/Animal forms.
+Leaving the (now-likely-redundant) `FlatModifier` enabled for
+Weredragon too is harmless even though potency already comes through
+naturally: it's still `type: "item"`, so PF2E's same-type-doesn't-
+stack rule means it can only ever match or be eclipsed by the natural
+value, never double-count.
 
 **How the fix works:** `applyDamageExclusion` explicitly skips
 excluding any modifier whose own `predicate` array already contains
@@ -98,11 +133,11 @@ There's no equivalent exclusion for attack-roll modifiers, so a
 same-predicate `FlatModifier` just stacks normally. So the item's
 rules are: one `FlatModifier` (attack, `type: "item"`) and several
 `DamageDice` entries (each property rune's bonus damage), each
-predicated on `["battle-form", "item:category:unarmed"]` (plus
-`target:trait:fiend`/`undead`/`unholy` where the rune's bonus is
-conditional). A `Note` RE reminds about rider effects that aren't
-automatable this way (Brilliant's crit blind save, Shock's crit arc,
-Holy's reaction heal, resistance-ignoring).
+predicated on the `battle-form`-or-Weredragon-hybrid/animal clause
+described above (plus `target:trait:fiend`/`undead`/`unholy` where the
+rune's bonus is conditional). A `Note` RE reminds about rider effects
+that aren't automatable this way (Brilliant's crit blind save, Shock's
+crit arc, Holy's reaction heal, resistance-ignoring).
 
 Deliberately **not** included: extra damage dice from the striking
 rune itself. The player found the +3 major-striking dice made battle
@@ -727,6 +762,39 @@ neither declares any top-level identifier and so carries no collision
 risk — but any *new* script here should still be wrapped from the
 start regardless, since a future sibling module could collide with
 any name).
+
+**Cleanup gap found in play, fixed in v2.14.2: reverting to Humanoid
+(or a battle form's effect simply going away) never removed the
+Bizarre Transformation effect.** The original implementation only
+handled the "gain a form" half — `promptBizarreTransformation()`
+deletes any *previous* Bizarre Transformation effect before creating a
+new one, so switching directly between two tracked forms was already
+self-cleaning, but there was no code path at all for "lose a form and
+don't gain a new one," so the damage-type override just stayed active
+indefinitely once you reverted to Humanoid. Fixed with a new exported
+`removeBizarreTransformation(actor)` function (alongside the existing
+`promptBizarreTransformation`, both exposed on
+`game.modules.get("phil-pf2e-weredragon")` at `init`), wired into two
+places:
+- `weredragon-form-humanoid.json`'s macro command now calls
+  `mod.removeBizarreTransformation(actor)` after successfully toggling
+  to Humanoid, mirroring how the Hybrid/Animal macros already call
+  `promptBizarreTransformation` — Humanoid's own macro deliberately
+  still doesn't *prompt* (no unarmed attacks to reflavor while
+  Humanoid), it only cleans up.
+- A new `Hooks.on("deleteItem", ...)` handler (same guard shape as the
+  existing `createItem` one — `userId === game.user.id`, `item.parent
+  instanceof Actor`, `item.type === "effect"`, slug in
+  `BATTLE_FORM_SLUGS`) calls the same cleanup whenever a tracked battle
+  form's own effect is deleted — covers dismissing/expiring a battle
+  form, and (harmlessly, since `promptBizarreTransformation` already
+  self-cleans on the creation side) the Untamed Form picker's
+  delete-then-create form-switch flow, which now fires cleanup twice
+  in a row without issue.
+`promptBizarreTransformation`'s own inline "delete any previous
+effect" step was refactored to call this same new function rather than
+duplicating the lookup, so there's exactly one place that knows how to
+find and remove the effect.
 
 ## Keeping in sync with upstream pf2e system updates
 
