@@ -122,6 +122,15 @@ Shifting into Kaiju form (however you get there — dragging the
 patched spell effect on, or picking it from the homebrew Untamed
 Form list) plays `kaiju-roar.ogg` for everyone at the table.
 
+## Aeon Stone (Pearly White Spindle) healing
+
+The real Aeon Stone (Pearly White Spindle) says it restores 1 HP
+every minute while invested, but that was never actually automated
+in the official content. This module adds it: while the character
+has that stone's resonance effect and isn't in an active encounter,
+1 HP heals for every in-game minute that passes (e.g. via the world
+clock/time-advance controls).
+
 ## Editing the design
 
 Source lives at:

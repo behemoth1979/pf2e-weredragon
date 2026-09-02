@@ -10,7 +10,8 @@
     "verified": "14.366"
   },
   "scripts": [
-    "scripts/kaiju-roar.js"
+    "scripts/kaiju-roar.js",
+    "scripts/aeon-stone-healing.js"
   ],
   "packs": [
     {

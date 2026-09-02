@@ -523,6 +523,50 @@ mechanism, and remember each new form needs its own slug check (all
 the patched slugs are listed in the `system.slug` overrides section
 above).
 
+## Pearly White Spindle aeon stone: 1 HP/minute out-of-combat healing
+
+`scripts/aeon-stone-healing.js`, third piece of runtime JS. The real
+official "Aeon Stone (Pearly White Spindle)" item's own description
+says "restoring 1 HP every minute" while invested — but its granted
+effect (`Effect: Aeon Stone Resonance (Pearly White Spindle)`, vanilla
+pf2e content, not something this repo patches/owns) has **zero**
+automation for that: checked the actual upstream source, its
+`system.rules` contains only a `Resistance` RE for void 1, nothing
+else. Pure flavor text describing a mechanic that was never built.
+
+Reuses the exact mechanism the pf2e system itself uses to expire
+timed effects: `Hooks.on("updateWorldTime", (worldTime, dt) => ...)`
+— the same hook `EffectTracker` listens to
+(`src/scripts/hooks/update-world-time.ts` →
+`game.pf2e.effectTracker.refresh()` upstream) — rather than a custom
+polling timer. `dt` is the elapsed seconds; `Math.floor(dt / 60)`
+gives whole minutes, healed directly onto `system.attributes.hp.value`
+(clamped to max). Out-of-combat only per what was asked — skipped
+while `game.combat?.started`. Fractional minutes aren't carried
+between calls (deliberate simplification, not a bug).
+
+**Identification gotcha, different from every other item this repo
+checks by slug**: the vanilla effect has no explicit `system.slug`
+set, and — confirmed by reading `ItemPF2e`'s actual `get slug()`
+getter in `src/module/item/base/document.ts` — `item.slug` is *only*
+`system.slug`, with **no name-derived fallback**. That fallback
+(`this.slug ?? sluggify(this.name)`) exists solely inside
+`getRollOptions()` for generating predicate strings like
+`item:slug:X` — it does not apply to reading `.slug` directly in
+script code. So this script matches by the item's exact `name`
+instead. Don't copy the slug-matching pattern used elsewhere in this
+repo (Kaiju's roar script, the Untamed Form macro) for *this* kind of
+check against an unmodified vanilla item with no explicit slug — name
+matching is the correct approach here specifically because there's no
+slug to check.
+
+**Permission model**: `actor.primaryUpdater !== game.user` guard,
+same pattern `EffectTracker` itself uses (confirmed in its source) —
+ensures exactly one connected client applies the healing per actor
+(whichever client is that actor's designated primary updater, usually
+its owning player — not GM-gated), rather than every client
+double-applying it.
+
 ## Keeping in sync with upstream pf2e system updates
 
 If the pf2e system reworks Werecreature Dedication (errata, new
