@@ -24,7 +24,22 @@
  * *is* a valid AdjustStrike property, and its narrower "definition" field
  * is fine here since it only needs an item-level option (item:slug:X), not
  * an actor-level one.
+ *
+ * Wrapped in an IIFE: Foundry loads every enabled module's plain
+ * "scripts" entries as classic (non-module) <script> tags sharing one
+ * global scope, not isolated per module. A top-level `const MODULE_ID`
+ * here collided with the sibling phil-pf2e-hero-points module's own
+ * identically-named top-level `const MODULE_ID` (found live: whichever
+ * module's script loaded second threw "Identifier 'MODULE_ID' has
+ * already been declared" and silently failed to execute at all --
+ * this file's own top-level declaration was the one erroring, so this
+ * feature just stopped working with no other symptom). Scoping every
+ * top-level declaration inside a function eliminates this whole class
+ * of cross-module collision regardless of what identifiers any other
+ * module happens to use.
  */
+
+(() => {
 
 const MODULE_ID = "phil-pf2e-weredragon";
 const DAMAGE_TYPES = ["acid", "bludgeoning", "cold", "electricity", "fire", "poison", "piercing", "slashing"];
@@ -164,3 +179,5 @@ Hooks.on("createItem", (item, _options, userId) => {
 
   promptBizarreTransformation(item.parent);
 });
+
+})();

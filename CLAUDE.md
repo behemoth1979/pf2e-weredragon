@@ -710,6 +710,24 @@ fix; if this proves flaky in play, needs a more deterministic wait
 (e.g. polling `actor.system.actions` for the expected strike, or a
 dedicated post-prepare hook if pf2e exposes one).
 
+**Bug found in play, fixed in v2.14.1: cross-module global-scope
+collision broke this script entirely.** This file's top-level `const
+MODULE_ID = "phil-pf2e-weredragon"` collided with the sibling
+`pf2e-hero-points` module's own identically-named top-level `const
+MODULE_ID` — Foundry loads every enabled module's plain `"scripts"`
+entries as classic `<script>` tags sharing one global page scope, not
+isolated per module, so two modules independently declaring the same
+top-level identifier throws `Uncaught SyntaxError: Identifier
+'MODULE_ID' has already been declared` for whichever one loads second,
+and that entire file silently fails to execute — no other symptom.
+Fixed by wrapping the whole file's body in an IIFE (`(() => { ... })
+();`), which is now standing practice for every script in this module
+(see `kaiju-roar.js`/`aeon-stone-healing.js`, left unwrapped since
+neither declares any top-level identifier and so carries no collision
+risk — but any *new* script here should still be wrapped from the
+start regardless, since a future sibling module could collide with
+any name).
+
 ## Keeping in sync with upstream pf2e system updates
 
 If the pf2e system reworks Werecreature Dedication (errata, new
