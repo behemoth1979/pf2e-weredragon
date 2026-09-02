@@ -198,6 +198,33 @@ material through the ordinary system path). **Don't reuse
 `AdjustStrike`** — that pattern only works on `predicate` fields
 (`FlatModifier`, `DamageDice`, etc.), not `definition`.
 
+**Second `AdjustStrike`, same unconditional pattern, added after live
+play found Holy's weakness bonus wasn't triggering.** The Holy rune's
+bonus damage (`DamageDice`, `damageType: "spirit"`) was applying fine,
+but a target's *weakness to holy* specifically never triggered.
+Confirmed against the real Holy weapon property rune's own CONFIG
+entry (`CONFIG.PF2E.runes.weapon.property.holy` in the compiled
+system source) that this is expected: Holy doesn't just add bonus
+spirit damage, it also carries `traits: ["holy", "magical"]` and a
+`strikeAdjustments: [{ adjustTraits: (e, t) => t.push("holy") }]`
+entry specifically so the *strike itself* carries the `holy` trait —
+weakness-to-holy checks that trait on the attack, not the `spirit`
+damage type of any one damage partial. (Checked Greater Brilliant's
+own real CONFIG entry for comparison: it has no such trait or
+`strikeAdjustments` at all — `traits: ["magical"]` only — so its
+fire/spirit/vitality weakness-triggering is purely damage-type-based
+and was already working correctly; it isn't part of this bug.) Since
+our item's `Strike`-RE-driven battle-form/Weredragon strikes never go
+through the real rune's own `strikeAdjustments`, the `holy` trait
+never got added there. Fixed with a second `AdjustStrike`
+(`property: "traits"`, `mode: "add"`, `value: "holy"`,
+`definition: ["item:category:unarmed"]`) — unconditional, same as the
+cold-iron one just above it, for the identical reason: for a normal
+(non-battle-form) unarmed strike, the real Holy rune should already be
+adding this trait through the ordinary system path, so pushing it a
+second time is a harmless no-op there, while for battle-form/Weredragon
+strikes it's the only thing that adds it at all.
+
 ## Third homebrew item: Black Dragon Hide Armor
 
 `src/packs/feats/black-dragon-hide-armor.json` — a third item in the

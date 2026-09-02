@@ -283,6 +283,16 @@
         "property": "materials",
         "selector": "strike-damage",
         "value": "cold-iron"
+      },
+      {
+        "definition": [
+          "item:category:unarmed"
+        ],
+        "key": "AdjustStrike",
+        "mode": "add",
+        "property": "traits",
+        "selector": "strike-damage",
+        "value": "holy"
       }
     ],
     "runes": {
