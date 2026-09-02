@@ -152,6 +152,15 @@ current unarmed attacks and a new damage type (or skip). Confirming
 applies it for real — that attack deals the new damage type and gains
 the matching trait — until you transform again.
 
+## Healing Transformation
+
+The Healing Transformation feat's official content is a toggle plus a
+reminder note added to your next polymorph spell's description — it
+doesn't actually roll or apply any healing. This module automates it:
+turn on the Healing Transformation spellshape toggle, then cast
+Untamed Form (Weredragon Homebrew) — you automatically restore 1d6
+Hit Points per the rank it was cast at, no extra clicks needed.
+
 ## Editing the design
 
 Source lives at:

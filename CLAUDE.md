@@ -796,6 +796,77 @@ effect" step was refactored to call this same new function rather than
 duplicating the lookup, so there's exactly one place that knows how to
 find and remove the effect.
 
+## Healing Transformation: automated healing on casting Untamed Form
+
+`scripts/healing-transformation.js` + `src/packs/feats/healing-
+transformation-spell.json` — automates the "Healing Transformation"
+spellshape feat, analyzed on request the same way Bizarre
+Transformation was analyzed before it was automated: its real rules
+(checked directly against the actual item, not assumed) are a
+toggleable `RollOption` (adds `spellshape:healing-transformation` when
+on) and an `ItemAlteration` that appends a reminder line to the next
+polymorph spell's own description -- no rule element anywhere actually
+rolls or applies healing. Scoped specifically to Untamed Form
+(Weredragon Homebrew) (this module's own patched, actually-castable
+copy of the real spell, from `untamed-form-spell.json`), not to
+"any polymorph spell" generally, per what was actually asked.
+
+**Detecting "Untamed Form was just cast, at what rank"**: confirmed
+directly from `ChatMessagePF2e#get item()` in the compiled system
+source that a chat message's `.item` getter already resolves back to
+the correctly-heightened spell instance -- for a spell origin it calls
+`item.loadVariant({ castRank: flags.pf2e.origin.castRank ?? item.rank
+})` internally. So `message.item.rank` on a `createChatMessage` hook
+is already the right cast rank, with no need to parse `data-cast-rank`
+out of the rendered chat-card HTML (the only other place that value
+appeared in the source read for this).
+
+**Matching `message.item.slug === "untamed-form"` required a small fix
+to `untamed-form-spell.json` first**: it had no explicit `system.slug`
+set. Per the aeon-stone-healing.js precedent already documented
+elsewhere in this file, `ItemPF2e#slug` is *only* `system.slug` with
+no name-derived fallback outside `getRollOptions()` -- so without
+adding one, `message.item.slug` would have resolved to `null` and this
+would never have matched at all. Added `"slug": "untamed-form"`
+directly to that item.
+
+**Reading the toggle's current on/off state**: `actor.rollOptions.all
+["spellshape:healing-transformation"]` -- `actor.rollOptions.all` is a
+real, frequently-used pattern in pf2e's own compiled source for
+reading a currently-set roll option (e.g. `rollOptions.all["self:
+effect:parry"]`, `rollOptions.all["hp-percent:${n}"]`, several others
+checked), and the specific option string here is exactly what the
+feat's own `RollOption` rule element sets when its
+`"healing-transformation"` suboption is toggled on (`option:
+"spellshape"` + a `suboptions` entry with `value:
+"healing-transformation"` combine to the roll option `spellshape:
+healing-transformation`). Deliberately does **not** auto-clear the
+toggle after one use -- no evidence was found that spellshape toggles
+are single-use/auto-consumed anywhere else in the system, so it's left
+as a persistent, player-managed toggle like any other spellshape.
+
+**Fully automatic, no click-through** -- the roll is a plain `Roll`
+this script builds and evaluates directly (not routed through pf2e's
+own spell-damage/heightening pipeline), and the resulting HP change is
+applied immediately via `actor.update()`, matching this module's own
+`aeon-stone-healing.js` precedent for fully-automatic healing rather
+than the click-to-apply pattern used for player-triggered damage
+spells elsewhere in this module (Breath Weapon, Spine Rake). A chat
+message still announces the roll and amount healed (or that the
+character was already at full HP) for visibility, even though nothing
+needs to be clicked.
+
+**The compendium item exists for browsability/flavor only, per the
+user's explicit request for "item type spell, item trait vitality"**
+-- `healing-transformation-spell.json` is a real `type: "spell"` item
+with `vitality`/`healing`/`druid` traits and a `primal` tradition, but
+it is never itself cast, rolled, or referenced by UUID anywhere in the
+script; the script rolls its own plain `Roll` independently. It exists
+purely so the character has a proper, readable spell entry describing
+what this house rule does, matching how the rest of this module treats
+homebrew mechanics as real, inspectable items rather than invisible
+script-only magic.
+
 ## Keeping in sync with upstream pf2e system updates
 
 If the pf2e system reworks Werecreature Dedication (errata, new

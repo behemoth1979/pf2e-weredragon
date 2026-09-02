@@ -1,0 +1,69 @@
+{
+  "_id": "HealTrnsfrmSpell",
+  "img": "icons/magic/life/heart-cross-strong-flame-purple.webp",
+  "name": "Healing Transformation (Weredragon Homebrew)",
+  "system": {
+    "area": null,
+    "cost": {
+      "value": ""
+    },
+    "counteraction": false,
+    "damage": {},
+    "defense": null,
+    "description": {
+      "value": "<p><em>Homebrew: automates the \"Healing Transformation\" spellshape feat. That feat's own real rules only append a reminder line to the next-cast polymorph spell's description (no actual healing automation exists in the base system) -- this item exists as a proper spell entry (type spell, vitality trait) purely for display/reference. The actual roll and healing are applied automatically by <code>scripts/healing-transformation.js</code> whenever this character casts Untamed Form (Weredragon Homebrew) while the Healing Transformation spellshape toggle is active, rather than being cast on its own.</em></p><p>You close wounds and patch injuries as you reach for a different shape. You restore a number of Hit Points equal to 1d6 per the rank Untamed Form was cast at.</p>"
+    },
+    "duration": {
+      "sustained": false,
+      "value": ""
+    },
+    "level": {
+      "value": 1
+    },
+    "publication": {
+      "license": "ORC",
+      "remaster": true,
+      "title": "Pathfinder Player Core"
+    },
+    "range": {
+      "value": ""
+    },
+    "requirements": "",
+    "rules": [],
+    "target": {
+      "value": "self"
+    },
+    "time": {
+      "value": ""
+    },
+    "traits": {
+      "rarity": "common",
+      "traditions": [
+        "primal"
+      ],
+      "value": [
+        "druid",
+        "healing",
+        "vitality"
+      ]
+    }
+  },
+  "type": "spell",
+  "_key": "!items!HealTrnsfrmSpell",
+  "sort": 726000,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "coreVersion": "14.366",
+    "systemId": "pf2e",
+    "systemVersion": "8.4.1",
+    "createdTime": 1735689600000,
+    "modifiedTime": 1735689600000,
+    "lastModifiedBy": "phildedication00"
+  },
+  "effects": []
+}
