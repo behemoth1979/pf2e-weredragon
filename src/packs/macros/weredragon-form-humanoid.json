@@ -1,0 +1,26 @@
+{
+  "_id": "WdrgnFrmHumanoid1",
+  "author": null,
+  "command": "const actor = canvas.tokens.controlled[0]?.actor ?? game.user.character;\nif (!actor) {\n  ui.notifications.warn(\"Select a token or assign a character first.\");\n  return;\n}\n\nconst result = await actor.toggleRollOption(\"all\", \"change-shape\", null, true, \"humanoid\");\nif (result === null) {\n  ui.notifications.error(\"Could not find the Change Shape toggle on this character -- do they have the Werecreature Dedication feat (this module's patched version)?\");\n} else {\n  ui.notifications.info(`${actor.name} shifts to Humanoid form.`);\n}\n",
+  "flags": {},
+  "folder": null,
+  "img": "icons/magic/control/hypnosis-mesmerism-eye.webp",
+  "name": "Weredragon Form: Humanoid",
+  "ownership": {
+    "default": 0
+  },
+  "scope": "global",
+  "sort": 100000,
+  "type": "script",
+  "_key": "!macros!WdrgnFrmHumanoid1",
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "coreVersion": "14.366",
+    "systemId": "pf2e",
+    "systemVersion": "8.4.1",
+    "createdTime": 1735689600000,
+    "modifiedTime": 1735689600000,
+    "lastModifiedBy": "phildedication00"
+  }
+}

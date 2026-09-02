@@ -535,6 +535,34 @@ on an actor they own.
 To use: open the module's **Homebrew: Weredragon Macros** compendium,
 drag "Untamed Form (Weredragon Homebrew)" onto the hotbar.
 
+## Hotbar macros: Weredragon form switch (Humanoid/Hybrid/Animal)
+
+Three more macros in `src/packs/macros/weredragon-form-{humanoid,
+hybrid,animal}.json` — one-click alternative to the Actions-tab
+Change Shape dropdown. Werecreature Dedication's own `change-shape`
+`RollOption` RE (in `werecreature-dedication.json`) is `toggleable:
+true` with `suboptions` for `humanoid`/`hybrid`/`animal`; pf2e exposes
+a public actor method for driving this exact kind of toggle
+programmatically: `actor.toggleRollOption(domain, option, itemId,
+value, suboption)` — confirmed by reading its real implementation in
+`src/module/actor/base.ts`, and it's the same method pf2e's own
+hotbar-drop handling and the character sheet's own toggle checkboxes
+call, not a workaround.
+
+**Getting the `domain` right matters and isn't obvious**: our
+`change-shape` `RollOption` RE never sets an explicit `"domain"`
+field, and `RollOptionRuleElement`'s schema defaults that field to
+`"all"` (confirmed in `roll-option/rule-element.ts`) — so the actual
+call is `actor.toggleRollOption("all", "change-shape", null, true,
+"<humanoid|hybrid|animal>")`. Guessing a domain like `"action"` or
+matching against the option name would silently fail to find the
+rule (returns `null`, not an error) — if `werecreature-dedication.json`
+is ever edited to add an explicit `domain` to that RollOption RE,
+these three macros need the same string.
+
+To use: open **Homebrew: Weredragon Macros**, drag all three
+("Weredragon Form: Humanoid/Hybrid/Animal") onto the hotbar.
+
 ## Sound effect on Kaiju transform
 
 Second piece of actual runtime JS (alongside the hotbar macro) — no

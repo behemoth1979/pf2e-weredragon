@@ -110,14 +110,20 @@ duplicate of Chain Lightning (8d12 electricity, basic Reflex, chains
 between nearby creatures), renamed and reflavored as a draconic
 breath; the numbers are unchanged from the original.
 
-## Hotbar macro
+## Hotbar macros
 
 The module includes a second compendium, **Homebrew: Weredragon
-Macros**, with a one-click "Untamed Form (Weredragon Homebrew)"
-macro — drag it onto your hotbar. Click once to transform (applies
-the patched Spell Effect: Untamed Form and prompts the form picker);
-click again to revert. No need to drag the effect onto the sheet by
-hand each time.
+Macros**:
+
+- **Untamed Form (Weredragon Homebrew)** — one-click transform. Click
+  once to apply the patched Spell Effect: Untamed Form and prompt the
+  form picker; click again to revert.
+- **Weredragon Form: Humanoid / Hybrid / Animal** — one-click Change
+  Shape switching, instead of using the Actions-tab dropdown. Drag
+  all three onto your hotbar.
+
+No need to drag effects onto the sheet or dig through the Actions tab
+by hand each time.
 
 ## Sound effect
 

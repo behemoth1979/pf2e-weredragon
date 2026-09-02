@@ -1,5 +1,5 @@
-2026/09/02-11:26:43.795 6748 Delete type=3 #1
-2026/09/02-11:26:43.798 10f10 Level-0 table #5: started
-2026/09/02-11:26:43.805 10f10 Level-0 table #5: 1141 bytes OK
-2026/09/02-11:26:43.809 10f10 Delete type=0 #3
-2026/09/02-11:26:43.809 10f10 Manual compaction at level-0 from '!macros!UntamedFrmMacro1' @ 72057594037927935 : 1 .. '!macros!UntamedFrmMacro1' @ 0 : 0; will stop at (end)
+2026/09/02-12:34:05.449 bf3c Delete type=3 #1
+2026/09/02-12:34:05.452 9d98 Level-0 table #5: started
+2026/09/02-12:34:05.456 9d98 Level-0 table #5: 1675 bytes OK
+2026/09/02-12:34:05.459 9d98 Delete type=0 #3
+2026/09/02-12:34:05.460 9d98 Manual compaction at level-0 from '!macros!UntamedFrmMacro1' @ 72057594037927935 : 1 .. '!macros!WdrgnFrmHybrid001' @ 0 : 0; will stop at (end)
