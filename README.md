@@ -140,6 +140,18 @@ has that stone's resonance effect and isn't in an active encounter,
 1 HP heals for every in-game minute that passes (e.g. via the world
 clock/time-advance controls).
 
+## Bizarre Transformation
+
+The Bizarre Transformation feat lets you change one unarmed attack's
+damage type when shifting form — the official content only reminds
+you this is available, it doesn't actually change anything. This
+module automates it: whenever you shift into Kaiju, a Monstrosity
+Form, any Animal Form, Aerial Form, Dragon Form, or use the Weredragon
+Form: Hybrid/Animal macros, you're prompted to pick one of your
+current unarmed attacks and a new damage type (or skip). Confirming
+applies it for real — that attack deals the new damage type and gains
+the matching trait — until you transform again.
+
 ## Editing the design
 
 Source lives at:

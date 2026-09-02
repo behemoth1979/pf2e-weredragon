@@ -638,6 +638,78 @@ ensures exactly one connected client applies the healing per actor
 its owning player — not GM-gated), rather than every client
 double-applying it.
 
+## Bizarre Transformation: automated damage-type swap on form change
+
+`scripts/bizarre-transformation.js` — automates the "Bizarre
+Transformation" druid feat, which official content leaves entirely to
+the player (see the earlier analysis: its own rules are just an
+`ItemAlteration` adding a reminder to Untamed Form's description, and
+a `RollOption` flag toggle — no actual damage-type change; checked
+directly against the real item, not assumed).
+
+**Why this needed three different rule elements, and how each was
+picked (not guessed):**
+
+- `ItemAlteration` (`property: "damage-type"`) can't be used — its own
+  iteration logic only reaches the actor's *real embedded items*
+  (`actor.items`/`itemTypes`/`inventory`), confirmed by reading
+  `item-alteration/rule-element.ts` directly. Synthetic battle-form
+  strikes live in `actor.system.actions`, a separate, non-embedded
+  collection — invisible to `ItemAlteration` entirely. This is *why*
+  the real feat only manages a reminder note: the engine genuinely
+  can't do more with this RE.
+- `AdjustStrike` (`property: "damage-type"`) doesn't exist — its
+  schema only supports `materials`, `property-runes`,
+  `range-increment`, `traits`, `weapon-traits` (same RE already used
+  for the cold iron house rule, whose `traits` support is reused here
+  for the "gains the appropriate trait" half of the effect).
+- `DamageAlteration` (a *different* RE from `DamageDice`) is the
+  correct tool, found by tracing what `DamageDicePF2e`'s own
+  `applyAlterations()` actually consumes. Copied its exact shape from
+  a real official effect that does the identical thing — "Stance: Asp
+  Stance" (`packs/pf2e/feat-effects/stance-asp-stance.json` upstream),
+  which overrides all unarmed strikes to piercing damage while active.
+  Its `predicate` field is the normal kind (unlike `AdjustStrike`'s
+  narrower `definition`) — it does see actor-level roll options — so
+  `item:slug:<chosen-strike>` correctly scopes it to one specific
+  attack.
+
+**How it's triggered** — two different paths, since Weredragon and
+the druid battle forms activate differently:
+- Battle forms (Kaiju, Monstrosity Form, all 13 Animal Form animals,
+  Aerial Form, Dragon Form): a `createItem` hook (same guard pattern
+  as `kaiju-roar.js` — `userId === game.user.id`) checks the created
+  effect's `system.slug` against a hardcoded set matching every
+  tracked form (the same slugs documented in the `system.slug`
+  overrides section above).
+- Weredragon Hybrid/Animal: these aren't item creations, they're a
+  toggle on the existing Werecreature Dedication item, and reliably
+  detecting "the toggle just changed to hybrid/animal" from a generic
+  actor/item-update hook wasn't something this session could verify
+  with confidence — so instead, the two relevant hotbar macros
+  (`weredragon-form-hybrid.json`, `weredragon-form-animal.json`) call
+  the prompt directly after a successful `toggleRollOption()`, via a
+  small API the script exposes on `Hooks.once("init", ...)`:
+  `game.modules.get("phil-pf2e-weredragon").promptBizarreTransformation`.
+  (Humanoid's macro doesn't call it — no unarmed attacks to reflavor.)
+
+**Mechanics**: prompts a `Dialog.wait()` listing the actor's current
+unarmed strikes (read from `actor.system.actions`, filtered on
+`strike.item.system.category === "unarmed"` — confirmed `.slug`/
+`.label` exist directly on the strike object by reading
+`StrikeData`/`BasicAttackAction` in `actor/data/base.ts`, not
+assumed) and the 8 RAW-listed damage types, with a Skip option. On
+Apply, deletes any previous Bizarre Transformation effect (only one
+active at a time — matches "a single unarmed attack," reset each
+transformation) and creates a new temporary effect item carrying the
+`DamageAlteration` + `AdjustStrike` pair scoped to the chosen strike.
+A 100ms delay before reading `system.actions` exists because the hook
+firing doesn't guarantee the actor has finished re-deriving strikes
+for the just-applied form yet — a pragmatic buffer, not a guaranteed
+fix; if this proves flaky in play, needs a more deterministic wait
+(e.g. polling `actor.system.actions` for the expected strike, or a
+dedicated post-prepare hook if pf2e exposes one).
+
 ## Keeping in sync with upstream pf2e system updates
 
 If the pf2e system reworks Werecreature Dedication (errata, new
