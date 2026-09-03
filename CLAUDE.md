@@ -319,6 +319,72 @@ place of the vanilla one (or in place of casting the real spell) —
 there's no attempt here to intercept the actual Monstrosity Form spell
 casting flow itself.
 
+**Damage type is now dynamic, matching the real "Heart of the Kaiju"
+feat's own choice, not hardcoded.** Originally shipped as
+`system.damage.0.type: "untyped"`. The real feat (untouched, used
+as-is from the compendium) has the player choose acid/cold/
+electricity/fire/sonic via a `ChoiceSet` RE (`flag: "damageType"`)
+when they first take it — confirmed directly against this character's
+own copy of the item, whose `system.rules[0]` shows the real,
+already-made `selection: "electricity"`, and whose own description
+text uses this exact resolvable path in an inline `@Damage[]` roll:
+`@Damage[15d6[@item.flags.system.rulesSelections.damageType]
+|options:area-damage]`. Since our spell is a *separate* item from the
+feat, no `{item|...}`-style resolvable string can reach across to
+read the feat's choice — that syntax only ever resolves relative to
+the item hosting the rule element. `scripts/kaiju-breath-weapon-
+damage-type.js` bridges this with a `createItem` hook: whenever
+"Breath Weapon (Kaiju)" (matched by its own explicit `system.slug`,
+added specifically for this — see the aeon-stone-healing.js precedent
+for why an explicit slug is needed for reliable runtime matching) is
+granted onto an actor, it looks up that actor's own "Heart of the
+Kaiju" feat (`slug: "heart-of-the-kaiju"`) and copies
+`flags.system.rulesSelections.damageType` (the same `.system` alias
+for `flags.pf2e`, confirmed via `ItemPF2e#prepareBaseData`'s own
+`Object.defineProperty` earlier in this file) onto the newly-granted
+spell's `system.damage.0.type`. A one-time copy at grant time, not an
+ongoing sync — correct because the feat's choice is permanent ("You
+can't change this later," per its own description), so nothing needs
+re-checking on every cast.
+
+## Inexorable: automated per-turn condition recovery for Cave Worm
+
+`src/packs/feats/inexorable-effect.json` + `scripts/inexorable.js` —
+automates the remaining un-automated half of Cave Worm Monstrosity
+Form's "Inexorable" ability (see the Cave Worm/Phoenix/Sea Serpent
+section below for the immobilized-immunity half, already handled
+upstream). Real ability text: "You automatically recover from the
+Paralyzed, Slowed, and Stunned conditions at the end of each of your
+turns. You're also immune to being Immobilized and ignore difficult
+terrain and greater difficult terrain." The terrain-ignoring part
+still isn't automated — no rule-element hook exists in Foundry for
+movement-cost exceptions, so it stays a manual reminder in the
+granted effect's own description.
+
+**Applied automatically, not dragged on manually**: a new `GrantItem`
+rule element on the shared `spell-effect-monstrosity-form.json`
+(predicate: `monstrosity-form:cave-worm`, same pattern already used
+for Phoenix's Blazing Conflagration and Sea Serpent's Spine Rake
+grants) grants `inexorable-effect.json` automatically whenever Cave
+Worm form is active, and removes it automatically when the form ends
+(non-physical granted items default to `onDelete: "cascade"`,
+confirmed via `ItemPF2e#prepareBaseData` — no manual cleanup coded).
+
+**Mechanism**: `Hooks.on("pf2e.endTurn", ...)` — a real hook, confirmed
+directly from `Combatant#onEndTurn()` in the compiled system source,
+which calls `Hooks.callAll("pf2e.endTurn", this, encounter, game.user
+.id)` at the end of every combatant's turn. The `game.user.id` third
+argument is the same multi-client guard convention already used by
+this module's other `createItem`/`deleteItem` hooks (`kaiju-roar.js`,
+`bizarre-transformation.js`) — gating on `userId === game.user.id`
+ensures only the one client that actually ended the turn performs the
+removal. When it fires, the actor whose turn ended is checked for the
+`inexorable`-slugged effect; if present, `actor.conditions.bySlug
+(slug)` (a real, widely-used pattern in the compiled system source,
+e.g. `conditions.bySlug("encumbered")`) finds and deletes any active
+Paralyzed/Slowed/Stunned condition outright — not decremented, deleted
+entirely, matching "automatically recover from."
+
 ## Seventh+ homebrew items: Monstrosity Form (Cave Worm/Phoenix/Sea Serpent) + Spine Rake
 
 Unlike Kaiju, the other three Monstrosity Form options (Cave Worm,
@@ -334,13 +400,22 @@ matches upstream's own structure instead of fighting it. Added: three
 option, pointing at `cave-worm-form.webp` / `phoenix-form.webp` /
 `sea-serpent-form.webp`.
 
-Phoenix's own special ability (Shroud of Flame) was already fully
-automated in the vanilla item (`Aura` RE + toggleable `RollOption`) —
-nothing to add there. Cave Worm's Inexorable (auto-recovers from
-paralyzed/slowed/stunned each turn) is partially automated upstream
-(`immunities: [{"type": "immobilized"}]`) but the per-turn condition
-auto-removal isn't; left as-is, matching vanilla, since it wasn't part
-of this round's ask.
+**Correction: Phoenix's Shroud of Flame was not actually fully
+automated — this was checked more carefully later and found wrong.**
+The original assessment here was that the vanilla item's `Aura` RE +
+toggleable `RollOption` fully handled it, "nothing to add there." That
+was incomplete: the `Aura` RE's own `effects` array — the field that
+actually grants something to creatures matching its `affects`/`events`
+criteria, confirmed against `AuraRuleElement`'s real schema in the
+compiled system source — was empty (`"effects": []`). An empty array
+grants nothing, so the vanilla item only ever implemented the visual
+aura ring and the on/off toggle; the actual "2d6 fire damage" never
+had any automation at all. **Automated later, see the Shroud of Flame
+section below.** Cave Worm's Inexorable (auto-recovers from paralyzed/
+slowed/stunned each turn) is partially automated upstream (`immunities:
+[{"type": "immobilized"}]`); the per-turn condition auto-removal was
+left un-automated at the time, since it wasn't part of that round's
+ask — **automated later, see the Inexorable section above.**
 
 Sea Serpent's **Spine Rake** was in the same under-automated state
 Kaiju's Breath Weapon was: described in prose only, no actual
@@ -361,6 +436,70 @@ conditional-grant pattern is directly copied from the vanilla file's
 own existing `GrantItem` for Phoenix's "Blazing Conflagration" (only
 granted when `feat:phoenixs-flight` + `monstrosity-form:phoenix`), not
 guessed.
+
+## Shroud of Flame: automated damage for Phoenix Monstrosity Form
+
+`src/packs/feats/shroud-of-flame-spell.json` (compendium item name:
+"Shroud of Flame Damage (Weredragon Homebrew)") + `src/packs/feats/
+shroud-of-flame-active-effect.json` + `scripts/shroud-of-flame.js` —
+automates the damage half of Phoenix's aura, which the vanilla item
+never actually implemented (see the correction note above). Only the
+turn-end trigger is automated, not "enters the aura" mid-movement —
+confirmed as the right scope with the user directly before building,
+since reliably detecting a token's path crossing the aura ring during
+movement is a materially harder problem than a simple turn-based
+check.
+
+**Lifecycle**: same auto-grant/auto-remove pattern as Inexorable — a
+new `GrantItem` RE on the shared `spell-effect-monstrosity-form.json`
+(predicate: `monstrosity-form:phoenix`) grants `shroud-of-flame-
+active-effect.json` while in Phoenix form, cascading away
+automatically when the form ends. **This effect's own name had to be
+distinct from the damage spell's name** — `GrantItem`'s `uuid` field
+resolves by name (an already-established, working pattern elsewhere in
+this repo), so giving both new items the identical name "Shroud of
+Flame (Weredragon Homebrew)" (the first pass) would have made which
+one actually got resolved ambiguous. The effect kept that name; the
+spell was renamed to "Shroud of Flame Damage (Weredragon Homebrew)"
+specifically to avoid the collision.
+
+**Trigger**: `Hooks.on("pf2e.endTurn", ...)`, the same real hook
+`inexorable.js` uses, with the same `userId === game.user.id` guard.
+For every token on the ending combatant's scene whose actor carries
+`shroud-of-flame-active` *and* has the `shrouded` roll option
+currently on (the pre-existing vanilla toggle — this script checks it,
+doesn't replace it), measures distance to the ending token via
+`tokenA.object.distanceTo(tokenB.object)` (confirmed as a real, widely
+-used pattern in the compiled system source) and deals damage if
+within 20 ft.
+
+**Self-damage is deliberately excluded** — the Phoenix never damages
+itself when its own turn ends, via an `actor === combatant.actor`
+exclusion in the token filter. This was a judgment call, not a
+confirmed rule (the ability text doesn't say either way); if it turns
+out wrong in play, that's the line to remove.
+
+**Getting a real, clickable Apply Damage button, not just an announced
+number, per what was asked**: confirmed directly from
+`SpellPF2e#rollDamage()` in the compiled system source that it reads
+`game.user.targets` — the *live* target selection — to determine the
+resulting damage roll's `context.target`, which is what a normal pf2e
+damage chat card's Apply Damage button actually reads. There's no
+argument to `rollDamage()` that lets you pass a target explicitly. So
+the script: saves the user's current target selection, targets only
+the creature that just ended its turn, constructs a temporary,
+unembedded copy of the damage spell parented to the Phoenix's actor
+(`new Item.implementation(data, {parent: actor})` — the same pattern
+already confirmed working elsewhere in this module for `ChatMessagePF2e
+#item`'s own `embeddedSpell` reconstruction), calls `.rollDamage({})`
+on it, then restores whatever the user had targeted before — so this
+doesn't silently clobber the GM's own target selection mid-combat. The
+damage spell item itself is fetched by its real `_id`
+(`ShroudFlameSpl01`), not by name, and is never granted onto any actor
+or shown on a character sheet — it's constructed fresh and discarded
+each time it's needed, existing as a real compendium item purely so
+the damage has an inspectable, documented definition rather than being
+invisible script-only magic.
 
 ## Animal Form, Dragon Form, and Aerial Form token swaps
 

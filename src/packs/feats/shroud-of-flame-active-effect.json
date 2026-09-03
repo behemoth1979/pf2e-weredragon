@@ -1,0 +1,43 @@
+{
+  "_id": "ShrdFlmActiveEf1",
+  "img": "icons/magic/fire/barrier-wall-flame-ring-yellow.webp",
+  "name": "Shroud of Flame (Weredragon Homebrew)",
+  "system": {
+    "description": {
+      "value": "<p><em>Homebrew: marker effect for the Phoenix Monstrosity Form's \"Shroud of Flame\" aura -- automates the damage half the vanilla item's own Aura rule element never actually granted (its \"effects\" array was empty, so nothing happened when a creature entered or ended its turn in the aura despite the aura ring and the on/off toggle both existing already). The real ability text: \"You gain an aura of fire that extends out from you. A creature that ends its turn within the aura takes 2d6 fire damage. A creature can take this damage only once per turn. You can activate or deactivate this aura with a Sustain action.\"</em></p><p>Granted automatically while in Phoenix Monstrosity Form -- see Spell Effect: Monstrosity Form's own GrantItem rule element (predicate: monstrosity-form:phoenix). Not meant to be dragged onto a sheet manually. Presence of this effect is what scripts/shroud-of-flame.js checks for, alongside the existing \"shrouded\" toggle (the vanilla on/off RollOption -- still the correct way to turn the aura on and off; this effect only tracks \"is a Phoenix,\" not \"is the aura currently on\"), before rolling damage against a creature that ends its turn within 20 feet at the end of each combatant's turn.</em></p><p>Only the turn-end trigger is automated -- \"enters the aura\" (a movement-triggered case) is not, since reliably detecting a token's path crossing the aura ring mid-movement is a materially harder problem than a simple turn-based check.</p>"
+    },
+    "duration": {
+      "value": -1,
+      "unit": "unlimited",
+      "expiry": null,
+      "sustained": false
+    },
+    "tokenIcon": {
+      "show": false
+    },
+    "traits": {
+      "rarity": "common",
+      "value": []
+    },
+    "rules": [],
+    "slug": "shroud-of-flame-active"
+  },
+  "type": "effect",
+  "_key": "!items!ShrdFlmActiveEf1",
+  "sort": 400500,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "coreVersion": "14.366",
+    "systemId": "pf2e",
+    "systemVersion": "8.4.1",
+    "createdTime": 1735689600000,
+    "modifiedTime": 1735689600000,
+    "lastModifiedBy": "phildedication00"
+  },
+  "effects": []
+}

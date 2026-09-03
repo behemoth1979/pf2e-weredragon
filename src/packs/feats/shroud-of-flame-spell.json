@@ -1,12 +1,9 @@
 {
-  "_id": "BrW3aponSpl00001",
-  "img": "systems/pf2e/icons/spells/monstrosity-form.webp",
-  "name": "Breath Weapon (Kaiju)",
+  "_id": "ShroudFlameSpl01",
+  "img": "systems/pf2e/icons/spells/blazing-bolt.webp",
+  "name": "Shroud of Flame Damage (Weredragon Homebrew)",
   "system": {
-    "area": {
-      "type": "cone",
-      "value": 60
-    },
+    "area": null,
     "cost": {
       "value": ""
     },
@@ -15,29 +12,24 @@
       "0": {
         "applyMod": false,
         "category": null,
-        "formula": "15d6",
+        "formula": "2d6",
         "kinds": [
           "damage"
         ],
         "materials": [],
-        "type": "untyped"
+        "type": "fire"
       }
     },
-    "defense": {
-      "save": {
-        "basic": true,
-        "statistic": "reflex"
-      }
-    },
+    "defense": null,
     "description": {
-      "value": "<p><em>Homebrew: the automated spell form of the Kaiju form's Breath Weapon, granted innately while transformed. Real area/damage/save fields (not just description enrichers), so the Reflex save actually rolls against this character's own spell DC.</em></p><p>Each creature in the area takes 15d6 damage (of your chosen damage type), with a basic Reflex save. Once activated, it can't be used again for [[/r 1d4 #Recharge Breath Weapon]]{1d4 rounds}.</p>"
+      "value": "<p><em>Homebrew: the automated damage roll for the Phoenix Monstrosity Form's \"Shroud of Flame\" aura. Not meant to be cast directly -- scripts/shroud-of-flame.js constructs a temporary copy of this item at the end of each combatant's turn and rolls it against whichever creature ended their turn within 20 feet of the Phoenix, if the aura is currently active. No save, per the real ability text.</em></p><p>A creature that ends its turn within the aura takes 2d6 fire damage.</p>"
     },
     "duration": {
       "sustained": false,
       "value": ""
     },
     "level": {
-      "value": 10
+      "value": 9
     },
     "publication": {
       "license": "ORC",
@@ -49,12 +41,12 @@
     },
     "requirements": "",
     "rules": [],
-    "slug": "breath-weapon-kaiju",
+    "slug": "shroud-of-flame-damage",
     "target": {
       "value": ""
     },
     "time": {
-      "value": "2"
+      "value": ""
     },
     "traits": {
       "rarity": "common",
@@ -63,13 +55,14 @@
       ],
       "value": [
         "evocation",
+        "fire",
         "primal"
       ]
     }
   },
   "type": "spell",
-  "_key": "!items!BrW3aponSpl00001",
-  "sort": 350000,
+  "_key": "!items!ShroudFlameSpl01",
+  "sort": 500000,
   "ownership": {
     "default": 0
   },

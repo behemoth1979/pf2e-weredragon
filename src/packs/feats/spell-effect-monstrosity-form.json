@@ -213,6 +213,14 @@
         "selector": "stinger-damage"
       },
       {
+        "flag": "caveWormInexorable",
+        "key": "GrantItem",
+        "predicate": [
+          "monstrosity-form:cave-worm"
+        ],
+        "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.Inexorable (Weredragon Homebrew)"
+      },
+      {
         "key": "TokenImage",
         "predicate": [
           "monstrosity-form:cave-worm"
@@ -382,6 +390,14 @@
           "monstrosity-form:phoenix"
         ],
         "uuid": "Compendium.pf2e.actionspf2e.Item.Blazing Conflagration"
+      },
+      {
+        "flag": "phoenixShroudOfFlameActive",
+        "key": "GrantItem",
+        "predicate": [
+          "monstrosity-form:phoenix"
+        ],
+        "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.Shroud of Flame (Weredragon Homebrew)"
       },
       {
         "key": "TokenImage",
