@@ -1,7 +1,7 @@
 {
   "_id": "WdrgnFrmAnimal001",
   "author": null,
-  "command": "const actor = canvas.tokens.controlled[0]?.actor ?? game.user.character;\nif (!actor) {\n  ui.notifications.warn(\"Select a token or assign a character first.\");\n  return;\n}\n\nconst result = await actor.toggleRollOption(\"all\", \"change-shape\", null, true, \"animal\");\nif (result === null) {\n  ui.notifications.error(\"Could not find the Change Shape toggle on this character -- do they have the Werecreature Dedication feat (this module's patched version)?\");\n  return;\n}\n\nui.notifications.info(`${actor.name} shifts to Animal form.`);\n\nconst mod = game.modules.get(\"phil-pf2e-weredragon\");\nif (mod?.promptBizarreTransformation) await mod.promptBizarreTransformation(actor);\n",
+  "command": "const actor = canvas.tokens.controlled[0]?.actor ?? game.user.character;\nif (!actor) {\n  ui.notifications.warn(\"Select a token or assign a character first.\");\n  return;\n}\n\nconst result = await actor.toggleRollOption(\"all\", \"change-shape\", null, true, \"animal\");\nif (result === null) {\n  ui.notifications.error(\"Could not find the Change Shape toggle on this character -- do they have the Werecreature Dedication feat (this module's patched version)?\");\n  return;\n}\n\nui.notifications.info(`${actor.name} shifts to Animal form.`);\n\nfoundry.audio.AudioHelper.play({\n  src: \"modules/phil-pf2e-weredragon/assets/sounds/weredragon-animal.ogg\",\n  volume: 0.8,\n  autoplay: true,\n  loop: false,\n}, true);\n\nconst mod = game.modules.get(\"phil-pf2e-weredragon\");\nif (mod?.promptBizarreTransformation) await mod.promptBizarreTransformation(actor);\n",
   "flags": {},
   "folder": null,
   "img": "icons/creatures/reptiles/dragon-horned-blue.webp",

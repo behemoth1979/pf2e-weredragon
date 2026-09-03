@@ -894,36 +894,59 @@ these three macros need the same string.
 To use: open **Homebrew: Weredragon Macros**, drag all three
 ("Weredragon Form: Humanoid/Hybrid/Animal") onto the hotbar.
 
-## Sound effect on Kaiju transform
+## Sound effects on transformation (every form with custom art)
 
-Second piece of actual runtime JS (alongside the hotbar macro) — no
-rule element exists for "play a sound when this predicate becomes
-true," so this needed a real script. `scripts/kaiju-roar.js`, loaded
-via `module.json`'s `"scripts"` array, hooks `createItem` and checks
-for `item.type === "effect"` + `item.system.slug ===
-"monstrosity-form-kaiju"` (same slug-based identity pattern as the
-hotbar macro) — that slug is only ever created by getting the patched
-Kaiju spell effect onto an actor, however it got there (manual drag,
-the Untamed Form picker, a future macro), so this fires correctly
-regardless of path. Plays `assets/sounds/kaiju-roar.ogg` via
-`foundry.audio.AudioHelper.play(..., true)` — the `true` broadcasts to
-every connected client, not just the one who transformed, so the
-whole table hears it.
+Originally shipped as Kaiju-only (`scripts/kaiju-roar.js`); extended in
+v2.19.0 to every other form once matching `.ogg` files existed for all
+of them, and superseded by `scripts/form-sounds.js`
+(`kaiju-roar.js` deleted, `kaiju-roar.ogg` renamed to `kaiju-form.ogg`
+for naming consistency with every other form's sound file — one
+`<slug>.ogg` per `<slug>.webp` in `assets/tokens/`, plus
+`weredragon-hybrid.ogg`/`weredragon-animal.ogg` for Weredragon's own
+two non-Humanoid shapes, which have no token art of their own but do
+get transformation sounds).
 
-**Important guard**: `createItem` fires on every client that receives
-the document sync, not just the one who created it — without checking
-`userId !== game.user.id` and returning early, every observing client
-would independently detect the same creation and each broadcast their
-own copy of the sound, causing overlapping/duplicate playback. Only
-the client that actually performed the creation should trigger the
-(already-broadcasting) play call.
+No rule element exists for "play a sound when this predicate becomes
+true," so this is real runtime JS, hooked on `createItem` with the
+same `userId !== game.user.id` guard as before (without it, every
+observing client would independently detect the same creation and
+each broadcast their own copy of the sound — `createItem` fires
+client-side for every client that receives the document sync, not
+just the one who caused it). Two matching shapes, mirroring exactly
+how each form's own `TokenImage` RE already decides which art to show
+— reused directly rather than re-derived:
 
-Scoped to Kaiju only, per what was actually asked — no sound wired up
-for any other form yet. If extended to other forms, reuse this same
-`createItem` + slug-check pattern rather than inventing a new
-mechanism, and remember each new form needs its own slug check (all
-the patched slugs are listed in the `system.slug` overrides section
-above).
+- Forms that are their own separate compendium item (Kaiju, all 13
+  Animal Form animals, Aerial Form) are matched by the item's own
+  fixed `system.slug` alone, same as the original Kaiju-only version.
+- Forms sharing one compendium item with several selectable types
+  (Monstrosity Form's Cave Worm/Phoenix/Sea Serpent; Dragon Form's 40
+  types) are matched by the shared item's slug **and** the identical
+  predicate roll option their own `TokenImage` RE is predicated on
+  (`monstrosity-form:cave-worm`/`:phoenix`/`:sea-serpent`,
+  `dragon-form:stormcrown`) — copied verbatim from
+  `spell-effect-monstrosity-form.json`/`spell-effect-dragon-form.json`,
+  not re-derived. Dragon Form only has a sound for Stormcrown, matching
+  that it's the only dragon type with token art in the first place —
+  every other type simply never matches, same as its `TokenImage` RE
+  never fires for them. Since the roll option comes from the same
+  just-created item's own `ChoiceSet`, and isn't guaranteed to be
+  reflected in the actor's derived `rollOptions` at the exact instant
+  the hook fires, this branch waits the same 100ms beat already
+  established (and documented as "a pragmatic buffer, not a guaranteed
+  fix") in `bizarre-transformation.js` for the identical class of
+  timing gap against `system.actions`.
+
+**Weredragon's own Hybrid/Animal forms can't be caught by a
+`createItem` hook at all** — same limitation already true for Bizarre
+Transformation's trigger, since Werecreature Dedication's change-shape
+toggle is a `RollOption` update on an existing item, not a new item
+being created. Their two sounds are instead played directly from
+`weredragon-form-hybrid.json`/`weredragon-form-animal.json`'s own
+macro commands, right after a successful `toggleRollOption()` call —
+same pattern already used there to call
+`promptBizarreTransformation()`. Humanoid's macro plays no sound
+(no token art or sound file exists for Humanoid).
 
 ## Pearly White Spindle aeon stone: 1 HP/minute out-of-combat healing
 

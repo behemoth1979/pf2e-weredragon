@@ -150,11 +150,15 @@ Macros**:
 No need to drag effects onto the sheet or dig through the Actions tab
 by hand each time.
 
-## Sound effect
+## Sound effects
 
-Shifting into Kaiju form (however you get there — dragging the
-patched spell effect on, or picking it from the homebrew Untamed
-Form list) plays `kaiju-roar.ogg` for everyone at the table.
+Shifting into any form this module has custom token art for (however
+you get there — dragging the patched spell effect on, picking it from
+the homebrew Untamed Form list, or one of the hotbar macros) plays a
+matching transformation sound for everyone at the table: Kaiju, all 13
+Animal Form animals, Aerial Form, Dragon Form (Stormcrown only), Cave
+Worm/Phoenix/Sea Serpent Monstrosity Form, and Weredragon's own Hybrid
+and Animal shapes.
 
 ## Aeon Stone (Pearly White Spindle) healing
 
