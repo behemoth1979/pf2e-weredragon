@@ -1213,6 +1213,89 @@ confirmed present on this character (they've already cast it
 successfully from the sheet), falling back to `1` if it's ever absent
 on some other character using the macro without that spell added.
 
+## Granted spells not appearing in the Spellcasting tab: shared innate entry fix
+
+**Bug found in play, fixed in v2.18.0**: the 40 Dragon Breath spells
+(and, it turned out, Breath Weapon (Kaiju) and Spine Rake (Sea Serpent)
+too) were genuinely being granted onto the actor — confirmed directly
+via console (`actor.items` showed e.g. "Dragon Breath (Stormcrown)"
+present) — but never appeared in the character sheet's Spellcasting
+tab, even after a full delete-and-recreate of every spell/effect/macro
+on the character.
+
+**Root cause, confirmed by reading the compiled pf2e source directly**:
+`CharacterSheetPF2e#prepareSpellcasting()` only ever iterates
+`actor.spellcasting.collections`. That collection is built by every
+embedded `spellcastingEntry` item's own `prepareSiblingData()`, which
+filters `actor.itemTypes.spell` for `system.location.value === this.id`
+(the entry's own actual item id). A spell with no `location.value`
+pointing at a real entry has nowhere to render — it exists on the
+actor, but is orphaned from the UI's perspective entirely.
+
+**Confirmed `GrantItem` genuinely cannot set this itself** — not a
+config mistake, a real gap: `GrantItemRuleElement#preCreate` was read
+directly. It clones the source item, applies `this.alterations`
+(`ItemAlteration` objects) to the clone, then creates it. Nothing in
+that path resolves `{item|...}`-style injected-property strings against
+arbitrary fields of the granted item's own source (only specific known
+fields like `uuid`/predicates get resolved) — and `ItemAlteration`'s
+full, exhaustively-enumerated set of valid `property` values (`ac-bonus,
+area-size, badge-max, badge-value, bulk, capacity, category,
+check-penalty, damage-dice-faces, damage-dice-number, damage-type,
+defense-passive, description, dex-cap, focus-point-cost, grade, group,
+hardness, hp-max, material-type, pd-recovery-dc, persistent-damage,
+rarity, range-increment, range-max, frequency-max, frequency-per,
+other-tags, name, runes-potency, runes-resilient, runes-striking,
+speed-penalty, strength, traits`) does not include `location` at all.
+
+**Checked how real vanilla content grants spells via bare `GrantItem`**
+(four examples found across the feats compendium: Read the Land, Awaken
+Others, Undead Creator, Harrower Dedication) — every one grants a
+*ritual*, never a normal spell. Rituals are special-cased in
+`SpellSource#prepareBaseData` (`this.system.location.value = "rituals"`,
+a hardcoded sentinel the Rituals tab always recognizes on its own,
+matching any spell with that value regardless of any real entry's id),
+which is why bare-`GrantItem` "just works" for rituals specifically and
+nowhere else. No vanilla feat grants a normal attack/heal spell this
+way — official content relies exclusively on the manual "drag the spell
+onto an existing spellcasting entry" sheet flow for that.
+
+**That manual-drop flow was read too** —
+`CreatureSheetPF2e#_handleDroppedItem` → `SpellcastingEntryPF2e#addSpell`
+→ `SpellCollection#addSpell` — and for a spell already embedded on the
+actor (exactly our situation), it turns out to do nothing more than:
+```js
+spell.update({
+  "system.location.value": entry.id,
+  "system.location.heightenedLevel": spell.rank,
+});
+```
+No special rule element, no resolvable-string magic — that's the whole
+mechanism real content (and the sheet's own drag-and-drop) relies on.
+
+**Fix**: `scripts/innate-spell-grants.js`, a new `createItem` hook
+(same guard shape as `kaiju-breath-weapon-damage-type.js` — `userId ===
+game.user.id`, `item.parent instanceof Actor`, `item.type === "spell"`)
+matching against a hardcoded set of the affected slugs (all 40
+`dragon-breath-<type>`, plus `breath-weapon-kaiju`, plus
+`spine-rake-sea-serpent`). On match, it find-or-creates one shared
+`spellcastingEntry` item named "Weredragon Homebrew (Innate Spells)"
+(`system.prepared.value: "innate"`) on the actor, then runs the exact
+`spell.update(...)` shown above against it. `ability`/`tradition` on
+that entry are mostly cosmetic for a character actor: confirmed via
+`SpellcastingEntryPF2e#prepareStatistic` that DC/attack come from the
+actor's own `"base-spellcasting"` statistic (since `system.proficiency
+.slug` is deliberately left unset here), which also overwrites
+`ability.value` from that statistic's own attribute — so the initial
+`wis`/`primal` values just need to be schema-valid, not matched per
+dragon type's own actual tradition.
+
+**`spine-rake-sea-serpent-spell.json` had no explicit `system.slug`**
+(only `breath-weapon-kaiju-spell.json` and the 40 Dragon Breath spells
+already had one) — added `"slug": "spine-rake-sea-serpent"` so this
+script's `item.slug` check can actually match it, per the same
+no-name-derived-fallback rule documented earlier in this file.
+
 ## Keeping in sync with upstream pf2e system updates
 
 If the pf2e system reworks Werecreature Dedication (errata, new
