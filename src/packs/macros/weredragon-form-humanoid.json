@@ -1,7 +1,7 @@
 {
   "_id": "WdrgnFrmHumanoid1",
   "author": null,
-  "command": "const actor = canvas.tokens.controlled[0]?.actor ?? game.user.character;\nif (!actor) {\n  ui.notifications.warn(\"Select a token or assign a character first.\");\n  return;\n}\n\nconst result = await actor.toggleRollOption(\"all\", \"change-shape\", null, true, \"humanoid\");\nif (result === null) {\n  ui.notifications.error(\"Could not find the Change Shape toggle on this character -- do they have the Werecreature Dedication feat (this module's patched version)?\");\n  return;\n}\n\nui.notifications.info(`${actor.name} shifts to Humanoid form.`);\n\nconst mod = game.modules.get(\"phil-pf2e-weredragon\");\nif (mod?.removeBizarreTransformation) await mod.removeBizarreTransformation(actor);\n",
+  "command": "const actor = canvas.tokens.controlled[0]?.actor ?? game.user.character;\nif (!actor) {\n  ui.notifications.warn(\"Select a token or assign a character first.\");\n  return;\n}\n\nconst result = await actor.toggleRollOption(\"all\", \"change-shape\", null, true, \"humanoid\");\nif (result === null) {\n  ui.notifications.error(\"Could not find the Change Shape toggle on this character -- do they have the Werecreature Dedication feat (this module's patched version)?\");\n  return;\n}\n\nui.notifications.info(`${actor.name} shifts to Humanoid form.`);\n\nconst breathWeapon = actor.items.find((i) => i.type === \"spell\" && i.system.slug === \"weredragon-breath-weapon\");\nif (breathWeapon) await breathWeapon.delete();\n\nconst mod = game.modules.get(\"phil-pf2e-weredragon\");\nif (mod?.removeBizarreTransformation) await mod.removeBizarreTransformation(actor);\n",
   "flags": {},
   "folder": null,
   "img": "icons/magic/control/hypnosis-mesmerism-eye.webp",

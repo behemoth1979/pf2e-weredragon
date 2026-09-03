@@ -375,7 +375,7 @@ directly from `Combatant#onEndTurn()` in the compiled system source,
 which calls `Hooks.callAll("pf2e.endTurn", this, encounter, game.user
 .id)` at the end of every combatant's turn. The `game.user.id` third
 argument is the same multi-client guard convention already used by
-this module's other `createItem`/`deleteItem` hooks (`kaiju-roar.js`,
+this module's other `createItem`/`deleteItem` hooks (`form-sounds.js`,
 `bizarre-transformation.js`) — gating on `userId === game.user.id`
 ensures only the one client that actually ended the turn performs the
 removal. When it fires, the actor whose turn ended is checked for the
@@ -384,6 +384,11 @@ removal. When it fires, the actor whose turn ended is checked for the
 e.g. `conditions.bySlug("encumbered")`) finds and deletes any active
 Paralyzed/Slowed/Stunned condition outright — not decremented, deleted
 entirely, matching "automatically recover from."
+
+Icon set to the real Shield spell's own (`systems/pf2e/icons/spells/
+shield.webp`), on request — a defensive-ward image fits Inexorable's
+own "automatically shrug off conditions" theme better than the
+original generic worm-creature icon.
 
 ## Seventh+ homebrew items: Monstrosity Form (Cave Worm/Phoenix/Sea Serpent) + Spine Rake
 
@@ -727,21 +732,56 @@ Name>}`. IDs used: Untamed Form `8RWfKConLYFZpQ9X`, Animal Form
 broken too, same fix applied) Heart of the Kaiju — a *feat*
 (`feats-srd` pack, not `spells-srd`) — `1ul2dasQBdlaMEC5`.
 
-**Update, after the Untamed Form picker bug (see the `ChoiceSet`
-section below): "RE `uuid` fields are fine by name" is not a blanket
-rule — `GrantItem`'s `uuid` field genuinely does resolve by name, but
-`ChoiceSet`'s `choices[].value` (also nominally a `uuid` field) does
-NOT — it silently overwrites the label to `"???"` instead. Don't
-assume any given RE's UUID-ish field resolves by name just because
-`GrantItem`'s does; when in doubt, use the real `_id` — it always
-works, for every field, in every RE, with no downside.**
+**Correction — the "`GrantItem`'s `uuid` field genuinely does resolve
+by name" claim above was wrong, found in play (v2.20.0): Inexorable
+and Shroud of Flame weren't being granted at all when shifting into
+Cave Worm/Phoenix form.** Root-caused by reading Foundry's own
+(un-minified) core client source directly over SSH, not the compiled
+pf2e bundle this time — `/home/node/resources/app/client/utils/
+helpers.mjs`'s `fromUuid()` calls `collection.getDocument(primaryId ??
+id)`, and `CompendiumCollection#getDocument(id)`
+(`.../documents/collections/compendium-collection.mjs`) is: check
+`this.get(id)` (a plain Map lookup keyed by real `_id`), then fall
+back to a database query `{_id: id}`. **There is no name-based
+fallback anywhere in this path, for any compendium, official or
+third-party.** So `GrantItem`'s `uuid` field does NOT resolve by name
+in general — it never did. The reason Werecreature Dedication's own
+untouched `Toughness`/`Change Shape` grants (`Compendium.pf2e.feats-
+srd.Item.Toughness`, `Compendium.pf2e.actionspf2e.Item.Change Shape`)
+appear to "work by name" is that those two specific vanilla documents
+happen to have their real `_id` literally equal to their display name
+— a legacy authoring convention in some of pf2e's oldest, most
+fundamental compendium packs, not a general resolution mechanism. Any
+of *this module's own* items (all using random 16-character `_id`s
+that don't match their names) were never going to resolve that way.
 
-**When adding any new patched spell effect**: any `@UUID[...]`
-*content link* in its description, and any `ChoiceSet` choice whose
-`value` is an item reference, needs a real ID (+ explicit `{label}`
-for content links specifically) — not just a copied name. Check
-upstream for the ID rather than assuming a name-based reference will
-resolve correctly anywhere outside `GrantItem`.
+**Fixed**: every remaining name-based `GrantItem` `uuid` pointing at
+an in-module item — Kaiju's `Breath Weapon`/`Breath Weapon (Kaiju)`
+grants (`spell-effect-monstrosity-form-kaiju.json`), and Cave Worm's
+`Inexorable`, Phoenix's `Shroud of Flame`, and Sea Serpent's `Spine
+Rake`/`Spine Rake (Sea Serpent)` grants (`spell-effect-monstrosity-
+form.json`) — swapped for their real `_id`s (`BrW3aponKaiju001`,
+`BrW3aponSpl00001`, `InexorableEffct1`, `ShrdFlmActiveEf1`,
+`SpnRakeAct0001XY`, `SpnRakeSpl0001XY`). All 40 Dragon Breath grants
+already used real IDs from the start (per the `system.slug`-adjacent
+generator-script convention), which is exactly why those were never
+affected — this bug was specific to the six grants authored earlier,
+before that convention was consistently applied everywhere. Confirmed
+via `grep -rn '"uuid": "Compendium.phil-pf2e-weredragon' src/packs/ |
+grep -vE 'Item\.[A-Za-z0-9]{16}"'` returning nothing that no
+in-module `GrantItem` uuid is name-based anymore, repo-wide.
+
+**Practical rule going forward, now verified against core source
+rather than inferred from a couple of examples that happened to work
+by coincidence: `GrantItem`'s `uuid` field needs a real `_id` for
+*any* item this module itself authors, full stop — same as every
+other UUID-ish field already documented in this section (`@UUID[...]`
+content links, `ChoiceSet.choices[].value`). Referencing a real,
+untouched vanilla pf2e document by name may happen to work if that
+specific document's `_id` coincidentally equals its name (as with
+Toughness/Change Shape) — don't rely on it, don't assume it for any
+new reference, and check upstream for the real ID instead of copying
+a name whenever in doubt.**
 
 ## Sixth-ish homebrew item: Untamed Form picker
 
@@ -835,8 +875,30 @@ text was written to match that, not to imply a shape it doesn't have).
 Traits (including `manipulate`) were deliberately left untouched even
 though a "breath" conceptually shouldn't need somatic components —
 that would be a mechanical change, and only the text was asked to
-change; revisit only if asked. Standalone item, not wired into any
-other homebrew mechanism (no grants, no predicates referencing it).
+change; revisit only if asked.
+
+**Now auto-granted in Hybrid/Animal form, like Dragon Breath is per
+dragon type.** Added `"slug": "weredragon-breath-weapon"` (had none),
+then wired the three Weredragon form-switch macros (see the hotbar
+macros section below) to grant/revoke it directly — `weredragon-form-
+hybrid.json`/`weredragon-form-animal.json` create it via `fromUuid(...
+).toObject()` + `createEmbeddedDocuments` if not already present
+(mirroring `untamed-form-toggle.json`'s own find-by-slug-then-create
+pattern exactly), and `weredragon-form-humanoid.json` deletes it if
+present. This can't go through a `GrantItem` rule element the way
+battle forms do, for the same reason already documented for Bizarre
+Transformation and Healing Transformation's own trigger paths: the
+Hybrid/Animal toggle is a `RollOption` update on the existing
+Werecreature Dedication item, not a new item being created, so there's
+no natural `GrantItem`/`createItem` hook point to attach to — a direct
+macro call is the established, reliable way this repo handles that
+specific toggle. `scripts/innate-spell-grants.js`'s `TRACKED_SLUGS`
+set was extended to include `weredragon-breath-weapon`, so the plain
+`createEmbeddedDocuments` call from these macros gets the exact same
+"place it in a real spellcasting entry so it shows up in the tab" fix
+already applied to Dragon Breath/Kaiju/Spine Rake — the fix is keyed
+entirely off the spell's own slug at `createItem` time, so it doesn't
+matter that this grant path is a macro instead of a `GrantItem`.
 
 ## Hotbar macro: one-click Untamed Form toggle
 

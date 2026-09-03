@@ -1,8 +1,8 @@
 /**
  * Fixes granted spells (Dragon Breath x40, Breath Weapon (Kaiju), Spine
- * Rake (Sea Serpent)) not appearing in the Spellcasting tab despite being
- * genuinely present on the actor (confirmed in play: `actor.items` has
- * them, but the sheet shows nothing).
+ * Rake (Sea Serpent), Weredragon Breath Weapon) not appearing in the
+ * Spellcasting tab despite being genuinely present on the actor (confirmed
+ * in play: `actor.items` has them, but the sheet shows nothing).
  *
  * Root cause, confirmed by reading the compiled pf2e source directly:
  * `CharacterSheetPF2e#prepareSpellcasting()` only ever iterates
@@ -53,6 +53,19 @@
  * overwrites `ability.value` from that statistic's own attribute -- so
  * the initial values here just need to be valid, not perfectly matched
  * per dragon type.
+ *
+ * "Weredragon Breath Weapon" is tracked here too even though it isn't
+ * granted via `GrantItem` at all -- Werecreature's Hybrid/Animal toggle is
+ * a `RollOption` update on the existing dedication feat, not a new item
+ * being created, so (same limitation already documented for Bizarre
+ * Transformation and Healing Transformation's own trigger paths) the
+ * `weredragon-form-hybrid`/`weredragon-form-animal` macros create it
+ * directly instead, mirroring `untamed-form-toggle.json`'s own
+ * find-by-slug-then-create-or-delete pattern. This hook still needs to run
+ * for it afterward, since a macro's plain `createEmbeddedDocuments` call
+ * has exactly the same "no location set" problem as a `GrantItem` grant
+ * does -- `createItem` fires either way, so one matching entry in
+ * `TRACKED_SLUGS` covers both trigger paths for free.
  */
 
 (() => {
@@ -72,6 +85,7 @@ const DRAGON_BREATH_TYPES = [
 const TRACKED_SLUGS = new Set([
   "breath-weapon-kaiju",
   "spine-rake-sea-serpent",
+  "weredragon-breath-weapon",
   ...DRAGON_BREATH_TYPES.map((type) => `dragon-breath-${type}`),
 ]);
 

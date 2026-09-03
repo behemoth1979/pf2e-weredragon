@@ -218,7 +218,7 @@
         "predicate": [
           "monstrosity-form:cave-worm"
         ],
-        "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.Inexorable (Weredragon Homebrew)"
+        "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.InexorableEffct1"
       },
       {
         "key": "TokenImage",
@@ -397,7 +397,7 @@
         "predicate": [
           "monstrosity-form:phoenix"
         ],
-        "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.Shroud of Flame (Weredragon Homebrew)"
+        "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.ShrdFlmActiveEf1"
       },
       {
         "key": "TokenImage",
@@ -514,7 +514,7 @@
         "predicate": [
           "monstrosity-form:sea-serpent"
         ],
-        "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.Spine Rake"
+        "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.SpnRakeAct0001XY"
       },
       {
         "flag": "seaSerpentSpineRakeSpell",
@@ -522,7 +522,7 @@
         "predicate": [
           "monstrosity-form:sea-serpent"
         ],
-        "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.Spine Rake (Sea Serpent)"
+        "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.SpnRakeSpl0001XY"
       },
       {
         "key": "TokenImage",

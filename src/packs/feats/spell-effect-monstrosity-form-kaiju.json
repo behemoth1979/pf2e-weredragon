@@ -88,12 +88,12 @@
       {
         "flag": "kaijuBreathWeapon",
         "key": "GrantItem",
-        "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.Breath Weapon"
+        "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.BrW3aponKaiju001"
       },
       {
         "flag": "kaijuBreathWeaponSpell",
         "key": "GrantItem",
-        "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.Breath Weapon (Kaiju)"
+        "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.BrW3aponSpl00001"
       },
       {
         "key": "TokenImage",

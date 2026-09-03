@@ -53,6 +53,7 @@
     },
     "requirements": "",
     "rules": [],
+    "slug": "weredragon-breath-weapon",
     "target": {
       "value": "1 creature, plus any number of additional creatures"
     },

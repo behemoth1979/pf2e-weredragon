@@ -1,3 +1,5 @@
-2026/09/04-08:53:39.836 45f8 Recovering log #4
-2026/09/04-08:53:39.845 45f8 Delete type=0 #4
-2026/09/04-08:53:39.846 45f8 Delete type=3 #2
+2026/09/04-09:49:26.895 2504 Delete type=3 #1
+2026/09/04-09:49:26.899 ed3c Level-0 table #5: started
+2026/09/04-09:49:26.903 ed3c Level-0 table #5: 3264 bytes OK
+2026/09/04-09:49:26.906 ed3c Delete type=0 #3
+2026/09/04-09:49:26.906 ed3c Manual compaction at level-0 from '!macros!UntamedFrmMacro1' @ 72057594037927935 : 1 .. '!macros!WdrgnFrmHybrid001' @ 0 : 0; will stop at (end)

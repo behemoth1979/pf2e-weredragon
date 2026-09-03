@@ -133,7 +133,10 @@ the patched Spell Effect above instead of the vanilla one.
 There's also a **Weredragon Breath Weapon** spell — a mechanical
 duplicate of Chain Lightning (8d12 electricity, basic Reflex, chains
 between nearby creatures), renamed and reflavored as a draconic
-breath; the numbers are unchanged from the original.
+breath; the numbers are unchanged from the original. It's automatically
+added to your Spellcasting tab whenever you shift into Hybrid or Animal
+form via the hotbar macros below, and removed again on reverting to
+Humanoid.
 
 ## Hotbar macros
 
