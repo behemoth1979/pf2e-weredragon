@@ -550,6 +550,130 @@ guaranteed byte-exact rather than transcribed by hand. Same round-trip
 verification (compile → extract → diff) as every other item in this
 repo still applies before committing.
 
+## Dragon Breath: 40 real spells, one per Dragon Form type
+
+`src/packs/feats/dragon-breath-<type>-spell.json` (40 files, one per
+dragon type — `type` is the lowercase slug, e.g. `dragon-breath-
+adamantine-spell.json`) — real castable `type: "spell"` items named
+"Dragon Breath (\<Type\>)", one for every dragon type in the shared
+`spell-effect-dragon-form.json`'s own `ChoiceSet`.
+
+**Correction, found mid-implementation: unlike Kaiju's Breath Weapon
+and Sea Serpent's Spine Rake, Dragon Breath was NOT actually
+unautomated — this was checked too shallowly at first.** The initial
+plan was to build these 40 spells *and* replace the shared item's
+existing `GrantItem` (which grants the real
+`Compendium.pf2e.actionspf2e.Item.Dragon Breath (Dragon Form)` action)
+with a patched action pointing at the new spells instead — the same
+"replace the vanilla item with a patched copy" pattern used everywhere
+else in this repo. Reading further into the shared item's own rule
+set (58+ rules, not just the `ChoiceSet` skimmed the first time)
+turned up a chain immediately after that `GrantItem`, all keyed off
+`{item|flags.system.itemGrants.dragonBreath.id}` (a resolvable
+reference to "whatever got granted under the `dragonBreath` flag"):
+two `ItemAlteration`s that dynamically rewrite the granted action's
+own description (via a localized string keyed by `breathShape`+
+`saveType`) and add the correct tradition/damage-type traits (the
+second one predicated `nor` against exactly the 7 dragon types whose
+damage type has no matching trait — bludgeoning/piercing types,
+confirming the "if applicable" exclusion is already handled
+precisely), and two `DamageAlteration`s targeting a special selector,
+`"{granted-item-id}-inline-damage"` — a real, working mechanism for
+altering the *inline* `@Damage[...]` roll embedded in an item's own
+description text, not something invented for this repo. One overrides
+that inline roll's damage type to the chosen dragon's real type; the
+other adds +4 dice when `parent:level >= 8`, matching "Heightened
+(8th)... an additional 4d6 damage" exactly. So the granted action
+*already* rolls the correct damage type and amount, already scales
+correctly at 8th, and already shows correctly customized description
+text — none of that needed rebuilding.
+
+**The one genuine gap**: the granted action's description has no
+`@Check[...]` enricher for the save at all — "with a basic save
+against your spell DC" is plain text, so there's no clickable save
+button; the GM/player has to already know (or look up) which save
+type applies and roll it manually on the other side. That's the real,
+narrow gap these 40 spells fill. Given that, the shared item's
+original `GrantItem`/`ItemAlteration`/`DamageAlteration` chain for the
+vanilla action was left **completely untouched** — replacing it would
+have thrown away real, working, dynamic automation to reproduce a
+strictly smaller subset of it. Instead, the 40 spells are granted
+*alongside* the existing action (see below), as a genuine alternative
+that has a real, clickable save button — not a replacement.
+
+**All data pulled directly from Dragon Form's own `ChoiceSet` and
+prose, not invented**: `rules[0].choices` on the shared item already
+gives `{breathShape, damageType, dragonType, saveType, tradition}` per
+type in fully structured form (confirmed by reading all 40 entries
+directly, not summarized) — that's where each spell's `area.type`
+(cone/line), `damage.type`, `defense.save.statistic`, and
+`traits.traditions` come from. The actual damage amount, area size,
+and heightening tier aren't in the ChoiceSet (only shape/type/save/
+tradition are) — those came from the shared item's own description
+prose: "dealing 10d6 damage... The shape is a 30-foot cone or a
+100-foot line... Heightened (8th) Your Dragon Breath deals an
+additional 4d6 damage." Recharge ("can't be used again for 1d4
+rounds") is a rollable inline link in the description, same pattern
+as Kaiju's Breath Weapon.
+
+**Traits**: per the shared item's own text — "Dragon Breath has the
+tradition trait matching the type of dragon and the damage trait
+matching the type of damage it deals, if applicable" — each spell's
+`traits.value` includes the tradition word itself (not just
+`traditions`, which is the usual spell-list-only field; this ability
+explicitly wants it as a visible trait too) plus the damage type, but
+only when that damage type is a real PF2E trait (acid/cold/
+electricity/fire/sonic/force/mental/poison/spirit/void) — physical
+types (bludgeoning/piercing/slashing, which several dragon types
+actually deal) have no matching trait to add, confirmed by their
+absence anywhere in the system as a trait.
+
+**Heightening uses `type: "fixed"`, not `"interval"`** — confirmed
+from a real official spell with the identical "single higher tier,
+not per-rank" shape ("Deity's Strike": base 7d12 at rank 7,
+`heightening: {type: "fixed", levels: {"9": {damage: {<key>: {formula:
+"8d12", ...}}}}, damage: {}}` at rank 9) — pulled directly from the
+real `spells` compendium pack (downloaded via SFTP to the host-side
+volume mount path, `/mnt/user/foundry/data/...` — not the in-container
+`/data/...` path, which SFTP can't see, since SFTP resolves against
+the Docker *host's* filesystem, not `docker exec`'s container
+namespace — then extracted locally with this repo's own
+`@foundryvtt/foundryvtt-cli`, since compendium `.ldb` files are
+Snappy-compressed SSTables that plain `grep` can't read the way the
+world's own recent-write `.log` files could earlier in this document).
+**The critical, easy-to-get-wrong detail**: each `levels["8"].damage`
+entry holds the *complete replacement* damage object for that rank
+(formula `"14d6"`), not an increment (`"4d6"`) — confirmed directly
+from the real example (base `7d12` → heightened level shows the full
+`8d12`, not `1d12`). Getting this backward would have silently made
+every heightened Dragon Breath deal only 4d6 total instead of 14d6.
+
+**Wiring — automatically granted, per type, alongside the vanilla
+action, not manually found**: the shared `spell-effect-dragon-form.json`
+gets 40 new `GrantItem` REs added (each `predicate: ["dragon-form:
+<type>"]`, matching the exact predicate convention this file already
+uses for its own per-type overrides — e.g. the existing Stormcrown
+`TokenImage`), each granting the one matching "Dragon Breath (\<Type\>)"
+spell by real `_id`. Since only one dragon type's predicate is ever
+true at a time, only the one matching spell is ever actually granted
+— it shows up in the Spellcasting tab and disappears automatically
+when the form ends (`GrantItem`'s default `onDelete: "cascade"` for
+non-physical items, same mechanism relied on for Inexorable/Shroud of
+Flame), same lifecycle as the vanilla action it sits alongside.
+
+**Built via a throwaway Node generator script**, not by hand — 40
+files sharing one schema with only shape/type/save/tradition varying
+per type is exactly the "large repetitive content" case this repo
+already has a convention for (see the token-swap section above).
+Random 16-character alphanumeric `_id`s were generated per file
+(Foundry document IDs are opaque; no need for them to be
+human-readable), and `system.slug` was set explicitly on every one
+(`dragon-breath-<type>`) as a matter of course, even though nothing in
+this module currently scripts against them — consistent with this
+repo's standing practice of always setting an explicit slug on any
+new/renamed item rather than relying on a name-derived fallback that
+may not exist or may include an unwanted suffix.
+
 ## `system.slug` overrides — required on every renamed spell effect
 
 Every patched spell-effect item above appends `[Weredragon Homebrew]`

@@ -104,6 +104,20 @@ dragon type with a token swap to `dragon-form.webp`, and Aerial Form
 `aerial-form.webp` that applies regardless of which of the four
 creatures you choose.
 
+The compendium also includes a real, castable **Dragon Breath**
+spell for every one of Dragon Form's 40 dragon types (e.g. "Dragon
+Breath (Stormcrown)", "Dragon Breath (Cinder)"), automatically added
+to your Spellcasting tab for whichever type you're currently
+transformed into. The real granted "Dragon Breath (Dragon Form)"
+action already deals the correct damage type/amount and heightens
+correctly at 8th — this spell exists alongside it as an alternative
+with a genuine, clickable save button, since the action's own save is
+just descriptive text with nothing to click. Each one has the correct
+area (30-foot cone or 100-foot line), damage type, and save type for
+its dragon type, dealing 10d6 damage (14d6 if Dragon Form was cast at
+8th) with a basic save that rolls against this character's actual
+spell DC.
+
 Finally, **Spell Effect: Untamed Form** is patched to replace the
 vanilla dynamic form picker with a static list of exactly the 17
 forms above — pick one from the dropdown and it grants that

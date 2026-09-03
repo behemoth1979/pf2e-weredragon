@@ -759,6 +759,326 @@
           "dragon-form:stormcrown"
         ],
         "value": "modules/phil-pf2e-weredragon/assets/tokens/dragon-form.webp"
+      },
+      {
+        "flag": "dragonBreathAdamantine",
+        "key": "GrantItem",
+        "predicate": [
+          "dragon-form:adamantine"
+        ],
+        "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.6IxZP7gC9AoQ76Dm"
+      },
+      {
+        "flag": "dragonBreathBarrage",
+        "key": "GrantItem",
+        "predicate": [
+          "dragon-form:barrage"
+        ],
+        "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.TrSCaiwxXVFTw4bD"
+      },
+      {
+        "flag": "dragonBreathBog",
+        "key": "GrantItem",
+        "predicate": [
+          "dragon-form:bog"
+        ],
+        "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.uSvtPWrsap7w0tkf"
+      },
+      {
+        "flag": "dragonBreathBrine",
+        "key": "GrantItem",
+        "predicate": [
+          "dragon-form:brine"
+        ],
+        "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.4Y2bLKT7V1WyzDkj"
+      },
+      {
+        "flag": "dragonBreathCinder",
+        "key": "GrantItem",
+        "predicate": [
+          "dragon-form:cinder"
+        ],
+        "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.r0M6xNvBUBMm8LOv"
+      },
+      {
+        "flag": "dragonBreathCloud",
+        "key": "GrantItem",
+        "predicate": [
+          "dragon-form:cloud"
+        ],
+        "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.scOC06I6CaUEbqUt"
+      },
+      {
+        "flag": "dragonBreathConspirator",
+        "key": "GrantItem",
+        "predicate": [
+          "dragon-form:conspirator"
+        ],
+        "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.mMlQkjyQOjVcm60P"
+      },
+      {
+        "flag": "dragonBreathCoral",
+        "key": "GrantItem",
+        "predicate": [
+          "dragon-form:coral"
+        ],
+        "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.3vB29EYbI3v6g9C2"
+      },
+      {
+        "flag": "dragonBreathCrystal",
+        "key": "GrantItem",
+        "predicate": [
+          "dragon-form:crystal"
+        ],
+        "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.xS8CTOvRkmi2Y6jo"
+      },
+      {
+        "flag": "dragonBreathDelight",
+        "key": "GrantItem",
+        "predicate": [
+          "dragon-form:delight"
+        ],
+        "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.rLYJIQz72RfRrKXf"
+      },
+      {
+        "flag": "dragonBreathDespair",
+        "key": "GrantItem",
+        "predicate": [
+          "dragon-form:despair"
+        ],
+        "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.UMS5Clb5H2hbcWcr"
+      },
+      {
+        "flag": "dragonBreathDiabolic",
+        "key": "GrantItem",
+        "predicate": [
+          "dragon-form:diabolic"
+        ],
+        "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.rg7mAhYwCUMLAm2q"
+      },
+      {
+        "flag": "dragonBreathEmpyreal",
+        "key": "GrantItem",
+        "predicate": [
+          "dragon-form:empyreal"
+        ],
+        "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.a2Dm9De7006ufAGk"
+      },
+      {
+        "flag": "dragonBreathExecutor",
+        "key": "GrantItem",
+        "predicate": [
+          "dragon-form:executor"
+        ],
+        "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.QOozl19i5PUxY2lV"
+      },
+      {
+        "flag": "dragonBreathForest",
+        "key": "GrantItem",
+        "predicate": [
+          "dragon-form:forest"
+        ],
+        "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.XHBz6LAbf66hxYIg"
+      },
+      {
+        "flag": "dragonBreathFortune",
+        "key": "GrantItem",
+        "predicate": [
+          "dragon-form:fortune"
+        ],
+        "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.5zSAenDEKencczkx"
+      },
+      {
+        "flag": "dragonBreathHorned",
+        "key": "GrantItem",
+        "predicate": [
+          "dragon-form:horned"
+        ],
+        "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.zzZ9AGKpKNoGiS0p"
+      },
+      {
+        "flag": "dragonBreathMagma",
+        "key": "GrantItem",
+        "predicate": [
+          "dragon-form:magma"
+        ],
+        "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.pW8ofhpBgjMVgfq9"
+      },
+      {
+        "flag": "dragonBreathMirage",
+        "key": "GrantItem",
+        "predicate": [
+          "dragon-form:mirage"
+        ],
+        "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.zKOdhmIu2jzdth1U"
+      },
+      {
+        "flag": "dragonBreathMocking",
+        "key": "GrantItem",
+        "predicate": [
+          "dragon-form:mocking"
+        ],
+        "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.S8QgjFEIrai1N4Iw"
+      },
+      {
+        "flag": "dragonBreathOath",
+        "key": "GrantItem",
+        "predicate": [
+          "dragon-form:oath"
+        ],
+        "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.SWYFCROYR18TVFwr"
+      },
+      {
+        "flag": "dragonBreathOmen",
+        "key": "GrantItem",
+        "predicate": [
+          "dragon-form:omen"
+        ],
+        "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.9R0xX9gMepx99IFU"
+      },
+      {
+        "flag": "dragonBreathPhase",
+        "key": "GrantItem",
+        "predicate": [
+          "dragon-form:phase"
+        ],
+        "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.TRE9nzru6MNI3HYt"
+      },
+      {
+        "flag": "dragonBreathRequiem",
+        "key": "GrantItem",
+        "predicate": [
+          "dragon-form:requiem"
+        ],
+        "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.JlOuwoEcffh0v7ek"
+      },
+      {
+        "flag": "dragonBreathResurrection",
+        "key": "GrantItem",
+        "predicate": [
+          "dragon-form:resurrection"
+        ],
+        "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.XIYAFsxcRFk46pjt"
+      },
+      {
+        "flag": "dragonBreathRime",
+        "key": "GrantItem",
+        "predicate": [
+          "dragon-form:rime"
+        ],
+        "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.77FUFcrsc1ISWR71"
+      },
+      {
+        "flag": "dragonBreathRune",
+        "key": "GrantItem",
+        "predicate": [
+          "dragon-form:rune"
+        ],
+        "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.btS5tzeFk8hJiEje"
+      },
+      {
+        "flag": "dragonBreathSage",
+        "key": "GrantItem",
+        "predicate": [
+          "dragon-form:sage"
+        ],
+        "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.qh5aCwtBlcSM7ihr"
+      },
+      {
+        "flag": "dragonBreathSea",
+        "key": "GrantItem",
+        "predicate": [
+          "dragon-form:sea"
+        ],
+        "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.V4o4HpxvCxQiMMhg"
+      },
+      {
+        "flag": "dragonBreathSky",
+        "key": "GrantItem",
+        "predicate": [
+          "dragon-form:sky"
+        ],
+        "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.oXcKjoSRrXkkF006"
+      },
+      {
+        "flag": "dragonBreathSovereign",
+        "key": "GrantItem",
+        "predicate": [
+          "dragon-form:sovereign"
+        ],
+        "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.z8rCRsa9aMX3X1Gk"
+      },
+      {
+        "flag": "dragonBreathStormcrown",
+        "key": "GrantItem",
+        "predicate": [
+          "dragon-form:stormcrown"
+        ],
+        "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.LfSEmZM5UxLUQB6I"
+      },
+      {
+        "flag": "dragonBreathTime",
+        "key": "GrantItem",
+        "predicate": [
+          "dragon-form:time"
+        ],
+        "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.GWX8YGDIc25ygM9j"
+      },
+      {
+        "flag": "dragonBreathUmbral",
+        "key": "GrantItem",
+        "predicate": [
+          "dragon-form:umbral"
+        ],
+        "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.IDvThmsbmoufeRJ4"
+      },
+      {
+        "flag": "dragonBreathUnderworld",
+        "key": "GrantItem",
+        "predicate": [
+          "dragon-form:underworld"
+        ],
+        "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.x0n1JbkrgywZpCeQ"
+      },
+      {
+        "flag": "dragonBreathVizier",
+        "key": "GrantItem",
+        "predicate": [
+          "dragon-form:vizier"
+        ],
+        "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.mYyor3ijDpWLtHqG"
+      },
+      {
+        "flag": "dragonBreathVorpal",
+        "key": "GrantItem",
+        "predicate": [
+          "dragon-form:vorpal"
+        ],
+        "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.uj7inev5qRwX82b9"
+      },
+      {
+        "flag": "dragonBreathWailing",
+        "key": "GrantItem",
+        "predicate": [
+          "dragon-form:wailing"
+        ],
+        "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.1UpMiTUcaXgrpHlO"
+      },
+      {
+        "flag": "dragonBreathWhisper",
+        "key": "GrantItem",
+        "predicate": [
+          "dragon-form:whisper"
+        ],
+        "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.mi5Ku4MmDbiY71y7"
+      },
+      {
+        "flag": "dragonBreathWish",
+        "key": "GrantItem",
+        "predicate": [
+          "dragon-form:wish"
+        ],
+        "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.p6jS5d19AybGuE6y"
       }
     ],
     "start": {
