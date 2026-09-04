@@ -13,15 +13,43 @@
  *
  * On request, switched from this script rolling and applying its own
  * plain `Roll` (fully automatic, no click needed) to actually casting
- * that spell instead -- reuses the exact same "temporary, unembedded
- * item parented to the actor, then `.rollDamage({})`" pattern already
- * proven working in this module for shroud-of-flame.js (see that
- * script's own docstring for why `rollDamage({})` -- not `toMessage()`
- * -- is what produces a real, clickable Apply Healing button on the
- * resulting chat card, matching how a normal spell's damage/healing
- * roll actually gets applied). The roll itself still isn't a separate
- * click -- `rollDamage()` executes it immediately -- but applying the
- * result now requires the normal click, same as any other spell.
+ * that spell instead -- constructs a temporary, unembedded item parented
+ * to the actor, then calls `.rollDamage({})` on it (same shape
+ * shroud-of-flame.js already uses, for why `rollDamage({})` -- not
+ * `toMessage()` -- is what produces a real, clickable Apply Healing
+ * button). The roll itself still isn't a separate click (`rollDamage()`
+ * executes it immediately), but applying the result now needs the normal
+ * click, same as any other spell.
+ *
+ * **Correction, found in play (v2.24.1): a bare temporary/unembedded copy
+ * silently does nothing at all** -- confirmed live, via Chrome DevTools
+ * Protocol connected directly to the user's own running Foundry session
+ * (not just read from source): `rollDamage()` completed with no thrown
+ * error, but posted no chat message either. Traced to `SpellPF2e
+ * #getDamage()`'s own early return: `if (... || !n?.statistic) return
+ * null;` where `n = this.spellcasting`, and `get spellcasting()` resolves
+ * via `actor.spellcasting.get(this.system.location.value)` -- a
+ * temporary copy has no `location.value` at all, so this is always null,
+ * so `getDamage()`/`rollDamage()` always silently return nothing,
+ * regardless of the spell's own damage/heightening data being completely
+ * correct. Manually casting the spell from the sheet never hit this,
+ * because Foundry's own drag-and-drop flow always assigns a real
+ * `location.value` as part of adding the spell -- only this script's own
+ * from-scratch temporary construction skipped that step. Fixed by
+ * pointing the temp copy's `system.location.value` at the same shared
+ * "Weredragon Homebrew (Innate Spells)" entry `innate-spell-grants.js`
+ * already find-or-creates for granted spells (exposed via
+ * `getOrCreateInnateEntry` on the module API for this reuse) -- without
+ * needing to actually embed this spell on the actor at all. Re-verified
+ * live after the fix: `spellcasting` resolves to that entry, `getDamage
+ * ()` returns non-null, and a real chat card posts with an actual rolled
+ * total.
+ *
+ * This same gap likely affects shroud-of-flame.js too (identical
+ * temporary-copy-with-no-location construction) -- not fixed here since
+ * it wasn't reported broken and reproducing/verifying it needs an actual
+ * Phoenix Monstrosity Form test in play, but worth checking if it turns
+ * out to have gone silently unused the same way.
  *
  * Detecting "Untamed Form was just cast, at what rank" without guessing:
  * `ChatMessagePF2e#get item()` (real source, client/documents/chat-
@@ -86,7 +114,20 @@ async function applyHealingTransformation(actor) {
   const source = await fromUuid(HEALING_TRANSFORMATION_SPELL_UUID);
   if (!source) return;
 
-  const tempSpell = new Item.implementation(source.toObject(), { parent: actor });
+  // A temporary, unembedded spell has no system.location.value, so
+  // SpellPF2e#spellcasting resolves to null and getDamage()/rollDamage()
+  // silently return nothing -- no error, just no chat card. Point it at
+  // the same shared innate entry innate-spell-grants.js already
+  // find-or-creates for granted spells, without actually embedding this
+  // spell on the actor.
+  const getOrCreateInnateEntry = game.modules.get(MODULE_ID)?.getOrCreateInnateEntry;
+  const sourceData = source.toObject();
+  if (getOrCreateInnateEntry) {
+    const entry = await getOrCreateInnateEntry(actor);
+    sourceData.system.location.value = entry.id;
+  }
+
+  const tempSpell = new Item.implementation(sourceData, { parent: actor });
   await tempSpell.rollDamage({});
 }
 

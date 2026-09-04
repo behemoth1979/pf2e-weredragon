@@ -73,6 +73,19 @@
  * common convention for "aura of X" abilities generally. If this turns
  * out to be wrong in play, the fix is removing the `actor ===
  * combatant.actor` exclusion in the token filter below.
+ *
+ * **Flagged, not yet confirmed either way**: `healing-transformation.js`
+ * found in play that this exact "temporary, unembedded copy + rollDamage
+ * ()" construction silently produces no chat message at all, because
+ * `SpellPF2e#getDamage()` requires `this.spellcasting` (which needs a
+ * real `system.location.value` pointing at an actual spellcasting entry
+ * on the actor) to be non-null -- a temp copy with no location never has
+ * one. This spell may have the identical gap; it just hasn't been
+ * specifically reported broken. If Shroud of Flame's damage turns out to
+ * never actually post in play, the fix is the same one applied there:
+ * point `sourceData.system.location.value` at a real entry id (e.g. via
+ * `game.modules.get("phil-pf2e-weredragon").getOrCreateInnateEntry(actor)`,
+ * exposed by innate-spell-grants.js) before constructing the temp item.
  */
 
 (() => {

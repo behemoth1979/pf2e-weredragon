@@ -1567,6 +1567,67 @@ signature dropped its now-unused `rank` parameter, and both call sites
 (the `createChatMessage` hook and `untamed-form-toggle.json`'s macro)
 were updated to match.
 
+**Correction, found in play right after that shipped (v2.24.1): the
+cast-the-spell trigger never actually did anything.** Reported as "not
+the old code or the new idea, nothing happens" when shifting into
+Untamed Form via the hotbar macro. First-round diagnosis (module
+version, macro command staleness, toggle state) all checked out fine —
+the real bug was one level deeper, and was only found by connecting
+directly to the user's own live Foundry session via Chrome DevTools
+Protocol (launched with `--remote-debugging-port`, a separate debug
+profile) and calling `applyHealingTransformation` for real: it
+completed with no thrown error, but posted no chat message, and
+`tempSpell.getDamage()` returned `null`.
+
+Traced to `SpellPF2e#getDamage()`'s own early return:
+`if (Object.keys(this.system.damage).length === 0 || !t || !n
+?.statistic) return null;` where `n = this.spellcasting`, and `get
+spellcasting()` resolves via `actor.spellcasting.get(this.system
+.location.value) ?? null`. A temporary, unembedded copy (constructed
+via `new Item.implementation(source.toObject(), {parent: actor})`, no
+`location.value` set) always resolves `spellcasting` to `null`, so
+`getDamage()`/`rollDamage()` always silently do nothing — regardless
+of the spell's own damage/heightening fields being completely correct
+(confirmed they were: `tempSpellIsCantrip: true`, `tempSpellRank: 10`
+for a level-20 actor, exactly as expected). Manually casting the spell
+from the sheet never hit this, because Foundry's own drag-and-drop
+flow (`SpellCollection#addSpell`, documented above) always assigns a
+real `location.value` as part of adding a spell to the sheet — only
+this script's from-scratch temporary construction skipped that step
+entirely, which is exactly why "manually add the spell and cast it,
+it works as intended" was true while the automated trigger did
+nothing.
+
+**Fixed by pointing the temp copy at the same shared innate entry**
+`innate-spell-grants.js` already find-or-creates for granted spells —
+`getOrCreateInnateEntry` was exposed on the module API specifically
+for this reuse, and `healing-transformation.js` now sets
+`sourceData.system.location.value = entry.id` before constructing the
+temporary item, without ever actually embedding the spell on the
+actor. Re-verified live, over the same CDP connection, after the fix:
+`spellcasting` resolved to the shared entry, `getDamage()` returned
+non-null, and a real chat card posted with a genuine rolled total.
+
+**This live-CDP verification loop is worth calling out as a technique,
+not just a one-off**: earlier fixes this session were shipped on the
+strength of reading source and reasoning through the mechanism, then
+corrected reactively when live play found they didn't actually work
+(the resistance-ignoring/struck-through-damage saga on the Gauntlets
+being the clearest earlier example). This was the first fix in this
+session actually *verified against the user's own live game state*
+before shipping, by connecting directly to their browser via CDP
+(`Runtime.evaluate` over the page's `webSocketDebuggerUrl`, listed at
+`http://localhost:9222/json/list` once Chrome is relaunched with
+`--remote-debugging-port=9222`) — prefer this when a fix is available
+and the user can launch a debuggable browser, rather than shipping on
+source-reading confidence alone and waiting for the next bug report.
+
+**Same gap flagged (not fixed) in `shroud-of-flame.js`**: it uses the
+identical temporary-unembedded-copy-plus-`rollDamage()` construction,
+never reported broken, but was never live-verified either — worth
+checking if Phoenix's Shroud of Flame damage turns out to have never
+actually been posting in play.
+
 ## Granted spells not appearing in the Spellcasting tab: shared innate entry fix
 
 **Bug found in play, fixed in v2.18.0**: the 40 Dragon Breath spells

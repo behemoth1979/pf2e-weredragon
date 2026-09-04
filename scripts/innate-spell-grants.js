@@ -108,6 +108,19 @@ async function getOrCreateInnateEntry(actor) {
   return created;
 }
 
+// Exposed for healing-transformation.js: a temporary, unembedded spell
+// (constructed to roll damage/healing without persisting on the actor)
+// has no `location.value` of its own, so `SpellPF2e#spellcasting` resolves
+// to null and `getDamage()`/`rollDamage()` silently return nothing (found
+// in play -- no exception, just no chat card). Setting the temp copy's
+// own `system.location.value` to this same shared entry's id before
+// constructing it fixes that, without needing the spell to actually be
+// embedded at all.
+Hooks.once("init", () => {
+  const mod = game.modules.get(MODULE_ID);
+  if (mod) mod.getOrCreateInnateEntry = getOrCreateInnateEntry;
+});
+
 Hooks.on("createItem", async (item, _options, userId) => {
   if (userId !== game.user.id) return;
   if (!(item.parent instanceof Actor)) return;
