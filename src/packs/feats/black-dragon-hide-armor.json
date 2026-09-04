@@ -44,7 +44,12 @@
         "key": "FlatModifier",
         "label": "Hide of the Obsidian Terror (armor)",
         "predicate": [
-          "origin:trait:poison"
+          {
+            "or": [
+              "origin:action:trait:poison",
+              "origin:item:trait:poison"
+            ]
+          }
         ],
         "selector": "ac",
         "type": "untyped",

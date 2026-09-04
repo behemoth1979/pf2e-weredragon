@@ -514,6 +514,50 @@ strength of eight consistent, real, matching-selector examples. Worth
 confirming next time a poison attack actually lands, or flagging if it
 turns out `origin:trait:poison` doesn't fire correctly in practice.
 
+**Correction, found in play almost immediately: it didn't fire.** The
+user tested against a real poison-trait spell attack ("Inkshot") and
+the AC bonus never applied. Root cause: `origin:trait:X` (no
+`action:`/`item:` segment) is the right namespace for a *creature's
+own* inherent trait (fiend, dragon, unholy — all real creature
+classifications in the eight examples this was based on), but
+`"poison"` here is a trait on the *spell/weapon being used*, not on
+the attacking creature itself — a categorically different roll-option
+namespace, which those eight examples never happened to cover.
+
+Found the actual namespace by reading the real chat message from the
+user's own Inkshot attack directly (`msg.flags.pf2e.context.options`,
+inspected live over the same CDP connection, not guessed): it
+contained `"origin:action:trait:poison"` — with an `action:` segment
+in between — but no bare `"origin:trait:poison"` anywhere. Also
+notably absent: `"origin:item:trait:poison"`, the shape the pf2e wiki
+fetch had originally (and wrongly) suggested. Fixed to `{"or":
+["origin:action:trait:poison", "origin:item:trait:poison"]}` —
+`action:trait:X` confirmed for spell/action-based poison sources
+(Inkshot), `item:trait:X` added alongside it since a weapon *strike*
+carrying poison (rather than a spell) wasn't tested and may populate
+the item-level namespace instead of (or in addition to) the
+action-level one; harmless to include both since an unmatched
+alternative in an `or` predicate simply doesn't contribute.
+
+**This time actually verified against real data, not just similar
+vanilla shapes**: re-fetched the same real chat message
+(`game.messages.get("<id>")`) and ran both the old and new predicate
+through `new game.pf2e.Predicate(...).test(options)` directly against
+its real, captured `context.options` array over the live CDP
+connection — confirmed `origin:trait:poison` returns `false` against
+that real attack (explaining exactly why it silently didn't fire) and
+the `or`-combined replacement returns `true`. This is a stronger form
+of verification than anything else in this file so far: not a
+constructed test scenario, but the actual roll options from the
+actual attack that was reported as broken.
+
+Patched directly onto the user's live equipped armor over the same CDP
+connection (`armor.update({"system.rules": rules})`) so it could be
+tested immediately without another compendium re-drag, and confirmed
+working against a genuine new poison attack in play — the first fix
+in this file verified against an actual live re-test after being
+reported broken, not just against previously-captured data.
+
 ## Fourth/fifth/sixth homebrew items: Monstrosity Form (Kaiju), Breath Weapon action + spell
 
 `src/packs/feats/spell-effect-monstrosity-form-kaiju.json` — a patched
