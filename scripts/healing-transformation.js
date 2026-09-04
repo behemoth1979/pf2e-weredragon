@@ -7,10 +7,21 @@
  * rolls or applies healing. This fills that gap specifically for Untamed
  * Form (Weredragon Homebrew) (this module's patched, actually-castable
  * copy of the real spell): whenever it's cast while the Healing
- * Transformation toggle is on, roll 1d6 per the rank it was cast at,
- * plus a flat +10 house-rule bonus ("Overflowing Life", per the user's
- * own naming -- see the item description), and apply it as healing
- * automatically -- no click-through needed.
+ * Transformation toggle is on, cast the real "Healing Transformation
+ * (Weredragon Homebrew)" spell (a directly castable duplicate of Heal,
+ * see healing-transformation-spell.json) on the actor's behalf.
+ *
+ * On request, switched from this script rolling and applying its own
+ * plain `Roll` (fully automatic, no click needed) to actually casting
+ * that spell instead -- reuses the exact same "temporary, unembedded
+ * item parented to the actor, then `.rollDamage({})`" pattern already
+ * proven working in this module for shroud-of-flame.js (see that
+ * script's own docstring for why `rollDamage({})` -- not `toMessage()`
+ * -- is what produces a real, clickable Apply Healing button on the
+ * resulting chat card, matching how a normal spell's damage/healing
+ * roll actually gets applied). The roll itself still isn't a separate
+ * click -- `rollDamage()` executes it immediately -- but applying the
+ * result now requires the normal click, same as any other spell.
  *
  * Detecting "Untamed Form was just cast, at what rank" without guessing:
  * `ChatMessagePF2e#get item()` (real source, client/documents/chat-
@@ -43,19 +54,10 @@
  * elsewhere in the system, so it's left as a persistent toggle the
  * player manages themselves, same as any other spellshape.
  *
- * The actual roll/heal is done directly by this script (a plain Roll,
- * not routed through pf2e's own spell-damage/heightening pipeline) and
- * applied to HP immediately with no manual "Apply Healing" click needed
- * -- matching this module's own aeon-stone-healing.js precedent for
- * fully-automatic healing, not the click-required pattern used for
- * player-triggered damage spells like Breath Weapon/Spine Rake
- * elsewhere in this module. A separate compendium item, "Healing
- * Transformation (Weredragon Homebrew)" (type spell, vitality trait), also
- * exists -- a real, directly castable duplicate of Heal (self-only, touch,
- * healing scaled by character level) the player can cast on their own
- * initiative. It's independent of this script: this script's own roll
- * (rank-scaled, +10 "Overflowing Life") only ever fires off an actual
- * Untamed Form cast/macro-use, never off that spell being cast.
+ * Casting the real spell this way means its own damage/healing formula
+ * is what actually determines the amount -- this script no longer hardcodes
+ * "1d6 per rank + 10" itself; whatever healing-transformation-spell.json's
+ * own `system.damage` formula says is what gets rolled and posted.
  *
  * Second trigger path: the createChatMessage hook only fires from an
  * actual spell cast (sheet Spellcasting tab), never from the "Untamed
@@ -65,44 +67,27 @@
  * entirely (no chat message, nothing for this hook to see), the exact
  * same "two different trigger paths needed" situation
  * bizarre-transformation.js already has for battle forms vs. Weredragon
- * Hybrid/Animal. Fixed the same way: applyHealingTransformation(actor,
- * rank) is factored out and exposed on
+ * Hybrid/Animal. Fixed the same way: applyHealingTransformation(actor)
+ * is factored out and exposed on
  * game.modules.get("phil-pf2e-weredragon") at "init", so
  * untamed-form-toggle.json can call it directly after creating the
- * effect, deriving rank from the actor's own embedded "Untamed Form
- * (Weredragon Homebrew)" spell item (already present whenever this
- * character can use the macro at all, since v2.15.0's live testing
- * confirmed casting it from the sheet already works) rather than from
- * a cast message that doesn't exist on this path.
+ * effect.
  */
 
 (() => {
 
 const MODULE_ID = "phil-pf2e-weredragon";
+const HEALING_TRANSFORMATION_SPELL_UUID = "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.HealTrnsfrmSpell";
 
-async function applyHealingTransformation(actor, rank) {
+async function applyHealingTransformation(actor) {
   if (!actor) return;
   if (!actor.rollOptions?.all?.["spellshape:healing-transformation"]) return;
 
-  // House rule on top of the base 1d6/rank: a flat +10, named "Overflowing
-  // Life" (per the item description), folded directly into the roll formula
-  // rather than added afterward, so it shows up in the roll breakdown too.
-  const roll = await new Roll(`${rank ?? 1}d6 + 10`).evaluate();
+  const source = await fromUuid(HEALING_TRANSFORMATION_SPELL_UUID);
+  if (!source) return;
 
-  const hp = actor.system.attributes.hp;
-  const healed = Math.min(roll.total, hp.max - hp.value);
-  if (healed > 0) {
-    await actor.update({ "system.attributes.hp.value": hp.value + healed });
-  }
-
-  const flavor = healed > 0
-    ? `<p><i class="fa-solid fa-heart"></i> <strong>Healing Transformation</strong> (vitality, +10 Overflowing Life): ${actor.name} restores ${healed} Hit Points.</p>`
-    : `<p><i class="fa-solid fa-heart"></i> <strong>Healing Transformation</strong> (vitality, +10 Overflowing Life): ${actor.name} is already at full Hit Points.</p>`;
-
-  await roll.toMessage({
-    speaker: ChatMessage.getSpeaker({ actor }),
-    flavor,
-  });
+  const tempSpell = new Item.implementation(source.toObject(), { parent: actor });
+  await tempSpell.rollDamage({});
 }
 
 Hooks.once("init", () => {
@@ -119,7 +104,7 @@ Hooks.on("createChatMessage", async (message, _options, userId) => {
   const actor = message.actor;
   if (!actor) return;
 
-  await applyHealingTransformation(actor, item.rank);
+  await applyHealingTransformation(actor);
 });
 
 })();

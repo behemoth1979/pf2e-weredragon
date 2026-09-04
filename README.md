@@ -188,18 +188,16 @@ the matching trait — until you transform again.
 
 The Healing Transformation feat's official content is a toggle plus a
 reminder note added to your next polymorph spell's description — it
-doesn't actually roll or apply any healing. This module automates it:
-turn on the Healing Transformation spellshape toggle, then cast
-Untamed Form (Weredragon Homebrew) (from the sheet or the hotbar
-macro) — you automatically restore 1d6 Hit Points per the rank it was
-cast at, plus a flat +10 house-rule bonus ("Overflowing Life"), no
-extra clicks needed.
-
-There's also a separate, directly castable **Healing Transformation**
-spell — a duplicate of Heal, simplified to touch range/self-target
-only, healing `Xd6` where X is half your character level (rounded
-up). It's independent of the toggle-plus-Untamed-Form combo above;
-just cast it like any other spell.
+doesn't actually roll or apply any healing. This module automates it
+with a real, directly castable **Healing Transformation** spell — a
+cantrip duplicate of Heal, simplified to touch range/self-target only,
+always healing `Xd6` where X is half your character level (rounded
+up, cantrip-scaled — no spell slot cost). Cast it yourself like any
+other cantrip, or turn on the Healing Transformation spellshape toggle
+and cast Untamed Form (Weredragon Homebrew) (from the sheet or the
+hotbar macro) — that automatically casts this same spell for you,
+posting the normal chat card with its Roll Healing/Apply Healing
+buttons.
 
 ## Editing the design
 

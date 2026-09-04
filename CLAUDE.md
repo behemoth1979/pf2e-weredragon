@@ -1489,6 +1489,84 @@ confirmed present on this character (they've already cast it
 successfully from the sheet), falling back to `1` if it's ever absent
 on some other character using the macro without that spell added.
 
+**Correction, found in play right after the spell rebuild above
+shipped: the `(ceil(@actor.level/2))d6` formula showed 0 on the Roll
+Healing button, every time, regardless of level.** Root-caused by
+reading `SpellPF2e#getDamage()` directly: `system.damage.0.formula` is
+parsed by `parseTermsFromSimpleFormula(formula, {rollData})`, which
+constructs a real Foundry `Roll` (so `@actor.level` and `ceil(...)` do
+get resolved/evaluated correctly at the `Roll` level) but then reduces
+that Roll's *terms* into simplified `{modifier, dice}` pairs, and only
+recognizes a term as contributing dice if it's `instanceof
+foundry.dice.terms.Die` — any other term type is silently folded into
+`{modifier: 0, dice: null}`, i.e. zero contribution. A parenthesized
+expression wrapping a function call (`ceil(@actor.level/2)`) evaluates
+through pf2e's own custom `IntermediateDie`/`ArithmeticExpression` term
+classes (confirmed present in the compiled source), not a plain `Die`
+— so it always contributed nothing, no matter what `@actor.level`
+actually was. This is a real, structural limitation of that one field
+specifically, not a syntax mistake: grepping the entire real `spells`
+compendium for `ceil(`/`floor(` used *directly* inside any
+`system.damage.X.formula` value turned up zero matches anywhere in
+official content — every real example of this pattern this session
+found earlier (Acid Arrow, Acid Grip, Caustic Blast, etc.) was
+exclusively inside `@Damage[...]` *inline description-text enrichers*,
+a different, more permissive resolution path entirely unrelated to
+this field.
+
+**Fixed by leaning on cantrip auto-scaling instead of a custom
+formula** (confirmed with the user which of two real options to use,
+given the meaningful gameplay difference — the other being normal
+rank-based heightening where the player chooses/pays for a slot).
+Added the `cantrip` trait; per `SpellPF2e#rank`'s own real
+implementation (read directly): for a cantrip with an actor, rank
+resolves to `this.system.location.autoHeightenLevel ||
+this.spellcasting?.system?.autoHeightenLevel.value ||
+Math.ceil(this.actor.level / 2)`, clamped 1–10 — i.e. exactly "half
+level, rounded up," with no dependency on the spell being in any
+particular (or even any) spellcasting entry, confirmed to still
+resolve correctly for a temporary/unembedded copy (`this.spellcasting`
+resolves to `null` for one, per its own `get spellcasting()` looking up
+`system.location.value` on the actor's entries — but the cantrip
+branch never touches that at all unless `autoHeightenLevel` is
+explicitly set, which it isn't here). `system.damage.0.formula`
+reverted to a plain `"1d6"`, with a standard `heightening: {type:
+"interval", interval: 1, damage: {"0": "1d6"}}` block added — the
+exact same interval-heightening mechanism every other spell in this
+module already uses successfully (Dragon Breath, Weredragon Breath
+Weapon, etc.), just letting the cantrip's own auto-computed rank drive
+how many extra intervals apply instead of a manually chosen cast rank.
+Being a cantrip does mean this is now free/at-will rather than
+slot-limited — an explicit, confirmed tradeoff for guaranteeing the
+formula, not an oversight.
+
+**Also on request**: icon changed to the real Summon Healing
+Servitor's own (`systems/pf2e/icons/spells/summon-healing-
+servitor.webp`), and the "Homebrew: ..." italic framing paragraph
+dropped entirely from the description, leaving just the in-character
+flavor line.
+
+**`scripts/healing-transformation.js` rewired to cast the real spell
+instead of rolling and applying its own separate `Roll`.** Previously:
+silent `new Roll(\`${rank}d6 + 10\`).evaluate()` + immediate
+`actor.update()`, zero clicks needed. Now: builds a temporary,
+unembedded copy of the spell (`new Item.implementation(source
+.toObject(), {parent: actor})`) and calls `.rollDamage({})` on it —
+the exact same pattern already proven working in this exact module by
+`shroud-of-flame.js` (confirmed structurally identical: that spell
+also has `defense: null`, is also never embedded on an actor, and is
+also rolled via a fresh temporary copy each time). The roll itself
+still isn't a separate click (`rollDamage()` executes it immediately
+and posts a chat card), but *applying* the result now needs the
+normal click, same as any other spell's damage/healing card — matching
+what casting this spell normally from the sheet already looks like.
+The flat "+10 Overflowing Life" bonus and the old rank-based formula
+are gone entirely now that the real spell (cantrip-scaled, no flat
+addition) is what actually gets rolled; `applyHealingTransformation`'s
+signature dropped its now-unused `rank` parameter, and both call sites
+(the `createChatMessage` hook and `untamed-form-toggle.json`'s macro)
+were updated to match.
+
 ## Granted spells not appearing in the Spellcasting tab: shared innate entry fix
 
 **Bug found in play, fixed in v2.18.0**: the 40 Dragon Breath spells

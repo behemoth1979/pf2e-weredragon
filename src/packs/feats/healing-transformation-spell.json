@@ -1,6 +1,6 @@
 {
   "_id": "HealTrnsfrmSpell",
-  "img": "icons/magic/life/heart-cross-strong-flame-purple.webp",
+  "img": "systems/pf2e/icons/spells/summon-healing-servitor.webp",
   "name": "Healing Transformation (Weredragon Homebrew)",
   "system": {
     "area": null,
@@ -12,7 +12,7 @@
       "0": {
         "applyMod": false,
         "category": null,
-        "formula": "(ceil(@actor.level/2))d6",
+        "formula": "1d6",
         "kinds": [
           "healing"
         ],
@@ -22,11 +22,18 @@
     },
     "defense": null,
     "description": {
-      "value": "<p><em>Homebrew: a real, directly castable duplicate of the Heal spell, reflavored and simplified for the \"Healing Transformation\" spellshape feat -- the real feat only appends a reminder note to your next-cast polymorph spell's description and doesn't add any healing of its own, so this exists as a standalone spell instead. Only the 1-action, touch, self-only mode is kept; the 30-foot/2-action mode, the 3-action emanation burst, and the vitality-damage-to-undead branch are all removed, since none of them apply to a self-only heal. Healing scales with your character level (half your level, rounded up) rather than spell rank.</em></p><p>You can take advantage of shapechanging magic to close wounds and patch injuries. You channel vital energy into yourself, restoring a number of Hit Points equal to half your level (rounded up) in d6s.</p>"
+      "value": "<p>You can take advantage of shapechanging magic to close wounds and patch injuries. You channel vital energy into yourself, restoring a number of Hit Points equal to half your level (rounded up) in d6s.</p>"
     },
     "duration": {
       "sustained": false,
       "value": ""
+    },
+    "heightening": {
+      "damage": {
+        "0": "1d6"
+      },
+      "interval": 1,
+      "type": "interval"
     },
     "level": {
       "value": 1
@@ -54,6 +61,7 @@
         "primal"
       ],
       "value": [
+        "cantrip",
         "druid",
         "healing",
         "manipulate",
