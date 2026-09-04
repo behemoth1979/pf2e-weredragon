@@ -657,6 +657,26 @@ each time it's needed, existing as a real compendium item purely so
 the damage has an inspectable, documented definition rather than being
 invisible script-only magic.
 
+**Correction, found in play (v2.24.2): the damage never actually
+posted, this whole time.** Confirmed live via Chrome DevTools Protocol
+against the user's own running Foundry session — the exact same bug
+`healing-transformation.js` hit first (see its own CLAUDE.md section):
+a temporary, unembedded spell has no `system.location.value`, so
+`SpellPF2e#spellcasting` resolves to `null`, and `getDamage()`'s own
+early return (`if (... || !n?.statistic) return null;`) means
+`rollDamage()` silently does nothing whenever that happens — no error,
+no chat card. Reproduced directly: constructing this exact temp copy
+and calling `getDamage()` on it returned `null`. Everything else about
+this feature (the aura ring, the toggle, the distance/turn-end
+trigger, the target save/restore) was genuinely correct and exercised
+every time — only the final `rollDamage()` call was silently a no-op.
+Fixed the same way as Healing Transformation: `sourceData.system
+.location.value` is set to the shared "Weredragon Homebrew (Innate
+Spells)" entry (via `getOrCreateInnateEntry`, exposed by innate-spell-
+grants.js) before constructing the temporary item. Re-verified live
+after the fix: `spellcasting` resolves correctly and `getDamage()`
+returns non-null.
+
 ## Animal Form, Dragon Form, and Aerial Form token swaps
 
 `src/packs/feats/spell-effect-animal-form-{ape,bear,bull,canine,cat,

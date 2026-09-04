@@ -74,18 +74,28 @@
  * out to be wrong in play, the fix is removing the `actor ===
  * combatant.actor` exclusion in the token filter below.
  *
- * **Flagged, not yet confirmed either way**: `healing-transformation.js`
- * found in play that this exact "temporary, unembedded copy + rollDamage
- * ()" construction silently produces no chat message at all, because
- * `SpellPF2e#getDamage()` requires `this.spellcasting` (which needs a
- * real `system.location.value` pointing at an actual spellcasting entry
- * on the actor) to be non-null -- a temp copy with no location never has
- * one. This spell may have the identical gap; it just hasn't been
- * specifically reported broken. If Shroud of Flame's damage turns out to
- * never actually post in play, the fix is the same one applied there:
- * point `sourceData.system.location.value` at a real entry id (e.g. via
- * `game.modules.get("phil-pf2e-weredragon").getOrCreateInnateEntry(actor)`,
- * exposed by innate-spell-grants.js) before constructing the temp item.
+ * **Correction, found in play right after healing-transformation.js hit
+ * the identical bug (v2.24.1): this spell's damage was never actually
+ * posting either.** Confirmed live -- not just by suspicion -- via
+ * Chrome DevTools Protocol connected directly to the user's own running
+ * Foundry session: constructing this exact temporary copy and calling
+ * `getDamage()` on it returned `null`, same root cause as
+ * healing-transformation.js's own: a temp copy with no `system.location
+ * .value` always resolves `SpellPF2e#spellcasting` to `null`, and
+ * `getDamage()`'s own early return (`if (... || !n?.statistic) return
+ * null;`) means `rollDamage()` silently does nothing whenever that
+ * happens -- no error, no chat card, regardless of how correct the
+ * spell's own damage data is. This means Shroud of Flame's damage has
+ * likely never actually applied in play since it was built, despite the
+ * aura ring, toggle, and distance/turn-end logic above all being
+ * genuinely correct and exercised every time.
+ *
+ * Fixed the same way: `sourceData.system.location.value` is set to the
+ * same shared "Weredragon Homebrew (Innate Spells)" entry `innate-
+ * spell-grants.js` already find-or-creates for granted spells (via
+ * `getOrCreateInnateEntry`, exposed on the module API) before
+ * constructing the temporary item -- without ever actually embedding
+ * this spell on the actor.
  */
 
 (() => {
@@ -123,7 +133,13 @@ Hooks.on("pf2e.endTurn", async (combatant, _encounter, userId) => {
   const previousTargets = Array.from(game.user.targets);
   try {
     endingToken.setTarget(true, { releaseOthers: true, user: game.user });
-    const tempSpell = new Item.implementation(damageSource.toObject(), { parent: phoenixActor });
+    const sourceData = damageSource.toObject();
+    const getOrCreateInnateEntry = game.modules.get("phil-pf2e-weredragon")?.getOrCreateInnateEntry;
+    if (getOrCreateInnateEntry) {
+      const entry = await getOrCreateInnateEntry(phoenixActor);
+      sourceData.system.location.value = entry.id;
+    }
+    const tempSpell = new Item.implementation(sourceData, { parent: phoenixActor });
     await tempSpell.rollDamage({});
   } finally {
     endingToken.setTarget(false, { releaseOthers: true, user: game.user });

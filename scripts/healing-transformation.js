@@ -45,11 +45,9 @@
  * ()` returns non-null, and a real chat card posts with an actual rolled
  * total.
  *
- * This same gap likely affects shroud-of-flame.js too (identical
- * temporary-copy-with-no-location construction) -- not fixed here since
- * it wasn't reported broken and reproducing/verifying it needs an actual
- * Phoenix Monstrosity Form test in play, but worth checking if it turns
- * out to have gone silently unused the same way.
+ * Confirmed (not just suspected) the identical gap in shroud-of-flame.js
+ * too, via the same live-CDP verification, and fixed it there the same
+ * way -- see that script's own docstring.
  *
  * Detecting "Untamed Form was just cast, at what rank" without guessing:
  * `ChatMessagePF2e#get item()` (real source, client/documents/chat-
