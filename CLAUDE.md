@@ -475,6 +475,45 @@ present. Re-verified live: both modifiers now report distinct types
 (`"item"` for Overflowing Life, `"untyped"` for Moonweave) and both
 show `enabled: true` simultaneously.
 
+**The +1 AC house-rule bonus scoped to poison-origin attacks only, on
+request** — it was originally unconditional against all attacks
+(matching only the flavor text at the time: "grants a +1 bonus to AC
+and to saving throws against poison," which read as AC-always +
+saves-vs-poison, not AC-vs-poison + saves-vs-poison — corrected per
+what was actually meant). Added `predicate: ["origin:trait:poison"]`.
+
+Confirmed the predicate shape against real vanilla content rather than
+guessed, and rather than trusted a summarized web fetch of the pf2e
+wiki alone (which claimed `origin:item:trait:X`, unverified — see
+below): searched the downloaded `equipment` compendium directly for
+any real item using an `origin:`-prefixed trait predicate on `ac`.
+Found eight, all consistently shaped `origin:trait:<trait>` (no
+`item:` segment) — e.g. Holy Chain and Cassisian Helmet both use
+`"selector": ["ac", "saving-throw"], "predicate": ["origin:trait:
+fiend"]` / `["origin:trait:unholy"]`, the identical selector shape
+needed here. Zero real items anywhere in the downloaded packs use
+`origin:item:trait:X` for anything. This is why the *existing*
+poison-save modifier on this same item uses bare `item:trait:poison`
+(no `origin:` prefix at all) while this new AC one needs `origin:
+trait:poison`: a saving throw's own "item" unambiguously means "the
+effect requiring this save," but AC is computed for the defender
+during the *attacker's* roll, so `item`/`self` from the defender's own
+perspective refers to the defender's own gear — reaching the
+attacker's traits specifically needs the `origin:` prefix pf2e swaps
+in for exactly this kind of opposed-check context (confirmed via the
+pf2e wiki's own "Quickstart guide for rule elements," which describes
+context domains swapping between actors for opposed checks like this,
+independent of the specific `origin:item:trait:X` claim that turned
+out not to match any real content).
+
+**Not live-fire verified** — unlike the last several fixes in this
+file, this one wasn't confirmed against an actual poison attack in the
+user's own running game (would need staging a real attacker with a
+poison-trait strike, not just a script call), only against the
+strength of eight consistent, real, matching-selector examples. Worth
+confirming next time a poison attack actually lands, or flagging if it
+turns out `origin:trait:poison` doesn't fire correctly in practice.
+
 ## Fourth/fifth/sixth homebrew items: Monstrosity Form (Kaiju), Breath Weapon action + spell
 
 `src/packs/feats/spell-effect-monstrosity-form-kaiju.json` — a patched
