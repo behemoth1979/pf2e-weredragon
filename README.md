@@ -195,6 +195,12 @@ macro) — you automatically restore 1d6 Hit Points per the rank it was
 cast at, plus a flat +10 house-rule bonus ("Overflowing Life"), no
 extra clicks needed.
 
+There's also a separate, directly castable **Healing Transformation**
+spell — a duplicate of Heal, simplified to touch range/self-target
+only, healing `Xd6` where X is half your character level (rounded
+up). It's independent of the toggle-plus-Untamed-Form combo above;
+just cast it like any other spell.
+
 ## Editing the design
 
 Source lives at:

@@ -49,10 +49,13 @@
  * -- matching this module's own aeon-stone-healing.js precedent for
  * fully-automatic healing, not the click-required pattern used for
  * player-triggered damage spells like Breath Weapon/Spine Rake
- * elsewhere in this module. A compendium item, "Healing Transformation
- * (Weredragon Homebrew)" (type spell, vitality trait), exists purely for
- * a proper browsable/flavor reference -- it is not itself cast or rolled
- * by this script.
+ * elsewhere in this module. A separate compendium item, "Healing
+ * Transformation (Weredragon Homebrew)" (type spell, vitality trait), also
+ * exists -- a real, directly castable duplicate of Heal (self-only, touch,
+ * healing scaled by character level) the player can cast on their own
+ * initiative. It's independent of this script: this script's own roll
+ * (rank-scaled, +10 "Overflowing Life") only ever fires off an actual
+ * Untamed Form cast/macro-use, never off that spell being cast.
  *
  * Second trigger path: the createChatMessage hook only fires from an
  * actual spell cast (sheet Spellcasting tab), never from the "Untamed

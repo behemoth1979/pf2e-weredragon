@@ -8,10 +8,21 @@
       "value": ""
     },
     "counteraction": false,
-    "damage": {},
+    "damage": {
+      "0": {
+        "applyMod": false,
+        "category": null,
+        "formula": "(ceil(@actor.level/2))d6",
+        "kinds": [
+          "healing"
+        ],
+        "materials": [],
+        "type": "vitality"
+      }
+    },
     "defense": null,
     "description": {
-      "value": "<p><em>Homebrew: automates the \"Healing Transformation\" spellshape feat. That feat's own real rules only append a reminder line to the next-cast polymorph spell's description (no actual healing automation exists in the base system) -- this item exists as a proper spell entry (type spell, vitality trait) purely for display/reference. The actual roll and healing are applied automatically by <code>scripts/healing-transformation.js</code> whenever this character casts Untamed Form (Weredragon Homebrew) while the Healing Transformation spellshape toggle is active, rather than being cast on its own.</em></p><p>You close wounds and patch injuries as you reach for a different shape. You restore a number of Hit Points equal to 1d6 per the rank Untamed Form was cast at, plus a flat house-rule bonus.</p><div style=\"border: 2px solid #4a2d1f; border-radius: 6px; padding: 6px 10px; margin: 8px 0; background: rgba(120, 46, 34, 0.08);\"><strong>Overflowing Life +10</strong></div>"
+      "value": "<p><em>Homebrew: a real, directly castable duplicate of the Heal spell, reflavored and simplified for the \"Healing Transformation\" spellshape feat -- the real feat only appends a reminder note to your next-cast polymorph spell's description and doesn't add any healing of its own, so this exists as a standalone spell instead. Only the 1-action, touch, self-only mode is kept; the 30-foot/2-action mode, the 3-action emanation burst, and the vitality-damage-to-undead branch are all removed, since none of them apply to a self-only heal. Healing scales with your character level (half your level, rounded up) rather than spell rank.</em></p><p>You can take advantage of shapechanging magic to close wounds and patch injuries. You channel vital energy into yourself, restoring a number of Hit Points equal to half your level (rounded up) in d6s.</p>"
     },
     "duration": {
       "sustained": false,
@@ -26,15 +37,16 @@
       "title": "Pathfinder Player Core"
     },
     "range": {
-      "value": ""
+      "value": "touch"
     },
     "requirements": "",
     "rules": [],
+    "slug": "healing-transformation",
     "target": {
       "value": "self"
     },
     "time": {
-      "value": ""
+      "value": "1"
     },
     "traits": {
       "rarity": "common",
@@ -44,6 +56,7 @@
       "value": [
         "druid",
         "healing",
+        "manipulate",
         "vitality"
       ]
     }

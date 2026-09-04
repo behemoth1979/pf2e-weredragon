@@ -1415,16 +1415,56 @@ message still announces the roll and amount healed (or that the
 character was already at full HP) for visibility, even though nothing
 needs to be clicked.
 
-**The compendium item exists for browsability/flavor only, per the
-user's explicit request for "item type spell, item trait vitality"**
--- `healing-transformation-spell.json` is a real `type: "spell"` item
-with `vitality`/`healing`/`druid` traits and a `primal` tradition, but
-it is never itself cast, rolled, or referenced by UUID anywhere in the
-script; the script rolls its own plain `Roll` independently. It exists
-purely so the character has a proper, readable spell entry describing
-what this house rule does, matching how the rest of this module treats
-homebrew mechanics as real, inspectable items rather than invisible
-script-only magic.
+**The compendium item was originally flavor-only, per the user's
+explicit request for "item type spell, item trait vitality"** --
+`healing-transformation-spell.json` started as a real `type: "spell"`
+item with `vitality`/`healing`/`druid` traits and a `primal` tradition,
+but was never itself cast, rolled, or referenced by UUID anywhere in
+the script; the script rolled its own plain `Roll` independently. It
+existed purely so the character had a proper, readable spell entry
+describing what this house rule does, matching how the rest of this
+module treats homebrew mechanics as real, inspectable items rather
+than invisible script-only magic.
+
+**Rebuilt into a real, directly castable spell on request** (a
+"duplicate of Heal," reflavored/simplified): full `system.damage`
+(kind `healing`, type `vitality`) instead of the previous empty `{}`,
+`defense: null` (no save -- it's always self-targeted), `range:
+"touch"`, `target: "self"`, single-action only. Built from the real
+Heal spell's own structure (fetched from the `spells` compendium, not
+guessed) as the base, then simplified per what was asked: Heal's
+3-action emanation-burst overlay and its "vs. Undead" damage-instead
+overlay were dropped entirely (both are irrelevant to a self-only
+heal), leaving just the 1-action/touch mode.
+
+**Healing scales with character level, not spell rank** -- deliberate
+house-rule deviation from both the real feat text ("1d6 Hit Points per
+spell rank") and this script's own separate roll (`{rank}d6 + 10`).
+Formula: `(ceil(@actor.level/2))d6`. The `(floor(@item.rank/2))d6`- and
+`(ceil(@item.level/2))d6`-shaped pattern (parenthesized math function
+wrapping a `/2`, then `d6`) is copied directly from several real
+official spells that already scale a damage/healing formula off
+`@item.rank`/`@item.level` this same way (Acid Arrow, Acid Grip, Caustic
+Blast, and others, checked directly, not assumed) -- `@actor.level`
+resolves the same way `@item.level` does, since both come from the same
+merged roll-data object any item on an actor gets via `getRollData()`.
+
+**No heightening block** -- would conflict with/be redundant against a
+formula that already scales automatically off character level with no
+per-rank choice involved, unlike a normal spell's heightening system.
+
+**The "+10 Overflowing Life" callout box from the original flavor-only
+version was dropped** -- the user's new formula for this spell is
+just `Xd6`, no flat addition, so keeping that callout would have
+described a bonus this item's own damage roll doesn't actually apply
+(the flat +10 still exists, but only as part of this script's own
+separate roll off an actual Untamed Form cast/macro-use -- see above).
+Description text is now framed as "Homebrew: a real, directly castable
+duplicate of the Heal spell..." followed by the real Healing
+Transformation feat's own flavor ("You can take advantage of
+shapechanging magic to close wounds and patch injuries...", adapted
+for self-only casting) rather than a description of the automation
+script.
 
 **Second trigger path, found in play (v2.15.1): the hotbar macro needed
 its own call, same as Bizarre Transformation before it.** Live testing
