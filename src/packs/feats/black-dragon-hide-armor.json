@@ -61,7 +61,7 @@
         "key": "FlatModifier",
         "label": "Moonweave (Major)",
         "selector": "healing-received",
-        "type": "item",
+        "type": "untyped",
         "value": 10
       }
     ],

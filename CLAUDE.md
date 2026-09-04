@@ -454,6 +454,27 @@ and no predicate was added to narrow it. Flagged to the user rather
 than silently decided; revisit if either edge case turns out to matter
 in play.
 
+**Correction, found in play immediately after shipping: `type: "item"`
+was the wrong choice, eclipsing the real "Overflowing Life" relic
+gift's own bonus instead of stacking with it.** Confirmed live via CDP
+against the user's own character: this character already has an
+unrelated "Overflowing Life" `healing-received` `FlatModifier` (from
+the third-party `pf2e-relics` module) at the same value (10) and the
+same `type: "item"` -- once Moonweave's own modifier was on the same
+selector with the identical type, pf2e's ordinary same-type-doesn't-
+stack rule meant only one of the two ever actually applied at a time,
+eclipsing the other, exactly the failure mode this file's own earlier
+Black Dragon Hide Armor section already documents (why the two
+existing house-rule bonuses on this same item are `"untyped"` and not
+`"item"` in the first place -- this new rule just didn't follow that
+same reasoning when it was first added). Fixed by changing Moonweave's
+own `type` to `"untyped"` too, so it always stacks regardless of what
+other `healing-received` modifiers -- from this module, from another
+module, or from a genuinely-etched vanilla item -- might also be
+present. Re-verified live: both modifiers now report distinct types
+(`"item"` for Overflowing Life, `"untyped"` for Moonweave) and both
+show `enabled: true` simultaneously.
+
 ## Fourth/fifth/sixth homebrew items: Monstrosity Form (Kaiju), Breath Weapon action + spell
 
 `src/packs/feats/spell-effect-monstrosity-form-kaiju.json` — a patched
