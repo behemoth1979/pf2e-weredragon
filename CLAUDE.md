@@ -411,6 +411,49 @@ requiring this save has the poison trait" — confirmed against a real
 official rule element using the same pattern, Iron Lung's
 `AdjustDegreeOfSuccess` on `saving-throw`).
 
+**Moonweave (Major) automated on request** — like Fortification and
+the real "Overflowing Life" relic gift (GM Core pg. 315, checked
+directly against Archives of Nethys when a different question about it
+came up earlier), Moonweave's own real item has `"rules": []` — no
+official automation exists for it either, despite reading as a
+mechanically simple "bonus HP when healed" effect. Real text
+(`equipment-srd` pack, `Moonweave (Major)`, checked directly rather
+than paraphrased): "...whenever you would be healed by a spell or
+magical effect, you recover an additional 10 Hit Points. You regain
+additional Hit Points from moonweave only the first time you regain HP
+from a given healing spell or effect...". Copied into this item's own
+description verbatim (per what was asked — "get the description from
+the rune's description"), replacing an earlier paraphrase.
+
+Automated with a `FlatModifier` (`selector: "healing-received"`,
+`type: "item"`, `value: 10`) — `"healing-received"` is a real,
+genuine pf2e selector, not invented for this: confirmed directly in
+`Actor#applyDamage()`'s own source, where `p = f.finalDamage < 0 ?
+"healing-received" : "damage-received"` picks the selector based on
+whether the computed final amount is actually healing, then calls
+`extractModifiers(this.synthetics, [p], ...)` — i.e. this selector is
+exactly how pf2e itself decides what "bonus to healing you receive"
+modifiers apply, for any actor being healed by any source. `type:
+"item"` (not `"untyped"`, unlike the two house-rule bonuses just
+above) since this is genuinely a rune-derived item bonus and no other
+`healing-received` modifier exists on this character to eclipse it —
+matches how real official rune-derived bonuses (Potency, etc.) are
+typed elsewhere in this same file.
+
+**Two known simplifications, not implemented**: the real ability only
+applies "the first time you regain HP from a given healing spell or
+effect" (a sustained/repeating heal only grants the bonus once, not
+every tick) — this `FlatModifier` has no such tracking and applies
+unconditionally to every instance of healing received, since
+implementing genuine once-per-spell/effect tracking would need a
+custom script watching applied-healing chat messages, which wasn't
+built. It's also not scoped to "spell or magical effect" specifically
+(mundane, non-magical healing like Treat Wounds would also trigger it)
+since `healing-received` fires for any healing regardless of source
+and no predicate was added to narrow it. Flagged to the user rather
+than silently decided; revisit if either edge case turns out to matter
+in play.
+
 ## Fourth/fifth/sixth homebrew items: Monstrosity Form (Kaiju), Breath Weapon action + spell
 
 `src/packs/feats/spell-effect-monstrosity-form-kaiju.json` — a patched
