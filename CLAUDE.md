@@ -225,6 +225,90 @@ adding this trait through the ordinary system path, so pushing it a
 second time is a harmless no-op there, while for battle-form/Weredragon
 strikes it's the only thing that adds it at all.
 
+**Greater Brilliant's and Greater Shock's resistance-ignoring, fixed
+in v2.21.0** — previously listed above as one of the rider effects
+"that aren't automatable this way," left as a `Note` RE reminder only.
+Turned out to be automatable after all, via the same `AdjustStrike`
+mechanism already used for cold iron/Holy's trait on this item, just a
+different `property` value. `CONFIG.PF2E.runes.weapon.property
+.greaterBrilliant`/`.greaterShock` (checked directly, not guessed) both
+carry an `ignoredResistances` array (`[{type: "fire", max: Infinity},
+{type: "spirit", max: Infinity}, {type: "vitality", max: Infinity}]`
+for Brilliant; `[{type: "electricity", max: Infinity}]` for Shock)
+alongside their own bonus-damage data — but that field is populated
+only when pf2e's own internal weapon-preparation reads a REAL weapon's
+`system.runes.property` array against this CONFIG data; it's not
+something `DamageDice`'s or `DamageAlteration`'s own RE schemas expose
+for manual authoring at all (checked both — neither has any
+resistance-related field).
+
+`AdjustStrike`'s `property-runes` mode (`VALID_PROPERTIES` includes
+`materials`, `property-runes`, `range-increment`, `traits`,
+`weapon-traits` — confirmed via schema, not assumed) is the real,
+vanilla-proven way to make a strike carry an actual rune slug: its
+`adjustWeapon` handler pushes the slug straight onto
+`weapon.system.runes.property`, the same array a genuinely-etched
+weapon has it in. Confirmed as a real, exercised pattern — not just a
+theoretical schema option — via three actual vanilla feats using it
+(Ghost Hunter's `Compendium.pf2e...Ghost_Hunter` grants `ghost-touch`
+this way when fighting incorporeal creatures). Since this pushes the
+rune onto the object's own `system.runes.property`, the SAME internal
+pipeline that reads `CONFIG.PF2E.runes.weapon.property` for a real
+weapon reads it here too, generating the bonus damage AND
+`ignoredResistances` automatically — the exact same already-proven
+mechanism the cold-iron material and Holy trait fixes rely on
+(`AdjustStrike` operating on already-constructed weapon objects via
+`actor.synthetics.strikeAdjustments`, confirmed working for battle-form
+strikes specifically in both of those earlier fixes).
+
+**Crucially, unlike the cold-iron/Holy-trait `AdjustStrike`s, these
+two are NOT left unconditional** — pushing `greaterBrilliant`/
+`greaterShock` onto a *normal* (non-battle-form) strike's
+`system.runes.property` would duplicate a rune the real, physical item
+already genuinely has there, doubling that bonus damage. Cold
+iron/Holy's trait push are harmless duplicates because they're
+idempotent boolean-ish flags; a rune-slug push feeding into a whole
+damage-generation pipeline is not. Scoped instead via `AdjustStrike`'s
+own top-level `predicate` field (confirmed, by reading
+`AdjustStrikeRuleElement#beforePrepareData()` directly, to gate via the
+ordinary `this.test()` — the actor-level check every RE has — before
+the adjustment is even registered, unlike `definition`, which stays
+item-level-only per the correction above) to the same `{"or":
+["battle-form", {"and": ["werecreature:weredragon", {"or": ["change-
+shape:hybrid", "change-shape:animal"]}]}]}` clause already used
+throughout this item, plus `definition: ["item:category:unarmed"]` for
+item-level scoping same as the other two `AdjustStrike`s.
+
+**Since the real rune now generates the bonus damage itself, the
+matching manual `DamageDice` REs for Greater Brilliant (all three:
+base fire, vs.-fiend spirit, vs.-undead vitality) and Greater Shock
+were removed** — keeping both would have doubled that damage for
+battle-form/Weredragon strikes specifically (the only strikes these
+REs' predicates ever match). Holy's two `DamageDice` REs are
+untouched: Holy has no `ignoredResistances` of its own (checked its
+CONFIG entry, confirmed in the note above this one — Holy's automation
+gap was specifically about its `holy` trait, already fixed
+separately), and swapping it to `property-runes` too wasn't asked for.
+One real discrepancy surfaced in removing the old REs: the vanilla
+Greater Brilliant's vitality-vs-undead bonus is actually predicated on
+`target:negative-healing`, not `target:trait:undead` the way this
+item's now-removed manual copy had it — a closely-related but not
+strictly identical check. Moot now that the real rune's own predicate
+drives it directly, but worth knowing this item's original manual
+implementation was very slightly imprecise there the whole time.
+
+The `Note` RE's text was trimmed to drop the now-mechanically-true
+"this damage ignores fire/spirit/vitality/electricity resistance"
+phrasing — it's no longer just a reminder, so restating it as one
+would read as inaccurate. Its remaining lines (Brilliant's crit blind
+save, Shock's crit arc-to-2-creatures, Holy's reaction heal) are
+untouched: none of those are mechanically applied by anything on this
+item, `property-runes` included — pf2e's own CONFIG data for these
+runes also carries a purely textual `notes` field for the identical
+"remind, don't automate" crit effects, confirming that's the intended
+scope even for a genuinely-etched real weapon, not a gap specific to
+this homebrew item.
+
 ## Third homebrew item: Black Dragon Hide Armor
 
 `src/packs/feats/black-dragon-hide-armor.json` — a third item in the
@@ -235,11 +319,36 @@ Obsidian Terror"** (renamed on request) — this section (and the source
 filename) keep referring to it by its mechanical basis.
 
 Etched with +3 potency, major resilient, and three property runes
-(Greater Fortification, Greater Dread, Major Moonweave), crafted from
+(Greater Fortification, Spellwatch, Major Moonweave), crafted from
 Dragonhide (standard-grade) precious material (`material: {"type":
 "dragonhide", "grade": "standard"}`). All of that is standard PF2E
 automation the system already understands from `system.runes` and
 `system.material` — no custom rule elements needed for any of it.
+
+**Greater Dread swapped for Spellwatch on request.** Confirmed
+Spellwatch's exact real text and stats (level 13, 3000 gp, no grade
+variants — unlike Dread/Fortification/Moonweave it only comes in one
+grade) directly from the real "Spellwatch" item in the `equipment`
+pack (downloaded via SFTP + this repo's own `extractPack`, same
+technique used elsewhere in this file), not guessed: "Counter-runes
+chip away at unwanted magic that impedes you. You can attempt a new
+saving throw against one hostile spell affecting you at the start of
+each of your turns...". `system.runes.property`'s `dread-greater`
+entry became `spellwatch` (a bare slug, no grade suffix — checked
+`CONFIG.PF2E.runes.armor.property.spellwatch` directly to confirm
+there's no `spellwatch-greater`/etc. variant to worry about getting
+wrong). Level stayed 20 — Resilient (Major) alone already requires
+level 20, so removing a level-18 rune and adding a level-13 one
+doesn't lower the floor. Price dropped by 18,000 gp (Dread (Greater)'s
+own 21,000 gp minus Spellwatch's 3,000 gp, checked against the same
+real equipment-pack items) — confirmed this delta approach was valid
+by verifying the *existing* total price decomposes cleanly into base
+Hide Armor (2 gp) + Potency +3 (20,560 gp) + Resilient (Major)
+(49,440 gp) + Fortification (Greater) (24,000 gp) + Dread (Greater)
+(21,000 gp) + Moonweave (Major) (14,000 gp) + a small remainder
+matching the Dragonhide material's own price bracket, i.e. this item's
+price really is computed as straightforward rune-price addition, not
+some other formula that a flat swap-out delta would get wrong.
 
 Note armor runes use a different shape than weapon runes: `property`
 is a plain string array (not the `{"0": ..., "1": ...}` object

@@ -82,89 +82,6 @@
         "value": 3
       },
       {
-        "damageType": "fire",
-        "dieSize": "d4",
-        "diceNumber": 1,
-        "key": "DamageDice",
-        "label": "Greater Brilliant",
-        "predicate": [
-          {
-            "or": [
-              "battle-form",
-              {
-                "and": [
-                  "werecreature:weredragon",
-                  {
-                    "or": [
-                      "change-shape:hybrid",
-                      "change-shape:animal"
-                    ]
-                  }
-                ]
-              }
-            ]
-          },
-          "item:category:unarmed"
-        ],
-        "selector": "strike-damage"
-      },
-      {
-        "damageType": "spirit",
-        "dieSize": "d4",
-        "diceNumber": 1,
-        "key": "DamageDice",
-        "label": "Greater Brilliant (vs. fiends)",
-        "predicate": [
-          {
-            "or": [
-              "battle-form",
-              {
-                "and": [
-                  "werecreature:weredragon",
-                  {
-                    "or": [
-                      "change-shape:hybrid",
-                      "change-shape:animal"
-                    ]
-                  }
-                ]
-              }
-            ]
-          },
-          "item:category:unarmed",
-          "target:trait:fiend"
-        ],
-        "selector": "strike-damage"
-      },
-      {
-        "damageType": "vitality",
-        "dieSize": "d4",
-        "diceNumber": 1,
-        "key": "DamageDice",
-        "label": "Greater Brilliant (vs. undead)",
-        "predicate": [
-          {
-            "or": [
-              "battle-form",
-              {
-                "and": [
-                  "werecreature:weredragon",
-                  {
-                    "or": [
-                      "change-shape:hybrid",
-                      "change-shape:animal"
-                    ]
-                  }
-                ]
-              }
-            ]
-          },
-          "item:category:unarmed",
-          "target:trait:undead"
-        ],
-        "selector": "strike-damage"
-      },
-      {
         "damageType": "spirit",
         "dieSize": "d4",
         "diceNumber": 1,
@@ -220,33 +137,6 @@
         "selector": "strike-damage"
       },
       {
-        "damageType": "electricity",
-        "dieSize": "d6",
-        "diceNumber": 1,
-        "key": "DamageDice",
-        "label": "Greater Shock",
-        "predicate": [
-          {
-            "or": [
-              "battle-form",
-              {
-                "and": [
-                  "werecreature:weredragon",
-                  {
-                    "or": [
-                      "change-shape:hybrid",
-                      "change-shape:animal"
-                    ]
-                  }
-                ]
-              }
-            ]
-          },
-          "item:category:unarmed"
-        ],
-        "selector": "strike-damage"
-      },
-      {
         "key": "Note",
         "outcome": [
           "criticalSuccess"
@@ -272,7 +162,7 @@
         ],
         "selector": "strike-damage",
         "title": "Gauntlets of the Obsidian Terror",
-        "text": "Greater Brilliant: target must succeed at a Fortitude save (DC = your class DC) or be blinded for 1 round; this damage ignores fire/spirit/vitality resistance. Greater Shock: electricity arcs to up to 2 other creatures within 10 feet for the same damage, ignoring electricity resistance. Holy vs. unholy: once per day you may spend a reaction to heal HP equal to double the unholy creature's level."
+        "text": "Greater Brilliant: target must succeed at a Fortitude save (DC = your class DC) or be blinded for 1 round. Greater Shock: electricity arcs to up to 2 other creatures within 10 feet for the same damage. Holy vs. unholy: once per day you may spend a reaction to heal HP equal to double the unholy creature's level."
       },
       {
         "definition": [
@@ -293,6 +183,62 @@
         "property": "traits",
         "selector": "strike-damage",
         "value": "holy"
+      },
+      {
+        "definition": [
+          "item:category:unarmed"
+        ],
+        "key": "AdjustStrike",
+        "mode": "add",
+        "predicate": [
+          {
+            "or": [
+              "battle-form",
+              {
+                "and": [
+                  "werecreature:weredragon",
+                  {
+                    "or": [
+                      "change-shape:hybrid",
+                      "change-shape:animal"
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "property": "property-runes",
+        "selector": "strike-damage",
+        "value": "greaterBrilliant"
+      },
+      {
+        "definition": [
+          "item:category:unarmed"
+        ],
+        "key": "AdjustStrike",
+        "mode": "add",
+        "predicate": [
+          {
+            "or": [
+              "battle-form",
+              {
+                "and": [
+                  "werecreature:weredragon",
+                  {
+                    "or": [
+                      "change-shape:hybrid",
+                      "change-shape:animal"
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "property": "property-runes",
+        "selector": "strike-damage",
+        "value": "greaterShock"
       }
     ],
     "runes": {

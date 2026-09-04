@@ -64,7 +64,7 @@ resistances/vulnerabilities keyed to that material.
 
 It also includes **Hide of the Obsidian Terror** — a custom Hide Armor
 built from Dragonhide (standard-grade), etched with +3 potency, major
-resilient, Greater Fortification, Greater Dread, and Major Moonweave,
+resilient, Greater Fortification, Spellwatch, and Major Moonweave,
 plus a house rule granting a flat +1 bonus to AC and to saving throws
 against poison.
 
