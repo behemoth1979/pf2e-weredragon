@@ -1,5 +1,5 @@
-2026/09/04-15:53:41.176 418c Delete type=3 #1
-2026/09/04-15:53:41.180 1f30 Level-0 table #5: started
-2026/09/04-15:53:41.184 1f30 Level-0 table #5: 3264 bytes OK
-2026/09/04-15:53:41.188 1f30 Delete type=0 #3
-2026/09/04-15:53:41.188 1f30 Manual compaction at level-0 from '!macros!UntamedFrmMacro1' @ 72057594037927935 : 1 .. '!macros!WdrgnFrmHybrid001' @ 0 : 0; will stop at (end)
+2026/09/04-16:14:28.122 4848 Delete type=3 #1
+2026/09/04-16:14:28.126 10318 Level-0 table #5: started
+2026/09/04-16:14:28.130 10318 Level-0 table #5: 3264 bytes OK
+2026/09/04-16:14:28.134 10318 Delete type=0 #3
+2026/09/04-16:14:28.134 10318 Manual compaction at level-0 from '!macros!UntamedFrmMacro1' @ 72057594037927935 : 1 .. '!macros!WdrgnFrmHybrid001' @ 0 : 0; will stop at (end)

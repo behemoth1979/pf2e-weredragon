@@ -309,6 +309,48 @@ runes also carries a purely textual `notes` field for the identical
 scope even for a genuinely-etched real weapon, not a gap specific to
 this homebrew item.
 
+**Correction, found in play immediately after v2.22.0 shipped: removing
+the manual `DamageDice` REs for Brilliant/Shock also silently dropped
+their actual bonus damage** — resistance-ignoring worked correctly,
+but Greater Brilliant's and Greater Shock's dice showed up struck
+through in the damage-roll dialog on every target, not just a specific
+one (confirmed it wasn't target-resistance-specific before treating it
+as a general regression). Root-caused by reading
+`BattleFormRuleElement#applyDamageExclusion(e, t)` directly: for
+*every* `DamageDicePF2e` instance in the strike's modifier list
+(`n instanceof Qs`, unconditionally — no filtering by source, damage
+type, or anything else), it disables the dice (`n.enabled = false;
+n.ignored = true`) unless that specific instance's own `predicate`
+already contains `"battle-form"` (bare, or inside an `"or"` array).
+The dice `AdjustStrike`'s `property-runes` addition causes pf2e to
+auto-generate from `CONFIG.PF2E.runes.weapon.property.greaterBrilliant/
+.greaterShock` are constructed entirely inside the system's own
+weapon-preparation code, using whatever predicate (if any) that CONFIG
+data specifies — never `"battle-form"` — so they were *always* going
+to be excluded the same way striking-rune dice are deliberately
+excluded elsewhere on this item. `ignoredResistances`, by contrast,
+evidently isn't gated by this same enabled/ignored flag — it kept
+working even while the dice carrying it were struck through, which is
+why only the bonus damage regressed and not the resistance-ignoring.
+
+**Fixed by keeping both mechanisms rather than choosing one**: the
+three Greater Brilliant `DamageDice` REs and the one Greater Shock
+`DamageDice` RE removed in v2.22.0 were restored exactly as they were
+(same predicates, same values) specifically to carry the bonus damage
+again — bypassing the exclusion the same way Holy's `DamageDice` REs
+already do, since those were never touched and never stopped working.
+The two new `AdjustStrike` `property-runes` REs stay too, purely for
+`ignoredResistances` now that it's confirmed to work independently of
+the dice-exclusion state. This isn't double-counted damage in
+practice: for a battle-form/Weredragon strike, the manual dice
+actually roll (bypass predicate present) while the auto-generated ones
+from the pushed rune get excluded (no bypass predicate) and contribute
+nothing; for a normal strike, neither the manual dice nor the
+`AdjustStrike` additions activate at all (both predicated on
+battle-form/Weredragon), leaving only the real weapon's own already-
+correct native rune processing — so the two mechanisms are never both
+"live" on the same strike's damage roll at once.
+
 ## Third homebrew item: Black Dragon Hide Armor
 
 `src/packs/feats/black-dragon-hide-armor.json` — a third item in the

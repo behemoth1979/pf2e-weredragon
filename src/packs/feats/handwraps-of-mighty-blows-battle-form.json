@@ -82,6 +82,89 @@
         "value": 3
       },
       {
+        "damageType": "fire",
+        "dieSize": "d4",
+        "diceNumber": 1,
+        "key": "DamageDice",
+        "label": "Greater Brilliant",
+        "predicate": [
+          {
+            "or": [
+              "battle-form",
+              {
+                "and": [
+                  "werecreature:weredragon",
+                  {
+                    "or": [
+                      "change-shape:hybrid",
+                      "change-shape:animal"
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "item:category:unarmed"
+        ],
+        "selector": "strike-damage"
+      },
+      {
+        "damageType": "spirit",
+        "dieSize": "d4",
+        "diceNumber": 1,
+        "key": "DamageDice",
+        "label": "Greater Brilliant (vs. fiends)",
+        "predicate": [
+          {
+            "or": [
+              "battle-form",
+              {
+                "and": [
+                  "werecreature:weredragon",
+                  {
+                    "or": [
+                      "change-shape:hybrid",
+                      "change-shape:animal"
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "item:category:unarmed",
+          "target:trait:fiend"
+        ],
+        "selector": "strike-damage"
+      },
+      {
+        "damageType": "vitality",
+        "dieSize": "d4",
+        "diceNumber": 1,
+        "key": "DamageDice",
+        "label": "Greater Brilliant (vs. undead)",
+        "predicate": [
+          {
+            "or": [
+              "battle-form",
+              {
+                "and": [
+                  "werecreature:weredragon",
+                  {
+                    "or": [
+                      "change-shape:hybrid",
+                      "change-shape:animal"
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "item:category:unarmed",
+          "target:trait:undead"
+        ],
+        "selector": "strike-damage"
+      },
+      {
         "damageType": "spirit",
         "dieSize": "d4",
         "diceNumber": 1,
@@ -133,6 +216,33 @@
           },
           "item:category:unarmed",
           "target:trait:unholy"
+        ],
+        "selector": "strike-damage"
+      },
+      {
+        "damageType": "electricity",
+        "dieSize": "d6",
+        "diceNumber": 1,
+        "key": "DamageDice",
+        "label": "Greater Shock",
+        "predicate": [
+          {
+            "or": [
+              "battle-form",
+              {
+                "and": [
+                  "werecreature:weredragon",
+                  {
+                    "or": [
+                      "change-shape:hybrid",
+                      "change-shape:animal"
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "item:category:unarmed"
         ],
         "selector": "strike-damage"
       },
