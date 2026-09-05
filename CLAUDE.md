@@ -2031,10 +2031,41 @@ which point at this repo's GitHub Releases (not raw branch files).
    `scripts/*.js` extracted fine on Forge despite the same backslash
    encoding, but fixed anyway as a latent portability issue independent
    of whether it was the culprit there.)
-5. On github.com: repo → Releases → "Create a new release" → tag it
-   `vX.Y.Z` matching `module.json` → attach both the zip and a
-   standalone copy of `module.json` → publish.
-6. Forge will offer an "Update" button once it next checks.
+5. If any file under `assets/tokens` or `assets/sounds` changed, also
+   run `node build-assets-zip.mjs` to produce
+   `pf2e-weredragon-assets.zip` (just `tokens/` and `sounds/`, no
+   `assets/` wrapper folder) and re-upload its contents into Forge's
+   own Assets Library (Foundry → Files → Assets Library on the Forge
+   world, or drag-and-drop the extracted `tokens/`/`sounds/` folders
+   there directly) — see the note below on why this manual step
+   exists. Skip this step on releases that don't touch those folders.
+6. On github.com: repo → Releases → "Create a new release" → tag it
+   `vX.Y.Z` matching `module.json` → attach the module zip, a
+   standalone copy of `module.json`, and (if produced this release)
+   `pf2e-weredragon-assets.zip` → publish.
+7. Forge will offer an "Update" button once it next checks.
+
+**Why the Assets Library step exists**: per the Forge investigation
+above, this module's own bundled `assets/` folder is not reliably
+served by Forge for a custom (non-Bazaar-listed), manifest-URL-installed
+module — every file under it 404s while everything else in the module
+(scripts, packs, module.json) loads fine, and this persisted across a
+version update. Forge's Assets Library, by contrast, is a first-class,
+per-account (not per-world) storage feature with genuinely public
+HTTPS URLs (open CORS, no login required) — confirmed reliable, unlike
+the mystery folder-specific failure. The plan: upload `tokens/`/
+`sounds/` there once, get back stable URLs of the form
+`https://assets.forge-vtt.com/<account-id>/tokens/...` and `.../sounds/...`,
+then have every `TokenImage` rule element, `scripts/form-sounds.js`'s
+sound-file map, and the three Weredragon form-switch macros reference
+those absolute URLs instead of the module-relative
+`modules/phil-pf2e-weredragon/assets/...` paths. Since these URLs are
+plain public internet URLs (not Forge-authenticated), they resolve
+identically from the local self-hosted dev server too — no dual-path
+logic needed. **Not yet done**: this requires the account-specific
+base URL from an actual upload before the reference swap can happen;
+`assets/tokens`/`assets/sounds` in this repo remain the source of
+truth to re-upload from whenever they change, via this zip.
 
 Repo: https://github.com/behemoth1979/pf2e-weredragon
 
