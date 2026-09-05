@@ -14,12 +14,33 @@
  * On request, switched from this script rolling and applying its own
  * plain `Roll` (fully automatic, no click needed) to actually casting
  * that spell instead -- constructs a temporary, unembedded item parented
- * to the actor, then calls `.rollDamage({})` on it (same shape
- * shroud-of-flame.js already uses, for why `rollDamage({})` -- not
+ * to the actor, then calls `.rollDamage({skipDialog: true})` on it (same
+ * shape shroud-of-flame.js already uses, for why `rollDamage()` -- not
  * `toMessage()` -- is what produces a real, clickable Apply Healing
  * button). The roll itself still isn't a separate click (`rollDamage()`
  * executes it immediately), but applying the result now needs the normal
  * click, same as any other spell.
+ *
+ * **Correction, found in play on a Forge-hosted instance (pf2e 8.5.0):
+ * `rollDamage({})` (an explicit empty object) popped a `DamageModifierDialog`
+ * instead of rolling immediately -- a real behavior difference from the
+ * dev instance this was first verified against, not a version-specific
+ * regression in pf2e itself.** Root cause, confirmed by reading
+ * `SpellPF2e#rollDamage(e, t)` directly: it never sets `skipDialog`
+ * itself -- it builds its own options object as `{target, ...eventToRollParams(e,
+ * {type: "damage"})}` and passes that straight to `getDamage()`.
+ * `getDamage`'s own signature defaults to `{skipDialog: true}`, but that
+ * default only applies when its argument is `undefined` -- since
+ * `rollDamage` always constructs and passes a real object (never
+ * `undefined`), that default never has a chance to kick in, and
+ * `eventToRollParams({}, ...)` doesn't add `skipDialog` on its own for a
+ * fake empty event. So the dialog showing was actually latent in every
+ * environment; something about the dev instance's event-derived roll
+ * params or the specific pf2e build happened not to surface it, but the
+ * fix removes the ambiguity entirely rather than relying on that. Fixed
+ * by passing `{skipDialog: true}` explicitly, which reaches `getDamage()`
+ * as part of `rollDamage`'s own constructed options object regardless of
+ * what `eventToRollParams` does.
  *
  * **Correction, found in play (v2.24.1): a bare temporary/unembedded copy
  * silently does nothing at all** -- confirmed live, via Chrome DevTools
@@ -126,7 +147,7 @@ async function applyHealingTransformation(actor) {
   }
 
   const tempSpell = new Item.implementation(sourceData, { parent: actor });
-  await tempSpell.rollDamage({});
+  await tempSpell.rollDamage({ skipDialog: true });
 }
 
 Hooks.once("init", () => {

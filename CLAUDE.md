@@ -1878,6 +1878,118 @@ already had one) — added `"slug": "spine-rake-sea-serpent"` so this
 script's `item.slug` check can actually match it, per the same
 no-name-derived-fallback rule documented earlier in this file.
 
+## Forge-hosted instance errors (pf2e 8.5.0): evocation trait + rollDamage dialog
+
+The user runs a second, real game on Forge VTT (`dm-az-spore-war.au
+.forge-vtt.com`, Foundry 14.365, pf2e **8.5.0**) — newer than the local
+dev instance (pf2e 8.4.1) everything in this file was verified against
+up to this point. Live console capture via Chrome DevTools Protocol
+surfaced two real module bugs and one non-issue, all specific to this
+newer pf2e version's stricter validation/behavior.
+
+**Bug 1 — `"evocation"` is no longer a valid trait.** Three files
+(`breath-weapon-kaiju.json`, `breath-weapon-kaiju-spell.json`,
+`shroud-of-flame-spell.json`) had `"evocation"` in `traits.value`,
+copied from the vanilla ability's own "(evocation, primal)" activation
+prose. Confirmed live against `CONFIG.PF2E.actionTraits` and
+`CONFIG.PF2E.spellTraits` on the Forge instance that `"evocation"` is
+`false` (not present) in both on pf2e 8.5.0 — the remaster removed
+magic schools as a mechanic, and this newer system build enforces that
+at the schema level (`element-validation failure at
+system.traits.value`), where 8.4.1 apparently didn't. Fixed by removing
+`"evocation"` from all three `traits.value` arrays (and the matching
+description prose in `breath-weapon-kaiju.json`). A repo-wide sweep
+confirmed no other magic-school trait (abjuration/conjuration/etc.)
+exists anywhere in `src/`. One harmless leftover: `spell-effect-
+monstrosity-form-kaiju.json`'s own description prose still quotes
+"(evocation, primal)" — that's plain descriptive text, not a validated
+`traits.value` field, so it isn't a bug and was left alone (matches how
+the vanilla item's own prose reads too).
+
+**Bug 2 — `rollDamage({})` pops a `DamageModifierDialog` instead of
+rolling immediately, on this pf2e version specifically.** Both
+`healing-transformation.js` and `shroud-of-flame.js` construct a
+temporary spell copy and call `.rollDamage({})` on it (an empty object
+standing in for the optional DOM event). Root-caused by reading
+`SpellPF2e#rollDamage(e, t)` directly: it never sets `skipDialog`
+itself — it builds `{target, ...eventToRollParams(e, {type:
+"damage"})}` and passes that straight to `getDamage()`.
+`getDamage`'s own signature defaults to `{skipDialog: true}`, but a
+default parameter only applies when the argument is `undefined` — since
+`rollDamage` always constructs and passes a real object, that default
+never gets a chance to apply, and `eventToRollParams({}, ...)` doesn't
+add `skipDialog` on its own for a fake empty event. This was latent in
+both pf2e versions; something about the dev instance's environment
+happened not to surface it there, but the bug was real either way.
+Fixed in both scripts by passing `{skipDialog: true}` explicitly
+instead of `{}`, which removes the ambiguity regardless of environment.
+
+**Non-issue — asset loading failures for `weredragon-hybrid`/
+`kaiju-form`/`sea-serpent-form` `.ogg`/`.webp`.** The captured console
+log showed `Failed to load audio element` and `Invalid Asset` for
+exactly these three forms' sound/token files.
+
+**Correction: this was wrongly written off as a one-time CDN cache
+miss — it's real, and it's not limited to those three forms.**
+Re-investigated by fetching the asset URLs directly from the live
+Forge session (`fetch('/modules/phil-pf2e-weredragon/assets/...')`,
+`cache: "no-store"`). Every single file under `assets/` returns 404 —
+tested across both old assets (`ape-form.webp`, present since one of
+the repo's earliest commits) and new ones (`kaiju-form.webp`), tokens
+and sounds alike. The three forms in the original console capture were
+just the only ones the player had actually transformed into during
+that session, not the only ones broken. The 404 is genuinely live and
+uncached, not a stale CDN copy: response headers show `cache-control:
+no-cache` and `cf-cache-status: BYPASS`, meaning Cloudflare passed the
+request straight through to Forge's own Express backend, which
+answered 404 both instantly and consistently across three repeated
+requests seconds apart.
+
+Meanwhile **everything else in the module loads correctly** on the
+same Forge world: `module.json`, `README.md`, `build.mjs`, every file
+under `scripts/` (old and new), and `packs/*` (403 Forbidden rather
+than 404 — meaning those files DO exist server-side, just aren't
+servable as raw static files, which is expected for compendium LevelDB
+internals). So this isn't a whole-module deployment failure — `assets/`
+specifically, and only `assets/`, is missing from whatever Forge
+actually extracted for this module on this world.
+
+Ruled out as the cause: git corruption (working-tree blob hash matches
+HEAD's stored blob hash exactly for every flagged file — no
+`core.autocrlf` mangling), wrong filenames/casing (every reference
+matches exactly), and the release zip's own path separators (inspected
+the actual v2.25.3 release zip's raw central-directory bytes: every
+nested path in the whole archive — `assets\tokens\...` *and*
+`scripts\...` alike — uses a literal backslash, a known side effect of
+building the release zip with PowerShell's `Compress-Archive`, which
+does not follow the zip spec's forward-slash requirement. But since
+`scripts\form-sounds.js` extracts and serves fine on Forge despite the
+identical backslash encoding, backslash paths alone don't explain why
+`assets\...` specifically fails while `scripts\...` doesn't — so this
+is very likely a latent zip-hygiene issue worth fixing on its own
+merits (a portable release zip shouldn't rely on any one platform's
+extractor being lenient about it), but not conclusively the actual
+root cause of the 404s here).
+
+**Not yet root-caused.** Best remaining explanation given the evidence
+(everything else present, only `assets/` entirely absent, consistently
+and immediately) is something specific to Forge's own module
+installer/package-cache for this world failing to extract that one
+folder — possibly a stale cached package predating some earlier change,
+possibly something about the folder name or its file count/size
+tripping a limit in Forge's installer. This needs either: (a) the user
+checking Forge's own file manager for this world to see what's
+literally on disk under this module's folder, or (b) forcing a full
+uninstall + reinstall of the module (not just the auto-update flow) to
+see if a from-scratch extraction picks up `assets/` correctly. Neither
+has been tried yet.
+
+**Not yet resolved**: a `[warning] PF2e System | The provided predicate
+set is malformed.` line appeared in the same captured log with no
+attached item/context, so it isn't yet attributable to this module or
+something else. Needs a fresh live capture (ideally narrowed to when
+the warning actually fires) to trace further.
+
 ## Keeping in sync with upstream pf2e system updates
 
 If the pf2e system reworks Werecreature Dedication (errata, new
@@ -1903,9 +2015,22 @@ which point at this repo's GitHub Releases (not raw branch files).
    version tag (the `"manifest"` URL stays constant — it always
    resolves to `releases/latest`).
 3. Commit + push.
-4. Run `node build.mjs` if source changed, and re-zip the module
-   contents (module.json, packs/, src/, assets/, scripts/, build.mjs,
-   rebuild-from-upstream.py, README.md — NOT node_modules or .git).
+4. Run `node build.mjs` if source changed, then `node
+   build-release-zip.mjs` to produce `pf2e-weredragon.zip` (module.json,
+   packs/, src/, assets/, scripts/, build.mjs, rebuild-from-upstream.py,
+   README.md — NOT node_modules or .git). **Don't zip this by hand with
+   PowerShell's `Compress-Archive`** — confirmed (by inspecting a past
+   release zip's raw central-directory bytes) that it stores every
+   nested path with a literal backslash instead of the zip-spec-required
+   forward slash. `build-release-zip.mjs` uses `archiver`, which always
+   writes forward slashes regardless of host OS — verified directly
+   against the zip's raw bytes, not just its higher-level API. (This
+   was investigated as a possible cause of a real bug where Forge failed
+   to serve anything under this module's `assets/` folder while every
+   other file loaded fine — inconclusive as the actual root cause, since
+   `scripts/*.js` extracted fine on Forge despite the same backslash
+   encoding, but fixed anyway as a latent portability issue independent
+   of whether it was the culprit there.)
 5. On github.com: repo → Releases → "Create a new release" → tag it
    `vX.Y.Z` matching `module.json` → attach both the zip and a
    standalone copy of `module.json` → publish.

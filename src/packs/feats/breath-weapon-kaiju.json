@@ -11,7 +11,7 @@
     },
     "category": "offensive",
     "description": {
-      "value": "<p><em>Homebrew: activating this triggers casting the automated Breath Weapon (Kaiju) spell — same \"Activate → Cast a Spell → Effect: you cast X\" pattern official items like soaring armor and snapleaf use for activities that cast a specific spell.</em></p><p><strong>Activate</strong> <span class=\"action-glyph\">2</span> (evocation, primal)</p><hr /><p><strong>Effect</strong> You cast @UUID[Compendium.phil-pf2e-weredragon.weredragon-feats.Item.Breath Weapon (Kaiju)].</p>"
+      "value": "<p><em>Homebrew: activating this triggers casting the automated Breath Weapon (Kaiju) spell — same \"Activate → Cast a Spell → Effect: you cast X\" pattern official items like soaring armor and snapleaf use for activities that cast a specific spell.</em></p><p><strong>Activate</strong> <span class=\"action-glyph\">2</span> (primal)</p><hr /><p><strong>Effect</strong> You cast @UUID[Compendium.phil-pf2e-weredragon.weredragon-feats.Item.Breath Weapon (Kaiju)].</p>"
     },
     "frequency": null,
     "publication": {
@@ -22,7 +22,6 @@
     "rules": [],
     "traits": {
       "value": [
-        "evocation",
         "primal"
       ]
     }

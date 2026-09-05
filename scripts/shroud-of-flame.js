@@ -52,10 +52,12 @@
  *    same "temporary item with a parent, never persisted" pattern
  *    already confirmed working elsewhere in this module (see
  *    `ChatMessagePF2e#item`'s own `embeddedSpell` reconstruction).
- * 4. Calls `.rollDamage({})` on it (an empty object stands in for the
- *    optional DOM event `rollDamage` reads defensively -- `e.target`
- *    is accessed directly, not `e?.target`, so `e` itself must be a
- *    real object, just not one with a real `.target`).
+ * 4. Calls `.rollDamage({skipDialog: true})` on it (the object stands in
+ *    for the optional DOM event `rollDamage` reads defensively --
+ *    `e.target` is accessed directly, not `e?.target`, so `e` itself
+ *    must be a real object, just not one with a real `.target`;
+ *    `skipDialog: true` is required explicitly -- see the correction
+ *    below).
  * 5. Restores whatever the user had targeted before, so this doesn't
  *    silently clobber the GM's own target selection mid-combat.
  *
@@ -96,6 +98,16 @@
  * `getOrCreateInnateEntry`, exposed on the module API) before
  * constructing the temporary item -- without ever actually embedding
  * this spell on the actor.
+ *
+ * **Correction, found in play alongside the identical fix in
+ * healing-transformation.js: `rollDamage({})` pops a `DamageModifierDialog`
+ * instead of rolling immediately.** `SpellPF2e#rollDamage()` never
+ * forwards a default `skipDialog` -- it builds its own options object
+ * from the passed-in (fake) event and passes that straight to
+ * `getDamage()`, so `getDamage`'s own `{skipDialog: true}` default
+ * parameter never applies. Fixed by passing `{skipDialog: true}`
+ * explicitly instead of `{}` -- see healing-transformation.js's own
+ * docstring for the full root-cause trace.
  */
 
 (() => {
@@ -140,7 +152,7 @@ Hooks.on("pf2e.endTurn", async (combatant, _encounter, userId) => {
       sourceData.system.location.value = entry.id;
     }
     const tempSpell = new Item.implementation(sourceData, { parent: phoenixActor });
-    await tempSpell.rollDamage({});
+    await tempSpell.rollDamage({ skipDialog: true });
   } finally {
     endingToken.setTarget(false, { releaseOthers: true, user: game.user });
     for (const t of previousTargets) t.setTarget(true, { releaseOthers: false, user: game.user });
