@@ -201,7 +201,7 @@
       },
       {
         "key": "TokenImage",
-        "value": "modules/phil-pf2e-weredragon/assets/tokens/frog-form.webp"
+        "value": "https://assets.forge-vtt.com/606afd8ff876ca5c729ba36a/pf2e/tokens/dregor/tokens/frog-form.webp"
       }
     ],
     "start": {

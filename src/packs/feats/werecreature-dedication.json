@@ -766,7 +766,7 @@
           "werecreature:weredragon",
           "change-shape:hybrid"
         ],
-        "value": "modules/phil-pf2e-weredragon/assets/tokens/weredragon-hybrid.webp"
+        "value": "https://assets.forge-vtt.com/606afd8ff876ca5c729ba36a/pf2e/tokens/dregor/tokens/weredragon-hybrid.webp"
       },
       {
         "key": "TokenImage",
@@ -774,7 +774,7 @@
           "werecreature:weredragon",
           "change-shape:animal"
         ],
-        "value": "modules/phil-pf2e-weredragon/assets/tokens/weredragon-animal.webp"
+        "value": "https://assets.forge-vtt.com/606afd8ff876ca5c729ba36a/pf2e/tokens/dregor/tokens/weredragon-animal.webp"
       }
     ],
     "traits": {

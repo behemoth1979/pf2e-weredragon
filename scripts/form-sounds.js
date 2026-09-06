@@ -41,7 +41,7 @@
 
 (() => {
 
-const SOUNDS_PATH = "modules/phil-pf2e-weredragon/assets/sounds";
+const SOUNDS_PATH = "https://assets.forge-vtt.com/606afd8ff876ca5c729ba36a/pf2e/audio/drengor/sounds";
 
 // Forms that are their own item, matched by fixed slug alone.
 const FIXED_SLUG_SOUNDS = {

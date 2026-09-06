@@ -2062,10 +2062,46 @@ those absolute URLs instead of the module-relative
 `modules/phil-pf2e-weredragon/assets/...` paths. Since these URLs are
 plain public internet URLs (not Forge-authenticated), they resolve
 identically from the local self-hosted dev server too — no dual-path
-logic needed. **Not yet done**: this requires the account-specific
-base URL from an actual upload before the reference swap can happen;
-`assets/tokens`/`assets/sounds` in this repo remain the source of
-truth to re-upload from whenever they change, via this zip.
+logic needed.
+
+**Done, as of the release documented here.** The user uploaded
+`tokens/`/`sounds/` into their Forge Assets Library and provided two real
+sample URLs, confirming the actual folder structure landed there:
+- Tokens: `https://assets.forge-vtt.com/606afd8ff876ca5c729ba36a/pf2e
+  /tokens/dregor/tokens/<filename>.webp`
+- Sounds: `https://assets.forge-vtt.com/606afd8ff876ca5c729ba36a/pf2e
+  /audio/drengor/sounds/<filename>.ogg`
+
+Note the folder-name mismatch between the two (`dregor` for tokens vs.
+`drengor` for sounds, missing an `n`) — almost certainly a typo made
+while creating the upload folders (the actual character name is
+"Drengor," confirmed from the sibling `pf2e-hero-points` module's own
+CLAUDE.md), not something to "fix" on this end: these are just the real
+paths that exist, used verbatim rather than corrected, since correcting
+one side would break the actual working URL.
+
+Every `TokenImage` rule element (all patched spell-effect files: Aerial
+Form, all 13 Animal Form animals, Dragon Form's Stormcrown entry,
+Monstrosity Form's Cave Worm/Phoenix/Sea Serpent, Kaiju, and
+Werecreature Dedication's own Hybrid/Animal `TokenImage`s), the two
+hotbar macros that play a sound directly
+(`weredragon-form-hybrid.json`/`weredragon-form-animal.json`), and
+`scripts/form-sounds.js`'s `SOUNDS_PATH` constant were all repointed
+from `modules/phil-pf2e-weredragon/assets/...` to these absolute Forge
+Assets Library URLs — a mechanical prefix swap (bulk `sed` across all 20
+matching files, then every resulting JSON file re-validated with
+`JSON.parse`) since every reference already followed the exact same
+`assets/tokens/<name>.webp` / `assets/sounds/<name>.ogg` shape. Verified
+via a plain unauthenticated `fetch()` from an unrelated machine (not
+logged into Forge at all) that four representative URLs (two tokens, two
+sounds) return `200` with the correct `image/webp`/`audio/ogg` content
+types — confirming these really are public, not gated behind Forge
+session auth.
+
+`assets/tokens`/`assets/sounds` remain in this repo as the source of
+truth — re-upload their contents via `build-assets-zip.mjs` into the
+same Assets Library folders whenever they change, since nothing
+auto-syncs that side.
 
 Repo: https://github.com/behemoth1979/pf2e-weredragon
 

@@ -225,7 +225,7 @@
         "predicate": [
           "monstrosity-form:cave-worm"
         ],
-        "value": "modules/phil-pf2e-weredragon/assets/tokens/cave-worm-form.webp"
+        "value": "https://assets.forge-vtt.com/606afd8ff876ca5c729ba36a/pf2e/tokens/dregor/tokens/cave-worm-form.webp"
       },
       {
         "brackets": [
@@ -404,7 +404,7 @@
         "predicate": [
           "monstrosity-form:phoenix"
         ],
-        "value": "modules/phil-pf2e-weredragon/assets/tokens/phoenix-form.webp"
+        "value": "https://assets.forge-vtt.com/606afd8ff876ca5c729ba36a/pf2e/tokens/dregor/tokens/phoenix-form.webp"
       },
       {
         "brackets": [
@@ -529,7 +529,7 @@
         "predicate": [
           "monstrosity-form:sea-serpent"
         ],
-        "value": "modules/phil-pf2e-weredragon/assets/tokens/sea-serpent-form.webp"
+        "value": "https://assets.forge-vtt.com/606afd8ff876ca5c729ba36a/pf2e/tokens/dregor/tokens/sea-serpent-form.webp"
       }
     ],
     "start": {
