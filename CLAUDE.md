@@ -873,6 +873,65 @@ guaranteed byte-exact rather than transcribed by hand. Same round-trip
 verification (compile → extract → diff) as every other item in this
 repo still applies before committing.
 
+## Bug found in play: most forms' tokens weren't resizing (only Kaiju worked)
+
+Reported as "might be a module clash" — it wasn't. Root-caused by
+downloading the full compiled pf2e system source (over the same SSH
+access documented in the "Keeping in sync" section, via `docker exec
+Foundry cat systems/pf2e/pf2e.mjs`) and reading
+`BattleFormRuleElement#prepareActorData` directly: it resolves its
+`size` (and every other bracketed field) via `this.brackets.findLast(e
+=> e.start <= (this.item.system.level?.value ?? 0))` — **the bracket
+threshold is compared against the effect *item's own* `system.level
+.value` field, not the actor's character level, not a cast/heightened
+rank stored anywhere else.**
+
+For a *real* cast of the vanilla spell, Foundry's own spellcasting flow
+sets the granted effect's `level.value` to match the heightened rank at
+cast time. But every patched item in this repo is designed to be
+**manually dragged onto the sheet** (per this file's own repeated
+instructions — there's no automated cast-and-grant path for most of
+these), and a dragged compendium item keeps whatever static
+`system.level.value` sits in its own JSON source — which, for every
+affected file, was the vanilla spell's own unheightened base rank (2
+for Animal Form, 4 for Aerial Form, 6 for Dragon Form, 8 for
+Monstrosity Form) baked in from the original upstream pull. Checked
+each file's own `BattleForm` brackets directly: Animal Form's size
+brackets are `start: 4 → "lg"` and `start: 5 → "huge"` — with the item
+stuck at level 2, `findLast` never reaches either bracket, so *no* size
+override ever applied, leaving the actor (and its token) at whatever
+size it already was. Aerial Form (level 4, brackets at 4/5/6) similarly
+landed on its lowest tier. Monstrosity Form (level 8, brackets at 8/9,
+both "huge") happened to already work correctly by coincidence — its
+static level exactly matched its first bracket. Dragon Form (level 6,
+brackets at 6/8) partially worked (Large, not Huge). **Kaiju was never
+actually a counterexample mechanically — it just doesn't use brackets
+for size at all**: its own `BattleForm` RE has a flat, unconditional
+`overrides.size: "gargantuan"`, so it was never subject to this bug
+regardless of its item's level (which happens to already be a static
+20, set for unrelated reasons).
+
+**Fix**: bumped `system.level.value` to `20` in all 13 Animal Form
+files, `spell-effect-aerial-form.json`, `spell-effect-dragon-form.json`,
+and `spell-effect-monstrosity-form.json` (the last one not strictly
+required, changed anyway for consistency with the others, and because
+it's harmless — `findLast` simply caps at whichever bracket's `start`
+is highest, so a level far beyond every defined bracket has no
+different effect than exactly matching the top one). This matches the
+"always get your best form" precedent Kaiju's own file already set,
+appropriate for this module's actual use case (personal homebrew for
+specific level-20 characters, not something needing to work correctly
+at arbitrary lower levels).
+
+**Verified live, not just reasoned from source**: reproduced the bug
+first (dragging the *old* Bear Form data onto a level-20 test character
+left it "med" with a 1×1 token, unchanged), then confirmed the fix
+(the same data with `level.value` overridden to 20 resolved to "huge",
+and the token's own `width`/`height` updated from `1` to
+`2.379070355348321` — Foundry's own Huge auto-scale ratio) via a live
+Chrome DevTools Protocol connection to the dev server, over the exact
+same `createEmbeddedDocuments` path a real drag-and-drop produces.
+
 ## Dragon Breath: 40 real spells, one per Dragon Form type
 
 `src/packs/feats/dragon-breath-<type>-spell.json` (40 files, one per
