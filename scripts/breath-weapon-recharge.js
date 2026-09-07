@@ -59,7 +59,9 @@
  * outside of an explicit rest/breather action, so this doesn't fight
  * with or prematurely undercut the real 1d4-round timer -- the *only*
  * thing that resets it is this script's own `deleteItem` handler below,
- * once the Breath Weapon Recharging effect actually expires.
+ * once the Breath Weapon Recharging effect is actually deleted (see the
+ * correction further down for what actually triggers that deletion in
+ * practice).
  *
  * Wrapped in an IIFE per this module's own standing practice (see
  * bizarre-transformation.js for the cross-module global-scope collision
@@ -99,6 +101,44 @@ Hooks.on("createChatMessage", async (message, _options, userId) => {
   if (!actor) return;
 
   await applyBreathWeaponRecharge(actor);
+});
+
+// **Bug found in play, fixed in v2.30.1: relying solely on the deleteItem
+// handler below (via pf2e's own EffectTracker auto-removing the effect)
+// never actually fired for the user in real play, even in active combat
+// with the automation.removeExpiredEffects world setting enabled.**
+// Root-caused live: EffectTracker only performs its actual removal pass
+// inside `refresh()`, which is wired to the `updateWorldTime` hook -- but
+// confirmed live, over CDP, that simply advancing combat turns
+// (`combat.nextTurn()`) does NOT itself advance world time on this
+// install, so `updateWorldTime` never fires, `refresh()` never runs on
+// its own, and the effect just sits there indefinitely with `remaining
+// <= 0` but never actually gets removed -- confirmed by manually calling
+// `game.pf2e.effectTracker.refresh()` afterward, which immediately
+// removed it. Whether world time auto-advances with combat turns is a
+// per-world Foundry/pf2e configuration matter, not something this module
+// can rely on being on.
+//
+// Fixed by not depending on that mechanism at all: checks the ending
+// combatant's own Breath Weapon Recharging effect directly on the same
+// real `pf2e.endTurn` hook `inexorable.js`/`shroud-of-flame.js` already
+// use successfully elsewhere in this exact module, and deletes it
+// directly once its own `remainingDuration.remaining` reaches zero --
+// which still correctly triggers the deleteItem handler below (a real
+// deletion either way, regardless of what triggered it), so the
+// frequency-reset logic doesn't need to be duplicated here.
+Hooks.on("pf2e.endTurn", async (combatant, _encounter, userId) => {
+  if (userId !== game.user.id) return;
+
+  const actor = combatant.actor;
+  if (!actor) return;
+
+  const effect = actor.items.find((i) => i.type === "effect" && i.slug === BREATH_WEAPON_RECHARGE_SLUG);
+  if (!effect) return;
+
+  if (effect.remainingDuration.remaining <= 0) {
+    await effect.delete();
+  }
 });
 
 // Refreshes the breath weapon spell's own Frequency (see the note above

@@ -1289,6 +1289,50 @@ unrelated test effect (different slug) left the spell's frequency
 completely untouched, proving the slug-matching guard is actually doing
 something, not just passing by coincidence.
 
+**Bug found in play, fixed in v2.30.1: the spell never actually
+refreshed in real play, even in active combat.** The `deleteItem`
+handler above is correct as far as it goes, but it depends entirely on
+pf2e's own `EffectTracker` naturally removing the expired effect on its
+own — and that never happened for the user, live-reproduced and
+root-caused directly: `EffectTracker`'s actual removal pass only runs
+inside its own `refresh()` method, which is wired to the
+`updateWorldTime` hook, not to combat turn advancement directly.
+Confirmed live, over CDP: simply calling `combat.nextTurn()` repeatedly
+does *not* itself advance world time on this install, so
+`updateWorldTime` never fires, `refresh()` never runs on its own, and
+the effect just sits there indefinitely with `remainingDuration
+.remaining <= 0` but never actually gets deleted — confirmed by then
+manually calling `game.pf2e.effectTracker.refresh()`, which immediately
+removed it. Whether world time auto-advances alongside combat turns is
+a per-world Foundry/pf2e configuration matter (not something visible
+from this repo, and not something this module can assume is on).
+
+**Fixed by not depending on `EffectTracker`/`updateWorldTime` at all**:
+added a second trigger, `Hooks.on("pf2e.endTurn", ...)` — the same real,
+already-proven-reliable hook `inexorable.js` and `shroud-of-flame.js`
+already use successfully elsewhere in this exact module. For the
+combatant whose turn just ended, it checks their own Breath Weapon
+Recharging effect's `remainingDuration.remaining` directly and, once
+it's reached zero, deletes the effect itself — which still correctly
+triggers the existing `deleteItem` handler above (a real deletion is a
+real deletion, regardless of what triggered it), so the frequency-reset
+logic didn't need to be duplicated. The original `deleteItem` handler
+was left in place rather than removed — harmless, and still correct for
+worlds where `updateWorldTime` genuinely does advance with combat turns
+(or where a GM manually deletes the effect).
+
+**Re-verified live after the fix**, deliberately *without* the manual
+`effectTracker.refresh()` crutch this time, to make sure the new trigger
+alone is what's doing the work: marked a test copy of the Kaiju spell as
+already-used (`frequency.value: 0`), granted a 1-round recharging
+effect, called `combat.nextTurn()` once, and confirmed the effect was
+gone and the spell's frequency was back to `1` — no manual intervention
+needed. Re-tested again with a 3-round duration across several
+consecutive turn advances to confirm it doesn't fire early: the effect
+correctly persisted through the first two turn-ends and was only
+removed (with the frequency reset following correctly) once the third
+one hit zero remaining duration.
+
 ## `system.slug` overrides — required on every renamed spell effect
 
 Every patched spell-effect item above appends `[Weredragon Homebrew]`
