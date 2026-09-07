@@ -52,12 +52,9 @@
  *    same "temporary item with a parent, never persisted" pattern
  *    already confirmed working elsewhere in this module (see
  *    `ChatMessagePF2e#item`'s own `embeddedSpell` reconstruction).
- * 4. Calls `.rollDamage({skipDialog: true})` on it (the object stands in
- *    for the optional DOM event `rollDamage` reads defensively --
- *    `e.target` is accessed directly, not `e?.target`, so `e` itself
- *    must be a real object, just not one with a real `.target`;
- *    `skipDialog: true` is required explicitly -- see the correction
- *    below).
+ * 4. Calls `.rollDamage(...)` on it, passing a fake "shift-click" event
+ *    object (see the corrections below for why -- a literal
+ *    `{skipDialog: true}` does not actually skip the dialog).
  * 5. Restores whatever the user had targeted before, so this doesn't
  *    silently clobber the GM's own target selection mid-combat.
  *
@@ -105,9 +102,23 @@
  * forwards a default `skipDialog` -- it builds its own options object
  * from the passed-in (fake) event and passes that straight to
  * `getDamage()`, so `getDamage`'s own `{skipDialog: true}` default
- * parameter never applies. Fixed by passing `{skipDialog: true}`
- * explicitly instead of `{}` -- see healing-transformation.js's own
- * docstring for the full root-cause trace.
+ * parameter never applies. "Fixed" at the time by passing
+ * `{skipDialog: true}` explicitly instead of `{}`.
+ *
+ * **Second correction: that fix never actually worked either, the whole
+ * time.** Found and re-diagnosed while building an unrelated automatic-
+ * apply feature for healing-transformation.js -- `eventToRollParams`'s
+ * real body never reads a passed-in `skipDialog` property at all; it
+ * computes its own answer entirely from `game.user.settings
+ * .showDamageDialogs` (this user's personal client setting) and,
+ * separately, `e.shiftKey` (only once `e` passes `isRelevantEvent`'s
+ * `ctrlKey`/`metaKey`/`shiftKey` property check, which `{skipDialog:
+ * true}` never did). The genuine, verified fix -- see
+ * healing-transformation.js's own docstring for the full trace and live
+ * confirmation -- is to fake a "shift-click" event whose `shiftKey` is
+ * computed from that same setting so the result is unconditionally
+ * `true` either way: `{ctrlKey: false, metaKey: false, shiftKey: !!game
+ * .user.settings.showDamageDialogs}`.
  */
 
 (() => {
@@ -152,7 +163,16 @@ Hooks.on("pf2e.endTurn", async (combatant, _encounter, userId) => {
       sourceData.system.location.value = entry.id;
     }
     const tempSpell = new Item.implementation(sourceData, { parent: phoenixActor });
-    await tempSpell.rollDamage({ skipDialog: true });
+    // See healing-transformation.js's own docstring for the full
+    // root-cause trace: {skipDialog: true} here never actually worked --
+    // rollDamage(e) treats `e` purely as a DOM event, and
+    // eventToRollParams(e, ...) never reads e.skipDialog at all, only
+    // e.shiftKey (and only once `e` passes isRelevantEvent's
+    // ctrlKey/metaKey/shiftKey property check). Faking a "shift-click"
+    // this way is the only way to force skipDialog regardless of this
+    // user's own "Show Damage Dialogs" client setting.
+    const skipDialogEvent = { ctrlKey: false, metaKey: false, shiftKey: !!game.user.settings.showDamageDialogs };
+    await tempSpell.rollDamage(skipDialogEvent);
   } finally {
     endingToken.setTarget(false, { releaseOthers: true, user: game.user });
     for (const t of previousTargets) t.setTarget(true, { releaseOthers: false, user: game.user });

@@ -1056,6 +1056,116 @@ repo's standing practice of always setting an explicit slug on any
 new/renamed item rather than relying on a name-derived fallback that
 may not exist or may include an unwanted suffix.
 
+## Healing Transformation and Shroud of Flame: the real `skipDialog` fix (v2.29.0)
+
+**The `{skipDialog: true}` fix documented earlier in this file for both
+`healing-transformation.js` and `shroud-of-flame.js` never actually
+worked, in any pf2e version, the whole time.** Found and properly
+re-diagnosed while building an unrelated feature (see the next section)
+requested on explicit user feedback: "for the healing transformation
+process, when i shift into an untamed form, can you roll and apply the
+healing to the druid without needing to click, it just adds extra
+clicks and dialogue boxes for no reason." Testing that new automatic-
+apply feature live surfaced a `DamageModifierDialog` popping up despite
+the existing `{skipDialog: true}` already being in place — meaning the
+earlier fix was never real to begin with.
+
+**Root cause, confirmed this time by reading `SpellPF2e#rollDamage(e,
+t)` and `eventToRollParams(e, t)` together** (the earlier investigation
+stopped at `rollDamage`'s own line without following `e` any further):
+`rollDamage` calls `getDamage({target, ...eventToRollParams(e, {type:
+"damage"})})` — `e` (whatever we pass) is always treated purely as a
+*DOM event*, never spread into the options object directly.
+`eventToRollParams`'s own real body never reads `e.skipDialog` at
+all — it computes its own `skipDialog` entirely from `game.user
+.settings.showDamageDialogs` (this user's personal Foundry client
+setting, `game.user.flags.pf2e.settings.showDamageDialogs`) and,
+separately, whether `e.shiftKey` is set — but only once `e` passes
+`isRelevantEvent(e)` (`!!e && "ctrlKey" in e && "metaKey" in e &&
+"shiftKey" in e`). Our old `{skipDialog: true}` object has none of
+those three properties, so `isRelevantEvent` was always `false`, and
+the function fell straight to `return {skipDialog: r}` where `r`
+depends solely on the user's own setting — our own `skipDialog` value
+was silently discarded on every single call, in every pf2e version.
+The original "fix" only ever appeared to work because whichever
+account verified it at the time happened to already have "Show Damage
+Dialogs" disabled as a personal setting, unrelated to the code change.
+Confirmed properly this time, live over CDP, on an account with that
+setting explicitly *enabled*: the old object still popped the dialog
+every time; the real fix (below) does not.
+
+**The actual, verified fix**: since `skipDialog` can only ever come out
+to `shiftKey ? !r : r`, there's no way to force an unconditional `true`
+through this path other than computing `shiftKey` from the user's own
+current setting so the result always lands on `true` regardless of
+what that setting is — the same "shift-click inverts your own default"
+convention pf2e already uses everywhere for check/damage rolls:
+```js
+const skipDialogEvent = {
+  ctrlKey: false,
+  metaKey: false,
+  shiftKey: !!game.user.settings.showDamageDialogs,
+};
+await tempSpell.rollDamage(skipDialogEvent);
+```
+Applied to both scripts. `healing-transformation.js`'s own docstring
+has the full trace and live verification detail; `shroud-of-flame.js`
+only needed this one fix (it deliberately still leaves a real,
+clickable Apply Damage button — see the next correction below for why
+that's different from Healing Transformation).
+
+## Healing Transformation: fully automatic again, no click needed (v2.29.0)
+
+On explicit user request (quoted above), `healing-transformation.js`
+was changed from "cast the real spell, but require a manual Apply
+Healing click on the resulting chat card" back to fully automatic —
+but *not* by reverting to the original bare-`Roll`-plus-`actor.update()`
+version. Instead it still casts the real spell (correct formula/
+heightening, cantrip auto-scaling) and now also applies the result
+itself:
+
+- `tempSpell.rollDamage(skipDialogEvent)`'s return value is the
+  evaluated `DamageRoll` itself, not the created chat message —
+  confirmed directly from `DamagePF2e.roll()`'s real source (its final
+  statement, via the comma operator, evaluates to the `DamageRoll` it
+  assigns a few lines earlier) — so `.total` is available immediately
+  with no separate message lookup needed for the roll itself.
+- `actor.applyDamage({damage: -total, token})` is exactly what the real
+  "Apply Healing" button calls under the hood, traced through
+  `applyDamageFromMessage()` in the compiled system source. Using it
+  directly (rather than a raw `actor.update()` against `system
+  .attributes.hp.value`) means this correctly triggers "healing-received"
+  bonuses too — confirmed live: a test actor with the third-party
+  Overflowing Life relic gift healed for roll-total-plus-10, not just
+  the roll total, something the *original* pre-spell version of this
+  script never did at all. `token` (`actor.getActiveTokens()[0]
+  ?.document`) is required, not optional despite the schema default —
+  `Actor#applyDamage`'s own internal chat-flavor-text builder
+  unconditionally reads `token.name` with no null-check, confirmed by
+  the exact `TypeError` thrown the first time this was tried without it.
+- The posted chat card's own Apply Healing button is left in place but
+  made inert: `flags.pf2e.suppressDamageButtons: true` is set on the
+  message afterward, found the same way `applyDamage`'s own required
+  `token` argument was — by testing this specific step live rather than
+  assuming it worked once the flag was set. **Correction: this does not
+  hide the button**, confirmed by inspecting exactly what
+  `ChatMessagePF2e`'s own render logic does with that flag — it only
+  ever skips assigning `data-roll-index` to each `.damage-application`
+  button, which the actual click-delegation logic elsewhere requires to
+  apply anything. So the button stays visually present but is left
+  permanently non-functional — confirmed live by dispatching a real
+  click on one after the flag was set and observing no HP change.
+  Acceptable given the actual goal (no double-heal risk), even though
+  it isn't cosmetically hidden.
+- Finding the right message to flag also needed a fix mid-build:
+  `game.messages.contents.at(-1)` is not reliable — confirmed live that
+  another installed module (`pf2e-modifiers-matter`) posts its own
+  follow-up chat message immediately after ours, so the literal last
+  message in the log is sometimes unrelated (no `.actor` at all), and
+  the real damage-roll message ends up further back. Fixed by matching
+  on `actor === actor && isDamageRoll && rolls[0]?.total === total`,
+  searching from the most recent message backward instead.
+
 ## Breath Weapon Recharging: automated recharge-timer effect
 
 `src/packs/feats/breath-weapon-recharging-effect.json` +
