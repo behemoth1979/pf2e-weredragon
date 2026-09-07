@@ -156,17 +156,46 @@ Hooks.on("pf2e.endTurn", async (combatant, _encounter, userId) => {
 // Same "one client acts" guard EffectTracker's own removal code uses
 // (`actor.primaryUpdater === game.user`), mirrored here as `userId ===
 // game.user.id` to match every other hook in this module.
+//
+// **Bug found in play, fixed in v2.30.2: resetting `system.frequency
+// .value` alone did nothing visible -- it isn't the field actually
+// gating the sheet's Cast button for this spell.** Confirmed live by
+// inspecting the actual rendered sheet HTML for the spell row: its
+// "uses" counter reads `data-item-property="system.location.uses
+// .value"`/`.max`, not `system.frequency` at all. Because this spell is
+// granted into a shared *innate* spellcasting entry (see innate-spell-
+// grants.js), Foundry tracks its per-use availability via `system
+// .location.uses` -- a completely separate field from `system
+// .frequency` that only exists once a spell has a real `location.value`
+// pointing at a spellcasting entry. Confirmed directly on a real,
+// already-expended copy: `location.uses.value` was `0` while
+// `frequency.value` had already been correctly reset to its max by the
+// original (incomplete) version of this fix -- the Cast button stayed
+// disabled regardless, because it never looked at `frequency` in the
+// first place. Both fields are now reset here; keeping the `frequency`
+// reset alongside the new `location.uses` one is harmless and matches
+// what a real, non-innate limited spell would need.
 Hooks.on("deleteItem", async (item, _options, userId) => {
   if (userId !== game.user.id) return;
   if (!(item.parent instanceof Actor)) return;
   if (item.type !== "effect" || item.slug !== BREATH_WEAPON_RECHARGE_SLUG) return;
 
   const actor = item.parent;
-  const spells = actor.items.filter((i) => i.type === "spell" && isBreathWeaponSpell(i.slug) && i.system.frequency);
+  const spells = actor.items.filter((i) => i.type === "spell" && isBreathWeaponSpell(i.slug));
 
   for (const spell of spells) {
-    if (spell.system.frequency.value < spell.system.frequency.max) {
-      await spell.update({ "system.frequency.value": spell.system.frequency.max });
+    const updateData = {};
+
+    if (spell.system.frequency && spell.system.frequency.value < spell.system.frequency.max) {
+      updateData["system.frequency.value"] = spell.system.frequency.max;
+    }
+
+    if (spell.system.location?.uses && spell.system.location.uses.value < spell.system.location.uses.max) {
+      updateData["system.location.uses.value"] = spell.system.location.uses.max;
+    }
+
+    if (Object.keys(updateData).length > 0) {
+      await spell.update(updateData);
     }
   }
 });

@@ -1333,6 +1333,53 @@ correctly persisted through the first two turn-ends and was only
 removed (with the frequency reset following correctly) once the third
 one hit zero remaining duration.
 
+**Bug found in play, fixed in v2.30.2: `system.frequency` was never
+the field actually gating the sheet's Cast button in the first
+place.** Reported as "still doesn't refresh," tested both in and out of
+combat, after the v2.30.1 fix above had already been verified working
+for the effect-deletion side. Root-caused by connecting live (over CDP)
+and inspecting the actual rendered spell row's HTML on the character
+sheet directly, rather than trusting the item data alone: its "uses"
+counter reads `data-item-property="system.location.uses.value"`/`.max`,
+a field this script had never touched. Because this spell is granted
+into a shared *innate* spellcasting entry (`innate-spell-grants.js`),
+Foundry tracks its per-use availability through `system.location.uses`
+once it has a real `location.value` pointing at a spellcasting entry —
+a completely separate mechanism from `system.frequency`, populated and
+consumed independently. Confirmed directly on the live actor: after a
+real cast via the sheet's own Cast button, `location.uses.value` was
+`0` while `frequency.value` — already reset by the v2.30.1 fix — stayed
+correctly at its max the whole time. The Cast button stayed disabled
+regardless, because it never reads `frequency` at all.
+
+**Fixed by resetting both fields** in the same `deleteItem` handler —
+`system.frequency.value` (kept, harmless, and correct for a
+hypothetical non-innate limited spell) and the newly-added `system
+.location.uses.value`, each independently guarded so a spell missing
+either field doesn't throw.
+
+**Re-verified live end-to-end, this time deliberately avoiding any risk
+of stale/duplicate hook registrations** from repeated in-session script
+injection (confirmed this was a real, self-inflicted testing footgun a
+few iterations earlier in this same investigation — injecting an
+updated script via CDP into a session that already auto-loaded the
+*previous* version leaves both copies' hooks registered simultaneously,
+which briefly produced a confusing extra recharge effect that had
+nothing to do with the actual fix). Overwrote the module's installed
+script file directly on the host (via SSH, same technique already
+established for testing the pf2e-toolbelt integration in the sibling
+`pf2e-hero-points` module) and did a single full page reload before
+testing, guaranteeing only one copy of the script's hooks was ever
+registered. With that clean state: clicked the sheet's real Cast
+button (not a scripted `rollDamage()`/`toMessage()` call) to cast the
+spell, confirmed `location.uses.value` dropped to `0` and a recharge
+effect was created; advanced one combat turn; confirmed the effect was
+gone, `location.uses.value` was back to `1`, and — checked directly
+against the live DOM, not just the underlying data — the sheet's own
+Cast `<button>` element had `disabled: false`, meaning the fix is
+confirmed working through the literal same interaction path a real
+player uses, start to finish.
+
 ## `system.slug` overrides — required on every renamed spell effect
 
 Every patched spell-effect item above appends `[Weredragon Homebrew]`
