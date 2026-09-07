@@ -1,0 +1,43 @@
+{
+  "_id": "BreathWpnRchrg01",
+  "img": "systems/pf2e/icons/spells/dragon-breath.webp",
+  "name": "Breath Weapon Recharging (Weredragon Homebrew)",
+  "system": {
+    "description": {
+      "value": "<p><em>Homebrew: automatically applied whenever Breath Weapon (Kaiju) or any Dragon Breath spell is cast, matching both abilities' own real text -- \"Once activated, it can't be used again for 1d4 rounds.\" Created by scripts/breath-weapon-recharge.js on the createChatMessage hook (matching this repo's own established pattern for detecting a specific spell cast), with a freshly-rolled 1d4 for its duration. Any previous copy of this effect on the same actor is deleted first rather than stacking a second one, so only one recharge timer is ever active at a time.</em></p><p>Your breath weapon is recharging and can't be used again until this expires.</p>"
+    },
+    "duration": {
+      "value": 1,
+      "unit": "rounds",
+      "expiry": "turn-end",
+      "sustained": false
+    },
+    "tokenIcon": {
+      "show": false
+    },
+    "traits": {
+      "rarity": "common",
+      "value": []
+    },
+    "rules": [],
+    "slug": "breath-weapon-recharging"
+  },
+  "type": "effect",
+  "_key": "!items!BreathWpnRchrg01",
+  "sort": 900000,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "coreVersion": "14.366",
+    "systemId": "pf2e",
+    "systemVersion": "8.5.0",
+    "createdTime": 1735689600000,
+    "modifiedTime": 1735689600000,
+    "lastModifiedBy": "phildedication00"
+  },
+  "effects": []
+}

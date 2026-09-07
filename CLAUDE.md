@@ -1056,6 +1056,72 @@ repo's standing practice of always setting an explicit slug on any
 new/renamed item rather than relying on a name-derived fallback that
 may not exist or may include an unwanted suffix.
 
+## Breath Weapon Recharging: automated recharge-timer effect
+
+`src/packs/feats/breath-weapon-recharging-effect.json` +
+`scripts/breath-weapon-recharge.js` — on request, automates the
+recharge timer both Breath Weapon (Kaiju) and every Dragon Breath spell
+already describe in their own real text ("Once activated, it can't be
+used again for 1d4 rounds"), which up to now was only a rollable inline
+link in each spell's own description, nothing that actually created a
+visible, expiring effect. Icon is the real "Breathe Fire" spell's own
+(`systems/pf2e/icons/spells/dragon-breath.webp` — confirmed directly
+against the `spells-srd` compendium, not guessed; it happens to share
+the exact same file as the real "Dragon Breath" spell's own icon).
+
+**Trigger, matching this repo's own established pattern** (see
+`healing-transformation.js`'s docstring for the full source trace of
+why this works): a `Hooks.on("createChatMessage", ...)` handler reads
+`message.item?.slug`, since `ChatMessagePF2e#get item()` already
+resolves a spell chat message back to the correctly-heightened spell
+instance. Matches `breath-weapon-kaiju` (Kaiju's own explicit slug) or
+any `dragon-breath-<type>` slug (all 40 Dragon Breath spells already
+have one, per the `system.slug` section above) — covering both
+abilities with the same one check, since both are real `type: "spell"`
+items whose casting already produces a normal spell chat message.
+
+**Duration is a real rolled 1d4, not a fixed placeholder.** pf2e's own
+effect duration schema (`system.duration.value`) only accepts a plain
+number, not a dice formula — confirmed against a real vanilla effect
+with a rounds-based duration ("Effect: Meddling Futures", `duration:
+{value: 0, unit: "rounds", expiry: "turn-end", sustained: false}`),
+which is also where this item's own `expiry: "turn-end"` is copied
+from rather than guessed. The compendium item's own stored
+`duration.value` (`1`) is just a schema-valid placeholder; the script
+rolls `1d4` fresh each time and overwrites it before creating the
+effect on the actor.
+
+**Only one recharge timer is ever active at a time**: any existing
+copy of the effect (matched by its own explicit `slug`,
+`breath-weapon-recharging`) is deleted before creating a fresh one,
+rather than stacking — recasting while already recharging (if the
+player somehow bypasses it) just resets the timer instead of layering
+a second, redundant effect. Same multi-client guard as every other
+`createItem`/`createChatMessage` hook in this module (`userId ===
+game.user.id`).
+
+**Deliberately not enforced mechanically** — per what was actually
+asked ("create a new effect... with an expiry"), this is a visible
+timer only; it doesn't block re-activating either breath weapon while
+present, matching how the rest of this module treats "reminder" text
+(e.g. terrain-ignoring on Inexorable) versus things it actually
+automates. It also isn't tied to leaving Kaiju/Dragon Form — the timer
+keeps counting down independently of the form itself, same as a real
+recharge would.
+
+**Verified live** (2026-09-07, via Chrome DevTools Protocol against the
+dev server): since the dev server's installed compendium predates this
+item, tested the script's own logic directly against the new item's
+exact source data — confirmed a fresh cast creates the effect with a
+real rolled duration (`1d4` → `4`, effect's `duration.value` matched
+exactly), and a second cast while one is already active deletes the
+old one and creates a new one with its own fresh roll (`3`), leaving
+exactly one `breath-weapon-recharging`-slugged effect on the actor
+either way — never two. The `createChatMessage`/`.item.slug` detection
+path itself wasn't independently re-verified here, since it's the same
+proven mechanism already confirmed working for Healing Transformation,
+Kaiju's dynamic damage type, and the innate-spell-grants fix.
+
 ## `system.slug` overrides — required on every renamed spell effect
 
 Every patched spell-effect item above appends `[Weredragon Homebrew]`
