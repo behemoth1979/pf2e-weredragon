@@ -36,6 +36,11 @@
       "sustained": false,
       "value": ""
     },
+    "frequency": {
+      "max": 1,
+      "per": "round",
+      "value": 1
+    },
     "level": {
       "value": 10
     },

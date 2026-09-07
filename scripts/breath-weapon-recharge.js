@@ -43,6 +43,24 @@
  * hook in this module (`userId === game.user.id`), so only the client
  * that actually cast the spell applies this, not every observing client.
  *
+ * **On request, extended to actually gate re-casting, not just show a
+ * timer**: previously the spells had no Frequency field at all --
+ * nothing stopped casting Breath Weapon or Dragon Breath again
+ * immediately, the recharge was purely a visual reminder. Added
+ * `system.frequency: {max: 1, per: "round", value: 1}` to all 41
+ * affected spell files (breath-weapon-kaiju-spell.json and all 40
+ * dragon-breath-<type>-spell.json), which makes pf2e's own normal
+ * spellcasting UI mark the spell "expended" after one cast, same as any
+ * other limited-use spell. `per: "round"` is the closest real interval
+ * pf2e's Frequency schema supports to "1d4 rounds" (there's no such
+ * variable-length option) -- confirmed via source (the same rest-based
+ * refresh routine `restForTheNight`/`takeABreather` use) that pf2e never
+ * auto-refreshes a `per: "round"`/`per: "turn"` frequency on its own
+ * outside of an explicit rest/breather action, so this doesn't fight
+ * with or prematurely undercut the real 1d4-round timer -- the *only*
+ * thing that resets it is this script's own `deleteItem` handler below,
+ * once the Breath Weapon Recharging effect actually expires.
+ *
  * Wrapped in an IIFE per this module's own standing practice (see
  * bizarre-transformation.js for the cross-module global-scope collision
  * this guards against).
@@ -81,6 +99,36 @@ Hooks.on("createChatMessage", async (message, _options, userId) => {
   if (!actor) return;
 
   await applyBreathWeaponRecharge(actor);
+});
+
+// Refreshes the breath weapon spell's own Frequency (see the note above
+// on why one was added at all) back to its max once the recharge timer
+// actually expires, so the spell becomes castable again without the
+// player needing to manually reset it.
+//
+// Reacting to the effect's own deletion, not a timer of this script's
+// own, is deliberate: confirmed directly in EffectTracker's real source
+// (compiled system code) that expired effects are removed via a genuine
+// `actor.deleteEmbeddedDocuments("Item", ...)` call -- a real
+// `deleteItem` hook firing, not just a cosmetic "expired" flag -- and
+// only when the `automation.removeExpiredEffects` world setting is on
+// (confirmed enabled on the dev server; this is pf2e's own default).
+// Same "one client acts" guard EffectTracker's own removal code uses
+// (`actor.primaryUpdater === game.user`), mirrored here as `userId ===
+// game.user.id` to match every other hook in this module.
+Hooks.on("deleteItem", async (item, _options, userId) => {
+  if (userId !== game.user.id) return;
+  if (!(item.parent instanceof Actor)) return;
+  if (item.type !== "effect" || item.slug !== BREATH_WEAPON_RECHARGE_SLUG) return;
+
+  const actor = item.parent;
+  const spells = actor.items.filter((i) => i.type === "spell" && isBreathWeaponSpell(i.slug) && i.system.frequency);
+
+  for (const spell of spells) {
+    if (spell.system.frequency.value < spell.system.frequency.max) {
+      await spell.update({ "system.frequency.value": spell.system.frequency.max });
+    }
+  }
 });
 
 })();

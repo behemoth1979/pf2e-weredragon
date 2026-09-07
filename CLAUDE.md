@@ -1232,6 +1232,63 @@ path itself wasn't independently re-verified here, since it's the same
 proven mechanism already confirmed working for Healing Transformation,
 Kaiju's dynamic damage type, and the innate-spell-grants fix.
 
+**On request, extended so the recharge timer actually gates re-casting,
+not just shows a countdown**: as originally built, nothing stopped the
+player from casting Breath Weapon (Kaiju) or a Dragon Breath spell
+again immediately — the "Breath Weapon Recharging" effect was purely a
+visual reminder. Fixed with two pieces:
+
+1. Added `system.frequency: {max: 1, per: "round", value: 1}` to all 41
+   affected spell files (`breath-weapon-kaiju-spell.json` and all 40
+   `dragon-breath-<type>-spell.json`, applied via a bulk text
+   substitution given the identical shared schema across all of them,
+   same "large repetitive content" convention this repo already uses
+   elsewhere). This makes pf2e's own normal spellcasting UI mark the
+   spell "expended" after one cast, same as any other limited-use
+   spell — no custom logic needed for that half.
+2. `scripts/breath-weapon-recharge.js` gained a `Hooks.on("deleteItem",
+   ...)` handler: when the Breath Weapon Recharging effect is deleted,
+   it resets the actor's matching breath-weapon spell's own `system
+   .frequency.value` back to `max`.
+
+**Why `per: "round"`, and why it doesn't fight with or prematurely
+undercut the real 1d4-round timer**: pf2e's Frequency schema has no
+variable-length interval option (no way to express "1d4 rounds"
+natively), so `round` is the closest available real value — confirmed
+against `CONFIG.PF2E.frequencies` directly rather than guessed
+(`turn`, `round`, `PT1M`, `PT10M`, `PT1H`, `PT24H`, `day`, `P1W`,
+`P1M`, `P1Y`). Confirmed via source (the same rest-duration-driven
+refresh routine `game.pf2e.actions.restForTheNight`/`takeABreather`
+use, which only refreshes a `per: "round"`/`per: "turn"` frequency when
+an explicit rest/breather action actually runs) that pf2e never
+auto-refreshes this kind of frequency on its own as rounds simply pass
+in combat — so the *only* thing that ever resets it is this script's
+own `deleteItem` handler, once the real 1d4-round-duration effect
+genuinely expires.
+
+**Why `deleteItem`, confirmed rather than assumed to be the right
+trigger**: read `EffectTracker`'s real source in the compiled system
+code directly. Expired effects are removed via a genuine
+`actor.deleteEmbeddedDocuments("Item", ...)` call inside its own
+`#removeExpired()` method — a real, observable `deleteItem` hook firing
+for each one, not merely a cosmetic "expired" flag toggling — but only
+when the world's own `automation.removeExpiredEffects` setting is
+enabled (`game.pf2e.settings.automation.removeEffects`; confirmed `true`
+on the dev server, and this is pf2e's own shipped default). `EffectTracker`
+itself gates its removal the same way this script's own handler does
+(`actor.primaryUpdater === game.user`, mirrored here as the same
+`userId === game.user.id` guard every other hook in this module
+already uses), so only one client ever performs the reset.
+
+**Verified live, not just reasoned from source**: granted a copy of the
+Kaiju spell (with `frequency.value: 0`, simulating "already cast") and
+a copy of the recharging effect onto a test actor, then deleted the
+effect — confirmed the spell's `frequency.value` went from `0` back to
+its `max` (`1`). Also confirmed the negative case: deleting an
+unrelated test effect (different slug) left the spell's frequency
+completely untouched, proving the slug-matching guard is actually doing
+something, not just passing by coincidence.
+
 ## `system.slug` overrides — required on every renamed spell effect
 
 Every patched spell-effect item above appends `[Weredragon Homebrew]`
