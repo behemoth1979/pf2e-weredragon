@@ -2373,6 +2373,75 @@ attached item/context, so it isn't yet attributable to this module or
 something else. Needs a fresh live capture (ideally narrowed to when
 the warning actually fires) to trace further.
 
+## Perfect Form Control: unlimited Untamed Form duration
+
+`scripts/perfect-form-control.js` — on request, automates "Perfect Form
+Control" (real druid class feat, level 18): "When you use Form Control,
+instead of lasting 1 hour, Untamed Form's duration is unlimited (you can
+still Dismiss it)." Checked directly against the real upstream item
+(`packs/pf2e/feats/class/druid/level-18/perfect-form-control.json`, via
+the same git-sparse-checkout technique used elsewhere in this file): its
+own `"rules"` array is empty. Form Control itself (the level-4
+prerequisite, also checked directly) is likewise just a `spellshape`
+toggle plus a reminder `ItemAlteration` appended to Untamed Form's
+description — neither real feat has any rule element that actually
+changes a granted effect's duration. Same "flavor text describing a
+mechanic that was never built" pattern as Bizarre Transformation and
+Healing Transformation before those were automated.
+
+**Mechanism**: a `createItem` hook (same guard shape as
+`bizarre-transformation.js`'s own — `userId === game.user.id`,
+`item.parent instanceof Actor`, `item.type === "effect"`) matches this
+module's own patched "Spell Effect: Untamed Form (Weredragon Homebrew)"
+effect by its existing explicit `system.slug`, `"untamed-form"` (set for
+the reasons in the `system.slug` overrides section above). When it fires
+and the actor also has a feat named exactly "Perfect Form Control", the
+just-created effect's own `system.duration` is overwritten to `{expiry:
+null, sustained: false, unit: "unlimited", value: -1}` — the real
+vanilla shape for "lasts until you Dismiss it," copied verbatim from a
+real official effect with that exact duration (`Effect: A Little Bird
+Told Me...`, `packs/pf2e/feat-effects/effect-a-little-bird-told-me.json`
+— found by grepping the downloaded compendium for `"unit": "unlimited"`,
+not guessed), rather than any custom "no expiry" scheme invented for
+this module.
+
+**One hook covers every path this effect can be created through** —
+manual drag-and-drop from the compendium and the `untamed-form-
+toggle.json` hotbar macro's own `createEmbeddedDocuments` call both
+create a real embedded Item and both fire `createItem` — unlike Bizarre
+Transformation/Healing Transformation, which needed a second, direct
+macro-call trigger path because their own activation is a `RollOption`
+toggle on an *existing* item, not a new item being created. Casting the
+patched Untamed Form spell doesn't create this effect either way (per
+the item's own section above — the player still drags/opens the linked
+effect manually after casting), so it's covered by the same drag-and-drop
+path, not a third trigger.
+
+**Feat matched by name, not slug — confirmed, not assumed, from the real
+source**: `src/module/item/base/document.ts`'s `get slug()` is a bare
+`return this.system.slug`, and that field's schema default is `initial:
+null` (`src/module/item/base/data/model.ts`) with nothing anywhere in
+`_preCreate`/`prepareBaseData` ever deriving it from the item's name —
+only `getRollOptions()` and a handful of other call sites do
+`this.slug ?? sluggify(this.name)` themselves, each at its own call site,
+never mutating `system.slug` itself. Perfect Form Control's real
+compendium source has no explicit `system.slug` (checked directly), so
+`feat.slug` reads `null` for it forever, on the compendium copy and any
+actor's embedded copy alike — matching by exact item name instead is the
+same established workaround `aeon-stone-healing.js` already uses for the
+identical situation with an unmodified vanilla item.
+
+**Not yet live-verified** — built and reasoned through source the same
+way several earlier fixes in this file started out, but not confirmed
+against a real actor with the feat in an actual running game session.
+Worth confirming (or fixing) the first time a level-18+ character with
+Perfect Form Control actually shifts into Untamed Form in play. Also
+deliberately one-way, matching this module's own established scope
+elsewhere: if Perfect Form Control is ever removed from a character
+after an unlimited-duration effect was already granted, the effect
+doesn't revert back to a timed duration — not asked for, and symmetrical
+handling wasn't built.
+
 ## Keeping in sync with upstream pf2e system updates
 
 If the pf2e system reworks Werecreature Dedication (errata, new
