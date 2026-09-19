@@ -1,10 +1,11 @@
 /**
- * Automates the recharge timer both Breath Weapon (Kaiju) and every
- * Dragon Breath spell describe in their own real text -- "Once activated,
- * it can't be used again for 1d4 rounds" -- by creating a real "Breath
- * Weapon Recharging (Weredragon Homebrew)" effect item on the caster
- * whenever one of those spells is cast, with a freshly-rolled 1d4 as its
- * duration. Previously this was only a rollable inline link in each
+ * Automates the recharge timer Breath Weapon (Kaiju), every Dragon Breath
+ * spell, and (added later, on request -- see the correction below) the
+ * Weredragon Breath Weapon spell all describe in their own real text --
+ * "Once activated, it can't be used again for 1d4 rounds" -- by creating a
+ * real "Breath Weapon Recharging (Weredragon Homebrew)" effect item on the
+ * caster whenever one of those spells is cast, with a freshly-rolled 1d4
+ * as its duration. Previously this was only a rollable inline link in each
  * spell's own description (`[[/r 1d4 #Recharge Breath Weapon]]`); this
  * script doesn't replace that text, it adds a real, visible, expiring
  * effect alongside it.
@@ -15,11 +16,24 @@
  * message's `.item` back to the correctly-heightened spell instance, so
  * a plain `Hooks.on("createChatMessage", ...)` handler checking
  * `message.item?.slug` is sufficient -- no need to parse chat-card HTML.
- * Matches both `breath-weapon-kaiju` (the Kaiju spell's own explicit
- * slug) and any `dragon-breath-<type>` slug (all 40 Dragon Breath
- * spells already have one, per this repo's own established
- * always-set-an-explicit-slug convention -- see the "system.slug
- * overrides" section of CLAUDE.md).
+ * `isBreathWeaponSpell()` matches `breath-weapon-kaiju`,
+ * `weredragon-breath-weapon` (both explicit slugs), and any
+ * `dragon-breath-<type>` slug (all 40 Dragon Breath spells already have
+ * one, per this repo's own established always-set-an-explicit-slug
+ * convention -- see the "system.slug overrides" section of CLAUDE.md).
+ *
+ * **Extended to Weredragon Breath Weapon on request, to match Dragon
+ * Form/Kaiju exactly**: `weredragon-breath-weapon-spell.json` gained the
+ * same `system.frequency: {max: 1, per: "round", value: 1}` block the
+ * other 41 spells already had, and `isBreathWeaponSpell()` gained the
+ * matching slug check -- every other hook in this file (recharge-effect
+ * creation, the `pf2e.endTurn` expiry check, the `deleteItem` frequency/
+ * uses reset) is keyed purely off that one function, so no other code
+ * needed to change. Casting Weredragon Breath Weapon already produces a
+ * normal spell chat message via the sheet's own Cast button (it's granted
+ * as a real innate spell by the Hybrid/Animal form macros, same as Dragon
+ * Breath/Kaiju), so the existing `createChatMessage` trigger covers it
+ * with no separate trigger path needed.
  *
  * **Only one recharge timer is ever active at a time**: any existing
  * copy of the effect (matched by its own explicit slug,
@@ -74,7 +88,11 @@ const BREATH_WEAPON_RECHARGE_SLUG = "breath-weapon-recharging";
 const RECHARGE_EFFECT_UUID = "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.BreathWpnRchrg01";
 
 function isBreathWeaponSpell(slug) {
-  return slug === "breath-weapon-kaiju" || !!slug?.startsWith("dragon-breath-");
+  return (
+    slug === "breath-weapon-kaiju" ||
+    slug === "weredragon-breath-weapon" ||
+    !!slug?.startsWith("dragon-breath-")
+  );
 }
 
 async function applyBreathWeaponRecharge(actor) {

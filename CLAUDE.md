@@ -558,6 +558,19 @@ working against a genuine new poison attack in play — the first fix
 in this file verified against an actual live re-test after being
 reported broken, not just against previously-captured data.
 
+**Correction, on request**: the item's own description previously
+called the +1 AC/save-vs-poison bonus a "house rule," with a separate
+"**House rule**" callout paragraph at the end. Per the user, this is
+conceptually a property of the black dragon hide material itself, not
+a separate house-rule carve-out — the trailing callout paragraph was
+removed and the opening summary line was reworded to attribute the
+bonus directly to the material ("The black dragon hide material itself
+grants a flat +1 bonus..."). Description-only change: the underlying
+`FlatModifier` rule elements, their `"type": "untyped"` choice, and the
+`origin:`-prefixed poison predicate are all unaffected — see the
+"found in play" sections above for why those are built the way they
+are.
+
 ## Fourth/fifth/sixth homebrew items: Monstrosity Form (Kaiju), Breath Weapon action + spell
 
 `src/packs/feats/spell-effect-monstrosity-form-kaiju.json` — a patched
@@ -1380,6 +1393,21 @@ Cast `<button>` element had `disabled: false`, meaning the fix is
 confirmed working through the literal same interaction path a real
 player uses, start to finish.
 
+**Extended to Weredragon Breath Weapon too, on request (v2.33.0)** — it
+previously had no recharge automation at all (no frequency limit, no
+recharge effect), unlike Dragon Breath/Kaiju. Brought in line with those
+two exactly: added the same `system.frequency: {max: 1, per: "round",
+value: 1}` block to `weredragon-breath-weapon-spell.json`, and added
+`weredragon-breath-weapon` as a third matched slug in
+`isBreathWeaponSpell()`. Since every hook in `breath-weapon-recharge.js`
+(recharge-effect creation on cast, the `pf2e.endTurn` expiry check, the
+`deleteItem`-driven frequency/`location.uses` reset) is keyed purely off
+that one function's return value, nothing else needed to change — the
+existing `createChatMessage` trigger already covers Weredragon Breath
+Weapon for free, since it's cast normally from the sheet's own Cast
+button (granted as a real innate spell by the Hybrid/Animal form
+macros), the same as Dragon Breath/Kaiju.
+
 ## `system.slug` overrides — required on every renamed spell effect
 
 Every patched spell-effect item above appends `[Weredragon Homebrew]`
@@ -1581,25 +1609,42 @@ change; revisit only if asked.
 **Now auto-granted in Hybrid/Animal form, like Dragon Breath is per
 dragon type.** Added `"slug": "weredragon-breath-weapon"` (had none),
 then wired the three Weredragon form-switch macros (see the hotbar
-macros section below) to grant/revoke it directly — `weredragon-form-
-hybrid.json`/`weredragon-form-animal.json` create it via `fromUuid(...
-).toObject()` + `createEmbeddedDocuments` if not already present
-(mirroring `untamed-form-toggle.json`'s own find-by-slug-then-create
-pattern exactly), and `weredragon-form-humanoid.json` deletes it if
-present. This can't go through a `GrantItem` rule element the way
-battle forms do, for the same reason already documented for Bizarre
-Transformation and Healing Transformation's own trigger paths: the
-Hybrid/Animal toggle is a `RollOption` update on the existing
-Werecreature Dedication item, not a new item being created, so there's
-no natural `GrantItem`/`createItem` hook point to attach to — a direct
-macro call is the established, reliable way this repo handles that
-specific toggle. `scripts/innate-spell-grants.js`'s `TRACKED_SLUGS`
-set was extended to include `weredragon-breath-weapon`, so the plain
+macros section below) to grant/revoke it directly — originally each
+macro's own inline command created it via `fromUuid(...).toObject()` +
+`createEmbeddedDocuments` if not already present (mirroring
+`untamed-form-toggle.json`'s own find-by-slug-then-create pattern
+exactly) and deleted it on reverting to Humanoid. This can't go through
+a `GrantItem` rule element the way battle forms do, for the same reason
+already documented for Bizarre Transformation and Healing
+Transformation's own trigger paths: the Hybrid/Animal toggle is a
+`RollOption` update on the existing Werecreature Dedication item, not a
+new item being created, so there's no natural `GrantItem`/`createItem`
+hook point to attach to — a direct macro call is the established,
+reliable way this repo handles that specific toggle.
+`scripts/innate-spell-grants.js`'s `TRACKED_SLUGS` set was extended to
+include `weredragon-breath-weapon`, so the plain
 `createEmbeddedDocuments` call from these macros gets the exact same
 "place it in a real spellcasting entry so it shows up in the tab" fix
 already applied to Dragon Breath/Kaiju/Spine Rake — the fix is keyed
 entirely off the spell's own slug at `createItem` time, so it doesn't
 matter that this grant path is a macro instead of a `GrantItem`.
+(v2.32.0 moved this grant/revoke logic — along with the toggle, sound,
+and Bizarre Transformation prompt/clear — out of the three macros'
+own inline commands and into a shared `shiftWeredragonForm(actor, form)`
+in `scripts/weredragon-form-shift.js`, so the macros are now thin
+wrappers; see the "Initiative prompt" section for why.)
+
+**Recharge automation added on request (v2.33.0), to match Dragon
+Form/Kaiju exactly** — see the "Breath Weapon Recharging" section
+above for the shared mechanism (`scripts/breath-weapon-recharge.js`):
+this spell gained the same `system.frequency: {max: 1, per: "round",
+value: 1}` block, and its slug was added to that script's
+`isBreathWeaponSpell()` matcher. Casting it now rolls a 1d4, creates the
+"Breath Weapon Recharging" effect, expends the spell's own use, and
+refreshes it automatically once the recharge effect's duration expires
+— identical behavior to Breath Weapon (Kaiju) and every Dragon Breath
+spell, with no separate trigger path needed since it's cast normally
+from the sheet like any other innate spell.
 
 ## Hotbar macro: one-click Untamed Form toggle
 
@@ -2441,6 +2486,99 @@ elsewhere: if Perfect Form Control is ever removed from a character
 after an unlimited-duration effect was already granted, the effect
 doesn't revert back to a timed duration — not asked for, and symmetrical
 handling wasn't built.
+
+## Healing Transformation: reverted to roll-only, no auto-apply (v2.32.0)
+
+On request, `applyHealingTransformation` (in `healing-transformation.js`)
+no longer applies the healing itself. v2.29.0 had added
+`actor.applyDamage({damage: -total, token})` right after the roll (plus a
+`flags.pf2e.suppressDamageButtons` flag on the resulting chat card) so
+shifting into Untamed Form healed the character with zero clicks. Per the
+new ask ("roll, but not automatically applied"), that auto-apply half is
+gone: the function now stops right after `tempSpell.rollDamage
+(skipDialogEvent)`, leaving the posted chat card's own Apply Healing
+button fully live, same as any other spell's damage/healing card. This
+is the same "cast the real spell, click Apply Healing yourself" shape the
+script had in between the original bare-`Roll` version and v2.29.0's
+auto-apply version — now current again. The `skipDialog` fix that also
+lives in this file (the fake-shift-click event, see the section above)
+is untouched — still needed regardless of whether the result gets
+auto-applied.
+
+## Initiative prompt: one-click Change Shape when rolling initiative (v2.32.0)
+
+`scripts/weredragon-form-shift.js` + `scripts/initiative-form-prompt.js`
+— on request, rolling initiative while in Humanoid form now offers a
+prompt to spend the free action and shift into Hybrid or Animal form,
+producing the identical result the "Weredragon Form: Hybrid"/"Animal"
+hotbar macros already do.
+
+**Shared logic factored out first**: the three `weredragon-form-
+{humanoid,hybrid,animal}.json` macros previously each inlined their own
+copy of "toggle Change Shape, play the matching sound, grant/revoke the
+Weredragon Breath Weapon spell, prompt/clear Bizarre Transformation."
+Since the new initiative trigger needed to produce that exact same
+sequence ("as if the macro was triggered," the literal ask), that body
+was moved into `shiftWeredragonForm(actor, form)` in the new
+`weredragon-form-shift.js`, exposed on `game.modules.get(MODULE_ID)` at
+`init` — the same shared-module-API convention already used for
+`promptBizarreTransformation`/`applyHealingTransformation`/
+`getOrCreateInnateEntry`. All three macros were rewritten to thin
+wrappers that resolve the acting actor and call
+`mod.shiftWeredragonForm(actor, "<form>")`; nothing about their own
+behavior changed, only where the logic lives (round-trip verified:
+compiled → extracted → diffed against source, identical apart from the
+pre-existing `_key`-field-position cosmetic difference).
+
+**Detecting "initiative was just rolled"**: confirmed directly against
+the compiled pf2e system source (via the same SSH access documented in
+the "Keeping in sync" section below) that every check roll's resulting
+chat message carries `flags.pf2e.context.type`, and that an initiative
+roll specifically sets `type: "initiative"` (`CheckPF2e`'s own message-
+building code does `type: t.type ?? "check"` into `context`, and
+separately gates `core: {initiativeRoll: true}` on that exact same
+`t.type === "initiative"` check — read together, both confirm the
+requested check type really does thread through as `context.type`).
+`initiative-form-prompt.js` hooks `createChatMessage` (same event this
+module already relies on for Healing Transformation's own cast-detection
+and Breath Weapon Recharging) and checks
+`message.flags?.pf2e?.context?.type === "initiative"`.
+
+**Only the actor's own client acts, not every connected client**: gated
+on `actor.primaryUpdater === game.user` — confirmed the correct "exactly
+one client" idiom already established in this module by
+`aeon-stone-healing.js` (which uses the same check, itself confirmed
+against `EffectTracker`'s own internal use of `primaryUpdater`) — rather
+than the `userId === game.user.id` (message-creator) guard used
+elsewhere in this module, since a Dialog needs to reach the actor's
+owning client specifically, not whichever client happened to trigger the
+roll.
+
+**Only prompts while currently in Humanoid form, and only for a
+Werecreature**: gated on `actor.rollOptions.all["change-shape"]` (skips
+any actor without the Werecreature Dedication feat's toggle at all) and
+`actor.rollOptions.all["change-shape:humanoid"]` (skips an actor already
+in Hybrid/Animal form). Confirmed by reading
+`RollOptionRuleElement#setOption()` directly: a toggled-on suboption
+sets both the bare option (`change-shape`) and the `<option>:<selection>`
+option (`change-shape:humanoid`, the default first suboption per
+`werecreature-dedication.json`'s own `RollOption` RE) — the same
+predicate shape already used throughout this file (`change-shape:hybrid`/
+`:animal`) for every other Weredragon-specific rule element.
+
+**The prompt itself** is a `Dialog.wait()` with three buttons (Hybrid,
+Animal, Stay Humanoid/skip) — same shape as Bizarre Transformation's own
+prompt. Picking Hybrid or Animal calls
+`mod.shiftWeredragonForm(actor, choice)` directly; skipping does nothing.
+
+**Not live-verified this session** — no running game session was
+available to test against, unlike several other fixes in this file that
+were confirmed via a live CDP connection before shipping. Built and
+reasoned through the compiled system source directly (via the same SSH
+access used elsewhere in this file), same standard held elsewhere in
+this repo, but worth confirming the first time initiative is actually
+rolled with Werecreature Dedication (this module's patched version) on
+the character.
 
 ## Keeping in sync with upstream pf2e system updates
 

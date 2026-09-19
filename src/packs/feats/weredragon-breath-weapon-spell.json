@@ -33,6 +33,11 @@
       "sustained": false,
       "value": ""
     },
+    "frequency": {
+      "max": 1,
+      "per": "round",
+      "value": 1
+    },
     "heightening": {
       "damage": {
         "0": "1d12"
