@@ -221,13 +221,6 @@
         "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.InexorableEffct1"
       },
       {
-        "key": "TokenImage",
-        "predicate": [
-          "monstrosity-form:cave-worm"
-        ],
-        "value": "https://assets.forge-vtt.com/606afd8ff876ca5c729ba36a/pf2e/tokens/dregor/tokens/cave-worm-form.webp"
-      },
-      {
         "brackets": [
           {
             "start": 8,
@@ -400,13 +393,6 @@
         "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.ShrdFlmActiveEf1"
       },
       {
-        "key": "TokenImage",
-        "predicate": [
-          "monstrosity-form:phoenix"
-        ],
-        "value": "https://assets.forge-vtt.com/606afd8ff876ca5c729ba36a/pf2e/tokens/dregor/tokens/phoenix-form.webp"
-      },
-      {
         "brackets": [
           {
             "start": 8,
@@ -523,13 +509,6 @@
           "monstrosity-form:sea-serpent"
         ],
         "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.SpnRakeSpl0001XY"
-      },
-      {
-        "key": "TokenImage",
-        "predicate": [
-          "monstrosity-form:sea-serpent"
-        ],
-        "value": "https://assets.forge-vtt.com/606afd8ff876ca5c729ba36a/pf2e/tokens/dregor/tokens/sea-serpent-form.webp"
       }
     ],
     "start": {

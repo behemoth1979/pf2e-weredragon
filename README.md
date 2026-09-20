@@ -74,36 +74,34 @@ Finally, it includes a patched **Spell Effect: Monstrosity Form
 only describes in text: it grants a **Breath Weapon** action that
 activates a real **Breath Weapon (Kaiju)** spell (60-foot cone, 15d6
 damage, basic Reflex save that rolls against this character's actual
-spell DC, 1d4-round recharge), sets fly Speed to 180 feet, and swaps
-the token to `kaiju-form.webp`. Its damage type automatically matches
-whatever was chosen from the real "Heart of the Kaiju" feat (acid/
-cold/electricity/fire/sonic) the first time it's granted, no manual
-setup needed. Drag it onto the sheet in place of the vanilla spell
-effect while transformed.
+spell DC, 1d4-round recharge), and sets fly Speed to 180 feet. Its
+damage type automatically matches whatever was chosen from the real
+"Heart of the Kaiju" feat (acid/cold/electricity/fire/sonic) the first
+time it's granted, no manual setup needed. Drag it onto the sheet in
+place of the vanilla spell effect while transformed.
 
 The module also patches the shared **Spell Effect: Monstrosity Form**
 item covering the other three battle forms (Cave Worm, Phoenix, Sea
-Serpent), adding a token swap for each (`cave-worm-form.webp`,
-`phoenix-form.webp`, `sea-serpent-form.webp`) and, for Sea Serpent, a
-**Spine Rake** action that activates a real **Spine Rake (Sea
-Serpent)** spell (4d8+10 slashing, basic Reflex save vs. this
-character's spell DC). For Cave Worm, it automatically grants
-**Inexorable**, which recovers you from Paralyzed, Slowed, and Stunned
-at the end of every one of your turns while transformed — no manual
-tracking needed. For Phoenix, it automatically enables **Shroud of
-Flame**'s damage: while the aura's on/off toggle is active, any
-creature that ends its turn within 20 feet takes 2d6 fire damage, with
-a normal clickable Apply Damage button — the vanilla item only ever
-implemented the aura's visual ring and toggle, never the actual
-damage.
+Serpent). For Sea Serpent, it adds a **Spine Rake** action that
+activates a real **Spine Rake (Sea Serpent)** spell (4d8+10 slashing,
+basic Reflex save vs. this character's spell DC). For Cave Worm, it
+automatically grants **Inexorable**, which recovers you from
+Paralyzed, Slowed, and Stunned at the end of every one of your turns
+while transformed — no manual tracking needed. For Phoenix, it
+automatically enables **Shroud of Flame**'s damage: while the aura's
+on/off toggle is active, any creature that ends its turn within 20
+feet takes 2d6 fire damage, with a normal clickable Apply Damage
+button — the vanilla item only ever implemented the aura's visual ring
+and toggle, never the actual damage.
 
 It also patches all 13 of Animal Form's per-animal spell effects (Ape,
 Bear, Bull, Canine, Cat, Crab, Crocodile, Deer, Frog, Orca, Seal,
-Shark, Snake) with matching token swaps, Dragon Form's Stormcrown
-dragon type with a token swap to `dragon-form.webp`, and Aerial Form
-(Bat/Bird/Wasp/Pterosaur) with a single token swap to
-`aerial-form.webp` that applies regardless of which of the four
-creatures you choose.
+Shark, Snake), Dragon Form, and Aerial Form so their size (Large,
+Huge, etc.) actually resolves correctly for a level 20 character —
+a dragged-on (not cast) form effect keeps whatever unheightened level
+it shipped with, and the vanilla items' own low level means their
+size brackets never trigger at all; these patched copies are bumped
+to level 20 so you always get your best size.
 
 The compendium also includes a real, castable **Dragon Breath**
 spell for every one of Dragon Form's 40 dragon types (e.g. "Dragon
@@ -121,9 +119,9 @@ spell DC.
 
 Finally, **Spell Effect: Untamed Form** is patched to replace the
 vanilla dynamic form picker with a static list of exactly the 17
-forms above — pick one from the dropdown and it grants that
-token-swapped homebrew version directly, instead of needing to drag
-individual patched items onto the sheet one at a time. Pest Form,
+forms above — pick one from the dropdown and it grants that patched
+homebrew version directly, instead of needing to drag individual
+patched items onto the sheet one at a time. Pest Form,
 Insect Form, Elemental Form, and Plant Form aren't in this list (no
 custom art yet) — use the real Untamed Form for those.
 
@@ -153,16 +151,6 @@ Macros**:
 
 No need to drag effects onto the sheet or dig through the Actions tab
 by hand each time.
-
-## Sound effects
-
-Shifting into any form this module has custom token art for (however
-you get there — dragging the patched spell effect on, picking it from
-the homebrew Untamed Form list, or one of the hotbar macros) plays a
-matching transformation sound for everyone at the table: Kaiju, all 13
-Animal Form animals, Aerial Form, Dragon Form (Stormcrown only), Cave
-Worm/Phoenix/Sea Serpent Monstrosity Form, and Weredragon's own Hybrid
-and Animal shapes.
 
 ## Aeon Stone (Pearly White Spindle) healing
 

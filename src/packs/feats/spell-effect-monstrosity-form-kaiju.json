@@ -94,10 +94,6 @@
         "flag": "kaijuBreathWeaponSpell",
         "key": "GrantItem",
         "uuid": "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.BrW3aponSpl00001"
-      },
-      {
-        "key": "TokenImage",
-        "value": "https://assets.forge-vtt.com/606afd8ff876ca5c729ba36a/pf2e/tokens/dregor/tokens/kaiju-form.webp"
       }
     ],
     "start": {

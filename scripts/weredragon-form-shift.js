@@ -2,9 +2,9 @@
  * Shared implementation behind the "shift Weredragon form" action, so a new
  * trigger can produce the exact same result as the three hotbar macros
  * (weredragon-form-{humanoid,hybrid,animal}.json) without re-deriving their
- * logic a third or fourth time -- toggle Change Shape, play the matching
- * transformation sound, grant/revoke the Weredragon Breath Weapon spell,
- * and prompt/clear Bizarre Transformation, all in one place.
+ * logic a third or fourth time -- toggle Change Shape, grant/revoke the
+ * Weredragon Breath Weapon spell, and prompt/clear Bizarre Transformation,
+ * all in one place.
  *
  * Added in v2.32.0 alongside initiative-form-prompt.js, which needed to
  * trigger this same sequence from a new place (rolling initiative) and
@@ -18,8 +18,14 @@
  *
  * The three macros were rewritten to thin wrappers that resolve the acting
  * actor and call `mod.shiftWeredragonForm(actor, "<form>")` -- their own
- * previously-inline toggle/sound/breath-weapon/Bizarre-Transformation logic
+ * previously-inline toggle/breath-weapon/Bizarre-Transformation logic
  * moved here unchanged, not reimplemented.
+ *
+ * **v2.34.0, on request: the transformation-sound half was removed
+ * entirely** (along with every TokenImage rule element and
+ * scripts/form-sounds.js -- see CLAUDE.md's removal section for the full
+ * list). `FORMS` no longer carries a `soundUrl` per form, and this
+ * function no longer calls `foundry.audio.AudioHelper.play(...)`.
  */
 
 (() => {
@@ -28,15 +34,9 @@ const MODULE_ID = "phil-pf2e-weredragon";
 const BREATH_WEAPON_UUID = "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.WdrgnBreathSpl01";
 
 const FORMS = {
-  humanoid: { label: "Humanoid", soundUrl: null },
-  hybrid: {
-    label: "Hybrid",
-    soundUrl: "https://assets.forge-vtt.com/606afd8ff876ca5c729ba36a/pf2e/audio/drengor/sounds/weredragon-hybrid.ogg",
-  },
-  animal: {
-    label: "Animal",
-    soundUrl: "https://assets.forge-vtt.com/606afd8ff876ca5c729ba36a/pf2e/audio/drengor/sounds/weredragon-animal.ogg",
-  },
+  humanoid: { label: "Humanoid" },
+  hybrid: { label: "Hybrid" },
+  animal: { label: "Animal" },
 };
 
 async function shiftWeredragonForm(actor, form) {
@@ -52,10 +52,6 @@ async function shiftWeredragonForm(actor, form) {
   }
 
   ui.notifications.info(`${actor.name} shifts to ${data.label} form.`);
-
-  if (data.soundUrl) {
-    foundry.audio.AudioHelper.play({ src: data.soundUrl, volume: 0.8, autoplay: true, loop: false }, true);
-  }
 
   const mod = game.modules.get(MODULE_ID);
 

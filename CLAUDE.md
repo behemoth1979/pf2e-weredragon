@@ -2580,6 +2580,57 @@ this repo, but worth confirming the first time initiative is actually
 rolled with Werecreature Dedication (this module's patched version) on
 the character.
 
+## Removed: token-image swap and transformation sound (v2.34.0)
+
+On request, all automation that changed a token's picture or played a
+sound when shifting into/out of a form was removed. This is a pure
+removal, not a fix or a scope change to anything else — everything else
+each affected file does (battle form mechanics, granted items, damage
+automation, etc.) is untouched.
+
+**Removed entirely**:
+- Every `TokenImage` rule element across the module: Werecreature
+  Dedication's own two (`werecreature:weredragon` + `change-shape:
+  hybrid`/`:animal`), all 13 Animal Form animal files, Aerial Form,
+  Dragon Form's single Stormcrown entry, Monstrosity Form's three
+  (Cave Worm/Phoenix/Sea Serpent), and Kaiju's one. Removed via a
+  throwaway Node script filtering each file's `system.rules` for
+  `key !== "TokenImage"` (matches this repo's own established practice
+  for large/repetitive structural edits — see the Dragon Breath/token-
+  swap sections above) rather than hand-editing 18 files; round-trip
+  verified (compile → extract → diff) clean afterward.
+- `scripts/form-sounds.js`, deleted outright and dropped from
+  `module.json`'s `scripts` array — this was the entire mechanism for
+  playing a sound when any battle-form effect (Kaiju, Animal Form,
+  Aerial Form, Monstrosity Form, Dragon Form's Stormcrown) was created
+  on an actor.
+- The sound-playing half of `scripts/weredragon-form-shift.js` (the
+  `soundUrl` field per form in its `FORMS` map, and the
+  `foundry.audio.AudioHelper.play(...)` call) — this was Weredragon's
+  own Hybrid/Animal sound, played directly from the shared
+  `shiftWeredragonForm()` function rather than from a `createItem`
+  hook (per the "Sound effects on transformation" section above,
+  Weredragon's toggle-based shift was never reachable by
+  `form-sounds.js`'s own `createItem` hook in the first place).
+
+**Left alone, on purpose**: the actual asset files under
+`assets/tokens/*.webp` and `assets/sounds/*.ogg` (and their uploaded
+copies in Forge's Assets Library) were not deleted — only the *logic*
+that referenced them was, per what was actually asked. They're inert,
+unreferenced files now; say the word if they should be cleaned up too.
+Also untouched: `TokenImage` REs' own former Forge Assets Library URL
+scheme (documented in the "Release process" section below) is now
+moot for this file set, but that section's own history was left as-is
+rather than rewritten, matching this repo's practice of correcting
+forward rather than editing away past narrative.
+
+The "Animal Form, Dragon Form, and Aerial Form token swaps" and "Sound
+effects on transformation" sections above, and the TokenImage/sound
+portions of the Kaiju, Monstrosity Form, and Weredragon Hybrid/Animal
+sections, now describe automation that no longer exists in the current
+code — kept as history of how and why it was built, not as current
+behavior.
+
 ## Keeping in sync with upstream pf2e system updates
 
 If the pf2e system reworks Werecreature Dedication (errata, new
