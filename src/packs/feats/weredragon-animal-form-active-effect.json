@@ -13,7 +13,7 @@
       "sustained": false
     },
     "tokenIcon": {
-      "show": false
+      "show": true
     },
     "traits": {
       "rarity": "common",

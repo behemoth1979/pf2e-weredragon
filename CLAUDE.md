@@ -1759,6 +1759,51 @@ form-shift path already funnels through this one shared function (the
 three hotbar macros' thin wrappers, and the initiative-form-prompt.js
 trigger), no separate wiring was needed anywhere else.
 
+**Bug found in play, fixed (v2.36.2): the third-party "Visage" module's
+own status-based automation (used to re-implement the token-image swap
+this repo removed on request — see the removal section above) never
+triggered for either marker effect, despite an identically-configured
+automation rule already working correctly for the vanilla battle-form
+effects (Kaiju, Animal Form (Ape), etc.).** Root-caused live via a
+Chrome DevTools Protocol connection to the user's own test-box session
+(logged in as GM, actor "Drengor") rather than guessed: pulled Visage's
+own source directly off the host filesystem (same SSH access used
+throughout this file) and read `VisageAutomation._evalStatus()`
+(`modules/visage/src/core/visage-automation.js`) — for a `type:
+"status"` condition with a `customStatus` string (as opposed to a real
+core-Foundry `statusId`), it searches `actor.appliedEffects || actor
+.effects || []` for an entry whose `.name` matches, case-insensitively.
+
+Reading `ActorPF2e#get appliedEffects()` directly in the compiled pf2e
+source (`pf2e.mjs`) confirms exactly why the vanilla forms match and
+ours didn't: `this.itemTypes.effect.filter((e) => e.system.tokenIcon
+?.show && (e.isIdentified || game.user.isGM))` — **only `type: "effect"`
+items with `system.tokenIcon.show` truthy are included at all.** Every
+vanilla battle-form effect this module patches (Kaiju, all 13 Animal
+Form animals, etc.) already has `tokenIcon.show: true` (checked
+directly, not assumed). Both new Weredragon marker effects were
+authored with `tokenIcon.show: false` instead — deliberately copied
+from `shroud-of-flame-active-effect.json`'s own precedent, which is a
+*correct* choice for a marker nobody needs to see a status icon for,
+but wrong here now that a marker's whole purpose is to be observed by
+external automation via `appliedEffects`.
+
+**Verified live before fixing the source**: patched the actor's
+already-embedded "Weredragon Hybrid Form" effect directly
+(`effect.update({"system.tokenIcon.show": true})`) and confirmed
+`actor.appliedEffects` immediately picked it up by name — then,
+without touching anything else, watched the token's own texture
+actually change to `weredragon-hybrid.webp` per the user's existing
+Visage automation rule, with zero further action needed. Fixed at the
+source by flipping `tokenIcon.show` to `true` in both
+`weredragon-hybrid-form-active-effect.json` and `weredragon-animal-
+form-active-effect.json` — no other field, and no code in
+`weredragon-form-shift.js`, needed to change. Since both marker
+effects are freshly created from the compendium source by
+`shiftWeredragonForm()` on every shift (never dragged once and kept
+around), this fix takes effect the next time either actor shifts form,
+with no manual re-drag needed on any character already using them.
+
 ## Sound effects on transformation (every form with custom art)
 
 Originally shipped as Kaiju-only (`scripts/kaiju-roar.js`); extended in
