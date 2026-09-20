@@ -137,6 +137,12 @@ added to your Spellcasting tab whenever you shift into Hybrid or Animal
 form via the hotbar macros below, and removed again on reverting to
 Humanoid.
 
+Shifting into Hybrid or Animal form also grants a matching marker
+effect (**Weredragon Hybrid Form** / **Weredragon Animal Form**, using
+the same icon as the corresponding hotbar macro below) so it's visible
+at a glance which shape you're in; it's removed automatically when you
+shift again.
+
 ## Hotbar macros
 
 The module includes a second compendium, **Homebrew: Weredragon

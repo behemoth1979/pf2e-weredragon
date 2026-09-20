@@ -3,8 +3,8 @@
  * trigger can produce the exact same result as the three hotbar macros
  * (weredragon-form-{humanoid,hybrid,animal}.json) without re-deriving their
  * logic a third or fourth time -- toggle Change Shape, grant/revoke the
- * Weredragon Breath Weapon spell, and prompt/clear Bizarre Transformation,
- * all in one place.
+ * Weredragon Breath Weapon spell, keep the active-form marker effect in
+ * sync, and prompt/clear Bizarre Transformation, all in one place.
  *
  * Added in v2.32.0 alongside initiative-form-prompt.js, which needed to
  * trigger this same sequence from a new place (rolling initiative) and
@@ -26,6 +26,17 @@
  * scripts/form-sounds.js -- see CLAUDE.md's removal section for the full
  * list). `FORMS` no longer carries a `soundUrl` per form, and this
  * function no longer calls `foundry.audio.AudioHelper.play(...)`.
+ *
+ * **v2.36.0, on request: two new marker effects track which Weredragon
+ * form is active** ("Weredragon Hybrid Form" / "Weredragon Animal Form",
+ * each using the same icon as its matching hotbar macro; on request,
+ * v2.36.1 dropped the "(Weredragon Homebrew)" suffix from both names). No rule elements of their own -- purely a
+ * visible, inspectable "is the actor currently Hybrid/Animal" marker, same
+ * shape as shroud-of-flame-active-effect.json. `syncFormEffect()` deletes
+ * whichever of the two (if either) doesn't match the new form and creates
+ * the matching one if it isn't already present -- shifting to Humanoid
+ * removes both, matching the breath-weapon-spell grant/revoke this
+ * function already does right below it.
  */
 
 (() => {
@@ -38,6 +49,30 @@ const FORMS = {
   hybrid: { label: "Hybrid" },
   animal: { label: "Animal" },
 };
+
+const FORM_EFFECT_SLUGS = {
+  hybrid: "weredragon-hybrid-active",
+  animal: "weredragon-animal-active",
+};
+const FORM_EFFECT_UUIDS = {
+  hybrid: "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.WdrgnHybridAct01",
+  animal: "Compendium.phil-pf2e-weredragon.weredragon-feats.Item.WdrgnAnimalAct01",
+};
+
+async function syncFormEffect(actor, form) {
+  const targetSlug = FORM_EFFECT_SLUGS[form] ?? null;
+
+  const stale = actor.items.filter(
+    (i) => i.type === "effect" && Object.values(FORM_EFFECT_SLUGS).includes(i.system.slug) && i.system.slug !== targetSlug,
+  );
+  for (const effect of stale) await effect.delete();
+
+  if (!targetSlug) return;
+  if (actor.items.find((i) => i.type === "effect" && i.system.slug === targetSlug)) return;
+
+  const source = await fromUuid(FORM_EFFECT_UUIDS[form]);
+  if (source) await actor.createEmbeddedDocuments("Item", [source.toObject()]);
+}
 
 async function shiftWeredragonForm(actor, form) {
   const data = FORMS[form];
@@ -52,6 +87,8 @@ async function shiftWeredragonForm(actor, form) {
   }
 
   ui.notifications.info(`${actor.name} shifts to ${data.label} form.`);
+
+  await syncFormEffect(actor, form);
 
   const mod = game.modules.get(MODULE_ID);
 

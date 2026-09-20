@@ -1725,6 +1725,40 @@ these three macros need the same string.
 To use: open **Homebrew: Weredragon Macros**, drag all three
 ("Weredragon Form: Humanoid/Hybrid/Animal") onto the hotbar.
 
+## Active-form marker effects for Weredragon Hybrid/Animal (v2.36.0)
+
+On request: two new plain marker effects, `weredragon-hybrid-form-
+active-effect.json` ("Weredragon Hybrid Form", slug `weredragon-
+hybrid-active`) and `weredragon-animal-form-active-effect.json`
+("Weredragon Animal Form", slug `weredragon-animal-active`), each using
+the exact same `img` as its matching hotbar macro (`icons/creatures/
+abilities/mouth-teeth-long-red.webp` for Hybrid, `icons/creatures/
+reptiles/dragon-horned-blue.webp` for Animal) — same shape as
+`shroud-of-flame-active-effect.json` (`system.rules: []`, unlimited
+duration, `tokenIcon.show: false`, purely a visible/inspectable "which
+Weredragon form is active" flag, not meant to be dragged onto a sheet
+manually).
+
+**Correction, on request (v2.36.1): the "(Weredragon Homebrew)" suffix
+was dropped from both names**, matching the same reasoning already
+applied to the 17 patched battle-form spell effects (see the
+`system.slug` overrides section above) — no functional effect, since
+these two items are matched by their explicit `system.slug` in
+`syncFormEffect()`, never by name.
+
+**Kept in sync from the one place that already handles every Weredragon
+form-shift trigger**: `scripts/weredragon-form-shift.js`'s
+`shiftWeredragonForm(actor, form)` gained a `syncFormEffect(actor,
+form)` call, run right after the `change-shape` toggle succeeds (before
+the existing breath-weapon-spell grant/revoke and Bizarre Transformation
+prompt/clear). It deletes whichever of the two marker effects (if
+either) doesn't match the new form, then creates the matching one if
+not already present; shifting to Humanoid has no matching slug, so both
+get removed and neither gets created. Since every Weredragon
+form-shift path already funnels through this one shared function (the
+three hotbar macros' thin wrappers, and the initiative-form-prompt.js
+trigger), no separate wiring was needed anywhere else.
+
 ## Sound effects on transformation (every form with custom art)
 
 Originally shipped as Kaiju-only (`scripts/kaiju-roar.js`); extended in

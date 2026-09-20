@@ -1,0 +1,43 @@
+{
+  "_id": "WdrgnAnimalAct01",
+  "img": "icons/creatures/reptiles/dragon-horned-blue.webp",
+  "name": "Weredragon Animal Form",
+  "system": {
+    "description": {
+      "value": "<p><em>Homebrew: marker effect present on the actor while shapeshifted into Weredragon's Animal form. Uses the same icon as the \"Weredragon Form: Animal\" hotbar macro. Granted automatically by that macro, the initiative form-shift prompt, or any other trigger that calls scripts/weredragon-form-shift.js's shiftWeredragonForm(actor, \"animal\") -- not meant to be dragged onto a sheet manually. Removed automatically when switching to Hybrid or Humanoid form.</em></p>"
+    },
+    "duration": {
+      "value": -1,
+      "unit": "unlimited",
+      "expiry": null,
+      "sustained": false
+    },
+    "tokenIcon": {
+      "show": false
+    },
+    "traits": {
+      "rarity": "common",
+      "value": []
+    },
+    "rules": [],
+    "slug": "weredragon-animal-active"
+  },
+  "type": "effect",
+  "_key": "!items!WdrgnAnimalAct01",
+  "sort": 776100,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "coreVersion": "14.366",
+    "systemId": "pf2e",
+    "systemVersion": "8.4.1",
+    "createdTime": 1735689600000,
+    "modifiedTime": 1735689600000,
+    "lastModifiedBy": "phildedication00"
+  },
+  "effects": []
+}

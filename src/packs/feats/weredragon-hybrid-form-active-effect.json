@@ -1,0 +1,43 @@
+{
+  "_id": "WdrgnHybridAct01",
+  "img": "icons/creatures/abilities/mouth-teeth-long-red.webp",
+  "name": "Weredragon Hybrid Form",
+  "system": {
+    "description": {
+      "value": "<p><em>Homebrew: marker effect present on the actor while shapeshifted into Weredragon's Hybrid form. Uses the same icon as the \"Weredragon Form: Hybrid\" hotbar macro. Granted automatically by that macro, the initiative form-shift prompt, or any other trigger that calls scripts/weredragon-form-shift.js's shiftWeredragonForm(actor, \"hybrid\") -- not meant to be dragged onto a sheet manually. Removed automatically when switching to Animal or Humanoid form.</em></p>"
+    },
+    "duration": {
+      "value": -1,
+      "unit": "unlimited",
+      "expiry": null,
+      "sustained": false
+    },
+    "tokenIcon": {
+      "show": false
+    },
+    "traits": {
+      "rarity": "common",
+      "value": []
+    },
+    "rules": [],
+    "slug": "weredragon-hybrid-active"
+  },
+  "type": "effect",
+  "_key": "!items!WdrgnHybridAct01",
+  "sort": 776000,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "coreVersion": "14.366",
+    "systemId": "pf2e",
+    "systemVersion": "8.4.1",
+    "createdTime": 1735689600000,
+    "modifiedTime": 1735689600000,
+    "lastModifiedBy": "phildedication00"
+  },
+  "effects": []
+}
