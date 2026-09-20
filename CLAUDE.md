@@ -1434,6 +1434,29 @@ for each of the 13 animals. **When adding any new patched spell
 effect to this repo, set this field too** — don't rely on
 auto-slugification once the name carries the homebrew suffix.
 
+**Correction, on request (v2.35.0): the `[Weredragon Homebrew]` name
+suffix was removed from all 17 patched battle-form spell effects plus
+the Untamed Form picker itself** (`spell-effect-aerial-form.json`, all
+13 `spell-effect-animal-form-*.json`, `spell-effect-dragon-form.json`,
+`spell-effect-monstrosity-form.json`, `spell-effect-monstrosity-form-
+kaiju.json`, and `spell-effect-untamed-form.json`) — their `name`
+fields now match the real vanilla items exactly (confirmed against a
+fresh pull of the `spell-effects` compendium, not assumed), because a
+third-party module the user runs looks these up by exact display name
+to recognize them, and the bracketed suffix was hiding them from it.
+**This is safe specifically because the `system.slug` overrides
+documented above already exist independently of the name** — they were
+never derived from `sluggify(name)` in the first place, they're a
+hardcoded field, so dropping the suffix from `name` doesn't reintroduce
+the `self:effect:X` collision this section warns about. The only
+remaining item still carrying a homebrew suffix in this family is
+`untamed-form-spell.json` (`type: "spell"`, name "Untamed Form
+[Weredragon Homebrew]") — left alone since the request was specifically
+about "spell effects," a different item type; extend the same rename to
+it if that turns out to matter too. The GrantItem/ChoiceSet/predicate
+matching this whole file documents elsewhere already keys off real IDs
+and slugs, never these names, so nothing else needed to change.
+
 ## `@UUID[...Item.<Name>]` content links need the real ID, not the name
 
 Every patched spell effect's description opens with `Granted by

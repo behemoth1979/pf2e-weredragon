@@ -1,7 +1,7 @@
 {
   "_id": "MonForm00Weredr1",
   "img": "systems/pf2e/icons/spells/monstrosity-form.webp",
-  "name": "Spell Effect: Monstrosity Form [Weredragon Homebrew]",
+  "name": "Spell Effect: Monstrosity Form",
   "type": "effect",
   "system": {
     "description": {
