@@ -2589,6 +2589,26 @@ after an unlimited-duration effect was already granted, the effect
 doesn't revert back to a timed duration — not asked for, and symmetrical
 handling wasn't built.
 
+**Extended on request: the granted battle-form effect itself needed the
+same fix, not just the Untamed Form wrapper.** Picking a form from the
+picker's `ChoiceSet` grants a *second*, separate embedded item (e.g.
+"Spell Effect: Animal Form (Ape)") via the same `GrantItem` — its own
+`system.duration` is whatever the vanilla battle form normally uses (1
+minute for most forms, 10 for Pest Form), entirely independent of the
+wrapper's duration. Forcing only the wrapper's duration unlimited left
+the actual shape expiring on schedule regardless and reverting the
+character — the wrapper effect persisting unlimited never mattered if
+the shape itself still timed out. Fixed by widening the `createItem`
+match from the single `"untamed-form"` slug to a `TRACKED_SLUGS` set
+covering the wrapper plus all 17 forms its `ChoiceSet` can grant (the
+same flat slug list `bizarre-transformation.js`'s own
+`BATTLE_FORM_SLUGS` already uses, plus `"untamed-form"` itself) — both
+the wrapper and the granted form effect fire their own `createItem`
+event (`GrantItem` creates them as sibling embedded items, not nested),
+so one hook already covers both with no ordering concerns: Perfect Form
+Control is a pre-existing feat being queried at that moment, not
+something created in the same batch.
+
 ## Healing Transformation: reverted to roll-only, no auto-apply (v2.32.0)
 
 On request, `applyHealingTransformation` (in `healing-transformation.js`)
